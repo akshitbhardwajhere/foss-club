@@ -94,80 +94,6 @@ npm run dev
 
 The frontend application will be available at `http://localhost:3000`.
 
-## 🔐 Admin Access
-
-After starting the backend, you can create an admin user:
-
-```bash
-# Run the script to create an admin
-cd server
-npx ts-node src/scripts/createAdmin.ts
-```
-
-**Default Admin Credentials:**
-- **Email**: [EMAIL_ADDRESS]`
-- **Password**: `admin123` (change this immediately after login)
-
-## 📝 Usage
-
-### Creating Content
-
-**Events:**
-```bash
-# Create a new event
-curl -X POST http://localhost:5000/api/events \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <admin_token>" \
-  -d '{
-    "title": "Tech Workshop",
-    "description": "Learn about new technologies",
-    "date": "2024-12-01T10:00:00Z",
-    "location": "Auditorium"
-  }'
-```
-
-**News:**
-```bash
-# Create a news post
-curl -X POST http://localhost:5000/api/news \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <admin_token>" \
-  -d '{
-    "title": "New Event Announced",
-    "content": "We are excited to announce...",
-    "author": "FOSS Team"
-  }'
-```
-
-**Blogs:**
-```bash
-# Create a blog post
-curl -X POST http://localhost:5000/api/blogs \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <admin_token>" \
-  -d '{
-    "title": "Getting Started with Open Source",
-    "content": "A beginner's guide...",
-    "author": "Jane Doe",
-    "tags": ["opensource", "beginner"]
-  }'
-```
-
-**Team Members:**
-```bash
-# Add a team member
-curl -X POST http://localhost:5000/api/team \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <admin_token>" \
-  -d '{
-    "name": "John Smith",
-    "role": "President",
-    "email": "[EMAIL_ADDRESS]",
-    "githubUrl": "https://github.com/john",
-    "linkedinUrl": "https://linkedin.com/in/john"
-  }'
-```
-
 ## 📂 API Endpoints
 
 ### Authentication
@@ -180,13 +106,6 @@ curl -X POST http://localhost:5000/api/team \
 - `POST /api/events` - Create event (admin)
 - `PUT /api/events/:id` - Update event (admin)
 - `DELETE /api/events/:id` - Delete event (admin)
-
-### News
-- `GET /api/news` - Get all news
-- `GET /api/news/:id` - Get news by ID
-- `POST /api/news` - Create news (admin)
-- `PUT /api/news/:id` - Update news (admin)
-- `DELETE /api/news/:id` - Delete news (admin)
 
 ### Blogs
 - `GET /api/blogs` - Get all blogs
