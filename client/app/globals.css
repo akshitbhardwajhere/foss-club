@@ -80,6 +80,9 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
+  --foss-main: #08b74f;
+  --foss-background: #09090b;
+  --foss-text: #ffffff;
 }
 
 .dark {
@@ -123,4 +126,28 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Custom Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(8, 183, 79, 0.2);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(8, 183, 79, 0.6);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(8, 183, 79, 0.2) transparent;
 }

@@ -1,0 +1,107 @@
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.deleteEvent = exports.updateEvent = exports.createEvent = exports.getEventById = exports.getEvents = void 0;
+const prisma_1 = __importDefault(require("../config/prisma"));
+const getEvents = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const events = yield prisma_1.default.event.findMany({
+            orderBy: { createdAt: "desc" },
+        });
+        res.json(events);
+    }
+    catch (error) {
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+exports.getEvents = getEvents;
+const getEventById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const id = req.params.id;
+        const event = yield prisma_1.default.event.findUnique({ where: { id } });
+        if (event) {
+            res.json(event);
+        }
+        else {
+            res.status(404).json({ message: "Event not found" });
+        }
+    }
+    catch (error) {
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+exports.getEventById = getEventById;
+const createEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { title, description, date, location, imageUrl } = req.body;
+        const event = yield prisma_1.default.event.create({
+            data: {
+                title,
+                description,
+                date: new Date(date),
+                location,
+                imageUrl,
+            },
+        });
+        res.status(201).json(event);
+    }
+    catch (error) {
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+exports.createEvent = createEvent;
+const updateEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { title, description, date, location, imageUrl } = req.body;
+        const id = req.params.id;
+        const eventExists = yield prisma_1.default.event.findUnique({ where: { id } });
+        if (eventExists) {
+            const updatedEvent = yield prisma_1.default.event.update({
+                where: { id },
+                data: {
+                    title: title || undefined,
+                    description: description || undefined,
+                    date: date ? new Date(date) : undefined,
+                    location: location || undefined,
+                    imageUrl: imageUrl || undefined,
+                },
+            });
+            res.json(updatedEvent);
+        }
+        else {
+            res.status(404).json({ message: "Event not found" });
+        }
+    }
+    catch (error) {
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+exports.updateEvent = updateEvent;
+const deleteEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const id = req.params.id;
+        const eventExists = yield prisma_1.default.event.findUnique({ where: { id } });
+        if (eventExists) {
+            yield prisma_1.default.event.delete({ where: { id } });
+            res.json({ message: "Event removed" });
+        }
+        else {
+            res.status(404).json({ message: "Event not found" });
+        }
+    }
+    catch (error) {
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+exports.deleteEvent = deleteEvent;
