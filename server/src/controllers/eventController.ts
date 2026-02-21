@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../config/prisma";
+import { deleteCloudinaryImage } from "../utils/cloudinary";
 
 export const getEvents = async (req: Request, res: Response) => {
   try {
@@ -31,12 +32,13 @@ export const getEventById = async (
 
 export const createEvent = async (req: Request, res: Response) => {
   try {
-    const { title, description, date, location, imageUrl } = req.body;
+    const { title, description, category, date, location, imageUrl } = req.body;
 
     const event = await prisma.event.create({
       data: {
         title,
         description,
+        category,
         date: new Date(date),
         location,
         imageUrl,
@@ -54,20 +56,29 @@ export const updateEvent = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const { title, description, date, location, imageUrl } = req.body;
+    const { title, description, category, date, location, imageUrl } = req.body;
     const id = req.params.id as string;
 
     const eventExists = await prisma.event.findUnique({ where: { id } });
 
     if (eventExists) {
+      if (
+        imageUrl !== undefined &&
+        eventExists.imageUrl &&
+        imageUrl !== eventExists.imageUrl
+      ) {
+        await deleteCloudinaryImage(eventExists.imageUrl);
+      }
+
       const updatedEvent = await prisma.event.update({
         where: { id },
         data: {
           title: title || undefined,
           description: description || undefined,
+          category: category || undefined,
           date: date ? new Date(date) : undefined,
           location: location || undefined,
-          imageUrl: imageUrl || undefined,
+          imageUrl: imageUrl === "" ? null : imageUrl || undefined,
         },
       });
       res.json(updatedEvent);
@@ -89,6 +100,9 @@ export const deleteEvent = async (
     const eventExists = await prisma.event.findUnique({ where: { id } });
 
     if (eventExists) {
+      if (eventExists.imageUrl) {
+        await deleteCloudinaryImage(eventExists.imageUrl);
+      }
       await prisma.event.delete({ where: { id } });
       res.json({ message: "Event removed" });
     } else {

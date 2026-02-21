@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../config/prisma";
+import { deleteCloudinaryImage } from "../utils/cloudinary";
 
 export const getBlogs = async (req: Request, res: Response) => {
   try {
@@ -60,6 +61,14 @@ export const updateBlog = async (
     const blogExists = await prisma.blog.findUnique({ where: { id } });
 
     if (blogExists) {
+      if (
+        imageUrl !== undefined &&
+        blogExists.imageUrl &&
+        imageUrl !== blogExists.imageUrl
+      ) {
+        await deleteCloudinaryImage(blogExists.imageUrl);
+      }
+
       const updatedBlog = await prisma.blog.update({
         where: { id },
         data: {
@@ -67,7 +76,7 @@ export const updateBlog = async (
           content: content || undefined,
           author: author || undefined,
           tags: tags ? { set: tags } : undefined,
-          imageUrl: imageUrl || undefined,
+          imageUrl: imageUrl === "" ? null : imageUrl || undefined,
         },
       });
       res.json(updatedBlog);
@@ -89,6 +98,9 @@ export const deleteBlog = async (
     const blogExists = await prisma.blog.findUnique({ where: { id } });
 
     if (blogExists) {
+      if (blogExists.imageUrl) {
+        await deleteCloudinaryImage(blogExists.imageUrl);
+      }
       await prisma.blog.delete({ where: { id } });
       res.json({ message: "Blog removed" });
     } else {

@@ -21,7 +21,6 @@ export default function AdminLayout({
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     useEffect(() => {
-
         setIsMounted(true);
     }, []);
 

@@ -17,13 +17,13 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-[#050B08] text-white min-h-screen flex flex-col items-center pt-24 font-sans selection:bg-[#08B74F]/30 selection:text-white">
+    <div className="bg-[#050B08] text-white min-h-screen flex flex-col items-center font-sans selection:bg-[#08B74F]/30 selection:text-white">
       {/* Dynamic Background Blurs */}
       <BackgroundBlur />
 
       {/* Hero Section */}
       <motion.section
-        className="flex flex-col items-center justify-center pt-24 pb-32 px-4 w-full max-w-8xl z-10"
+        className="flex flex-col items-center justify-center min-h-screen pt-16 px-4 w-full max-w-8xl z-10"
         variants={containerVariants}
         initial="hidden"
         animate="visible"

@@ -3,10 +3,10 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, LucideIcon } from 'lucide-react';
 import Link from 'next/link';
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 interface StatBlock {
-    value: number | string;
+    value: number | string | ReactNode;
     label: string;
     valueColor?: string;
 }
@@ -19,6 +19,7 @@ interface AdminStatCardProps {
     stats: StatBlock[];
     colorTheme: 'blue' | 'green' | 'orange';
     colSpan?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     itemVariants: any; // Passed from parent layout
 }
 

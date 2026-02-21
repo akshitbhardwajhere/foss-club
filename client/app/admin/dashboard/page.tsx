@@ -25,14 +25,21 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 
 export default function AdminDashboardPage() {
     const dispatch = useAppDispatch();
     const router = useRouter();
 
     const handleLogout = async () => {
-        await dispatch(logoutAdmin()).unwrap();
-        router.push('/admin/login');
+        try {
+            await dispatch(logoutAdmin()).unwrap();
+            toast.success("Successfully signed out.");
+            router.push('/admin/login');
+        } catch (error) {
+            toast.error("Failed to sign out.");
+        }
     };
 
     const [stats, setStats] = useState({
@@ -128,10 +135,14 @@ export default function AdminDashboardPage() {
                         colorTheme="blue"
                         colSpan="lg:col-span-2"
                         itemVariants={itemVariants}
-                        stats={[
-                            { label: "Total", value: loadingStats ? "-" : stats.events.total, valueColor: "text-blue-400" },
-                            { label: "Past", value: loadingStats ? "-" : stats.events.past, valueColor: "text-zinc-400" },
-                            { label: "Upcoming", value: loadingStats ? "-" : stats.events.upcoming, valueColor: "text-[#08B74F]" }
+                        stats={loadingStats ? [
+                            { label: "Total", value: <Skeleton className="h-6 w-12 bg-zinc-800" />, valueColor: "text-blue-400" },
+                            { label: "Past", value: <Skeleton className="h-6 w-12 bg-zinc-800" />, valueColor: "text-zinc-400" },
+                            { label: "Upcoming", value: <Skeleton className="h-6 w-12 bg-zinc-800" />, valueColor: "text-[#08B74F]" }
+                        ] : [
+                            { label: "Total", value: stats.events.total, valueColor: "text-blue-400" },
+                            { label: "Past", value: stats.events.past, valueColor: "text-zinc-400" },
+                            { label: "Upcoming", value: stats.events.upcoming, valueColor: "text-[#08B74F]" }
                         ]}
                     />
 
@@ -143,8 +154,10 @@ export default function AdminDashboardPage() {
                         href="/admin/team"
                         colorTheme="green"
                         itemVariants={itemVariants}
-                        stats={[
-                            { label: "Active", value: loadingStats ? "-" : stats.team.total, valueColor: "text-[#08B74F]" }
+                        stats={loadingStats ? [
+                            { label: "Active", value: <Skeleton className="h-6 w-12 bg-zinc-800" />, valueColor: "text-[#08B74F]" }
+                        ] : [
+                            { label: "Active", value: stats.team.total, valueColor: "text-[#08B74F]" }
                         ]}
                     />
 
@@ -157,8 +170,10 @@ export default function AdminDashboardPage() {
                         colorTheme="orange"
                         colSpan="lg:col-span-2"
                         itemVariants={itemVariants}
-                        stats={[
-                            { label: "Published", value: loadingStats ? "-" : stats.blogs.total, valueColor: "text-orange-400" }
+                        stats={loadingStats ? [
+                            { label: "Published", value: <Skeleton className="h-6 w-12 bg-zinc-800" />, valueColor: "text-orange-400" }
+                        ] : [
+                            { label: "Published", value: stats.blogs.total, valueColor: "text-orange-400" }
                         ]}
                     />
 

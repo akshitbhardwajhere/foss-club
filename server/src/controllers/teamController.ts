@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../config/prisma";
+import { deleteCloudinaryImage } from "../utils/cloudinary";
 
 // @desc    Get all team members
 // @route   GET /api/team
@@ -91,15 +92,23 @@ export const updateTeamMember = async (
       return;
     }
 
+    if (
+      imageUrl !== undefined &&
+      teamMember.imageUrl &&
+      imageUrl !== teamMember.imageUrl
+    ) {
+      await deleteCloudinaryImage(teamMember.imageUrl);
+    }
+
     const updatedTeamMember = await prisma.teamMember.update({
       where: { id },
       data: {
         name,
         role,
         email,
-        githubUrl,
-        linkedinUrl,
-        imageUrl,
+        githubUrl: githubUrl === "" ? null : githubUrl,
+        linkedinUrl: linkedinUrl === "" ? null : linkedinUrl,
+        imageUrl: imageUrl === "" ? null : imageUrl,
       },
     });
 
@@ -127,6 +136,10 @@ export const deleteTeamMember = async (
       return;
     }
 
+    if (teamMember.imageUrl) {
+      await deleteCloudinaryImage(teamMember.imageUrl);
+    }
+
     await prisma.teamMember.delete({
       where: { id },
     });
@@ -148,12 +161,9 @@ export const reorderTeamMembers = async (
     const { items } = req.body;
 
     if (!Array.isArray(items)) {
-      res
-        .status(400)
-        .json({
-          message:
-            "Invalid payload format. Expected { items: [{ id, order }] }",
-        });
+      res.status(400).json({
+        message: "Invalid payload format. Expected { items: [{ id, order }] }",
+      });
       return;
     }
 

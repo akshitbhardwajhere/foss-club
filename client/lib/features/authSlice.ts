@@ -22,7 +22,11 @@ export const checkAuth = createAsyncThunk(
     try {
       const response = await api.get("/api/admin/me");
       return response.data;
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as any;
+      if (!error.response) {
+        return rejectWithValue("Network Error");
+      }
       const msg =
         error.response?.data?.message || error.message || "Not authenticated";
       return rejectWithValue(msg);
@@ -39,7 +43,11 @@ export const loginAdmin = createAsyncThunk(
     try {
       const response = await api.post("/api/admin/login", credentials);
       return response.data;
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as any;
+      if (!error.response) {
+        return rejectWithValue("Network Error");
+      }
       const msg =
         error.response?.data?.message || error.message || "Login failed";
       return rejectWithValue(msg);
@@ -53,7 +61,11 @@ export const logoutAdmin = createAsyncThunk(
     try {
       await api.post("/api/admin/logout");
       return true;
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as any;
+      if (!error.response) {
+        return rejectWithValue("Network Error");
+      }
       const msg =
         error.response?.data?.message || error.message || "Logout failed";
       return rejectWithValue(msg);

@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import api from '@/lib/axios';
 import { motion } from 'framer-motion';
 import { Calendar, MapPin, ArrowLeft } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface Event {
     id: string;
@@ -39,8 +40,32 @@ export default function EventDetailPage() {
 
     if (loading) {
         return (
-            <div className="bg-[#050B08] min-h-screen flex items-center justify-center">
-                <div className="w-10 h-10 border-4 border-[#08B74F] border-t-transparent flex rounded-full animate-spin" />
+            <div className="bg-[#050B08] text-white min-h-screen flex flex-col items-center overflow-x-hidden relative w-full pt-32 pb-20 px-4 font-sans">
+                <div className="max-w-4xl mx-auto w-full z-10 mt-12">
+                    <div className="bg-zinc-900/40 backdrop-blur-sm border border-zinc-800/50 rounded-3xl overflow-hidden shadow-2xl relative">
+                        {/* Hero Image Skeleton */}
+                        <Skeleton className="w-full h-[400px] bg-zinc-800/60" />
+
+                        <div className="p-8 md:p-12 relative -mt-20 flex flex-col items-center">
+                            {/* Title Skeleton */}
+                            <Skeleton className="h-12 w-3/4 mb-6 bg-zinc-800" />
+
+                            {/* Meta info Skeleton */}
+                            <div className="flex flex-wrap justify-center items-center gap-6 mb-10">
+                                <Skeleton className="h-10 w-32 rounded-full bg-zinc-800" />
+                                <Skeleton className="h-10 w-32 rounded-full bg-zinc-800" />
+                            </div>
+
+                            {/* Content Skeleton */}
+                            <div className="w-full max-w-3xl space-y-4">
+                                <Skeleton className="h-6 w-full bg-zinc-800" />
+                                <Skeleton className="h-6 w-11/12 bg-zinc-800" />
+                                <Skeleton className="h-6 w-full bg-zinc-800" />
+                                <Skeleton className="h-6 w-4/5 bg-zinc-800" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

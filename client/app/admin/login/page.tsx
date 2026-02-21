@@ -25,10 +25,14 @@ const formSchema = z.object({
 import { useAppDispatch } from '@/lib/store';
 import { loginAdmin } from '@/lib/features/authSlice';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 export default function AdminLoginPage() {
     const dispatch = useAppDispatch();
     const router = useRouter();
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -39,6 +43,7 @@ export default function AdminLoginPage() {
     })
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
+        setIsSubmitting(true);
         try {
             const payload = {
                 email: values.email,
@@ -46,11 +51,21 @@ export default function AdminLoginPage() {
             };
             const resultAction = await dispatch(loginAdmin(payload)).unwrap();
             if (resultAction) {
+                toast.success("Welcome back to the FOSS Admin Portal.");
                 router.push('/admin/dashboard');
             }
-        } catch (error) {
-            console.error("Login Failed:", error);
-            // Optionally add a toast notification here later
+        } catch (err: unknown) {
+            console.error("Login Failed:", err);
+            const error = err as any;
+
+            // Handle network errors (e.g. backend down) when authSlice explicitly passes it or when it bubbles up raw
+            if (error === 'Network Error' || error.message === 'Network Error') {
+                toast.error("Internal Server Error");
+            } else {
+                toast.error(error.message || error.response?.data?.message || error.error || error || "Invalid login credentials. Please try again.");
+            }
+        } finally {
+            setIsSubmitting(false);
         }
     }
 
@@ -76,6 +91,7 @@ export default function AdminLoginPage() {
 
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+
                             <FormField
                                 control={form.control}
                                 name="email"
@@ -102,8 +118,8 @@ export default function AdminLoginPage() {
                                     </FormItem>
                                 )}
                             />
-                            <Button type="submit" className="w-full bg-[#08B74F] text-black hover:bg-[#08B74F]/90 text-lg font-bold h-12 rounded-xl mt-4">
-                                Sign In
+                            <Button type="submit" disabled={isSubmitting} className="w-full bg-[#08B74F] text-black hover:bg-[#08B74F]/90 text-lg font-bold h-12 rounded-xl mt-4 disabled:opacity-50">
+                                {isSubmitting ? "Signing In..." : "Sign In"}
                             </Button>
                         </form>
                     </Form>

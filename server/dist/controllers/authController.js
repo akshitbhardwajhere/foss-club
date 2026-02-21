@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMe = exports.logoutAdmin = exports.loginAdmin = exports.registerAdmin = void 0;
+exports.getMe = exports.logoutAdmin = exports.loginAdmin = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const prisma_1 = __importDefault(require("../config/prisma"));
@@ -29,40 +29,6 @@ const setTokenCookie = (res, token) => {
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 };
-const registerAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { email, password } = req.body;
-        const adminExists = yield prisma_1.default.admin.findUnique({ where: { email } });
-        if (adminExists) {
-            res.status(400).json({ message: "Admin already exists" });
-            return;
-        }
-        const salt = yield bcryptjs_1.default.genSalt(10);
-        const passwordHash = yield bcryptjs_1.default.hash(password, salt);
-        const admin = yield prisma_1.default.admin.create({
-            data: {
-                email,
-                passwordHash,
-            },
-        });
-        if (admin) {
-            const token = generateToken(admin.id);
-            setTokenCookie(res, token);
-            res.status(201).json({
-                id: admin.id,
-                email: admin.email,
-                message: "Registration successful",
-            });
-        }
-        else {
-            res.status(400).json({ message: "Invalid admin data" });
-        }
-    }
-    catch (error) {
-        res.status(500).json({ message: "Server error" });
-    }
-});
-exports.registerAdmin = registerAdmin;
 const loginAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;

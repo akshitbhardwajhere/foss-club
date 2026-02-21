@@ -8,6 +8,7 @@ interface Event {
     id: string;
     title: string;
     description: string;
+    category?: string;
     date: string;
     location: string;
     imageUrl?: string;
@@ -29,6 +30,11 @@ export default function EventCard({ event, index, isPast }: EventCardProps) {
                 transition={{ delay: index * 0.1 }}
             >
                 <div className="absolute top-4 right-4 z-10 flex gap-2">
+                    {event.category && (
+                        <span className="px-3 py-1 rounded-full text-xs font-bold backdrop-blur-md shadow-lg bg-zinc-900/70 text-[#08B74F] border border-[#08B74F]/30">
+                            {event.category}
+                        </span>
+                    )}
                     <span className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-md shadow-lg ${isPast ? 'bg-zinc-800/80 text-zinc-300 border border-zinc-700' : 'bg-[#08B74F] text-black border border-[#08B74F]/50'}`}>
                         {isPast ? 'Completed' : 'Upcoming'}
                     </span>

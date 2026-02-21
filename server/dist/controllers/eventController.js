@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteEvent = exports.updateEvent = exports.createEvent = exports.getEventById = exports.getEvents = void 0;
 const prisma_1 = __importDefault(require("../config/prisma"));
+const cloudinary_1 = require("../utils/cloudinary");
 const getEvents = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const events = yield prisma_1.default.event.findMany({
@@ -67,6 +68,11 @@ const updateEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const id = req.params.id;
         const eventExists = yield prisma_1.default.event.findUnique({ where: { id } });
         if (eventExists) {
+            if (imageUrl !== undefined &&
+                eventExists.imageUrl &&
+                imageUrl !== eventExists.imageUrl) {
+                yield (0, cloudinary_1.deleteCloudinaryImage)(eventExists.imageUrl);
+            }
             const updatedEvent = yield prisma_1.default.event.update({
                 where: { id },
                 data: {
@@ -93,6 +99,9 @@ const deleteEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const id = req.params.id;
         const eventExists = yield prisma_1.default.event.findUnique({ where: { id } });
         if (eventExists) {
+            if (eventExists.imageUrl) {
+                yield (0, cloudinary_1.deleteCloudinaryImage)(eventExists.imageUrl);
+            }
             yield prisma_1.default.event.delete({ where: { id } });
             res.json({ message: "Event removed" });
         }

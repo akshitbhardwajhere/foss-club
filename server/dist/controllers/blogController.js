@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteBlog = exports.updateBlog = exports.createBlog = exports.getBlogById = exports.getBlogs = void 0;
 const prisma_1 = __importDefault(require("../config/prisma"));
+const cloudinary_1 = require("../utils/cloudinary");
 const getBlogs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const blogs = yield prisma_1.default.blog.findMany({
@@ -67,6 +68,11 @@ const updateBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         const id = req.params.id;
         const blogExists = yield prisma_1.default.blog.findUnique({ where: { id } });
         if (blogExists) {
+            if (imageUrl !== undefined &&
+                blogExists.imageUrl &&
+                imageUrl !== blogExists.imageUrl) {
+                yield (0, cloudinary_1.deleteCloudinaryImage)(blogExists.imageUrl);
+            }
             const updatedBlog = yield prisma_1.default.blog.update({
                 where: { id },
                 data: {
@@ -93,6 +99,9 @@ const deleteBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         const id = req.params.id;
         const blogExists = yield prisma_1.default.blog.findUnique({ where: { id } });
         if (blogExists) {
+            if (blogExists.imageUrl) {
+                yield (0, cloudinary_1.deleteCloudinaryImage)(blogExists.imageUrl);
+            }
             yield prisma_1.default.blog.delete({ where: { id } });
             res.json({ message: "Blog removed" });
         }

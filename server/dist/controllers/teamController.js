@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.reorderTeamMembers = exports.deleteTeamMember = exports.updateTeamMember = exports.createTeamMember = exports.getTeamMemberById = exports.getTeamMembers = void 0;
 const prisma_1 = __importDefault(require("../config/prisma"));
+const cloudinary_1 = require("../utils/cloudinary");
 // @desc    Get all team members
 // @route   GET /api/team
 // @access  Public
@@ -90,6 +91,11 @@ const updateTeamMember = (req, res) => __awaiter(void 0, void 0, void 0, functio
             res.status(404).json({ message: "Team member not found" });
             return;
         }
+        if (imageUrl !== undefined &&
+            teamMember.imageUrl &&
+            imageUrl !== teamMember.imageUrl) {
+            yield (0, cloudinary_1.deleteCloudinaryImage)(teamMember.imageUrl);
+        }
         const updatedTeamMember = yield prisma_1.default.teamMember.update({
             where: { id },
             data: {
@@ -121,6 +127,9 @@ const deleteTeamMember = (req, res) => __awaiter(void 0, void 0, void 0, functio
             res.status(404).json({ message: "Team member not found" });
             return;
         }
+        if (teamMember.imageUrl) {
+            yield (0, cloudinary_1.deleteCloudinaryImage)(teamMember.imageUrl);
+        }
         yield prisma_1.default.teamMember.delete({
             where: { id },
         });
@@ -138,9 +147,7 @@ const reorderTeamMembers = (req, res) => __awaiter(void 0, void 0, void 0, funct
     try {
         const { items } = req.body;
         if (!Array.isArray(items)) {
-            res
-                .status(400)
-                .json({
+            res.status(400).json({
                 message: "Invalid payload format. Expected { items: [{ id, order }] }",
             });
             return;

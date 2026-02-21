@@ -20,8 +20,16 @@ const db_1 = __importDefault(require("./config/db"));
 (0, db_1.default)();
 const app = (0, express_1.default)();
 // Middleware
+const allowedOrigins = ["http://localhost:3000", process.env.CLIENT_URL].filter(Boolean);
 app.use((0, cors_1.default)({
-    origin: "http://localhost:3000",
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        }
+        else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
     credentials: true,
 }));
 app.use(express_1.default.json());
