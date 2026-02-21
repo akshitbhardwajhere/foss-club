@@ -1,32 +1,59 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, MapPin, MessageSquare } from 'lucide-react';
+import { Mail, MapPin, MessageSquare, Send, Loader2, User, AtSign, FileText, Sparkles } from 'lucide-react';
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
+import { toast } from 'sonner';
+import api from '@/lib/axios';
 import BackgroundBlur from '@/components/shared/BackgroundBlur';
 import PageHeader from '@/components/shared/PageHeader';
 
 const formSchema = z.object({
     name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-    email: z.string().email({ message: "Invalid email address." }),
-    message: z.string().min(10, { message: "Message must be at least 10 characters." }),
+    email: z.string().email({ message: "Please enter a valid email address." }),
+    reason: z.string().min(10, { message: "Please tell us more (at least 10 characters)." }),
+    expertise: z.string().min(2, { message: "Expertise must be at least 2 characters." }),
 })
 
+type FormData = z.infer<typeof formSchema>;
+
 export default function ContactPage() {
-    const form = useForm<z.infer<typeof formSchema>>({
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const {
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors },
+    } = useForm<FormData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: "",
             email: "",
-            message: "",
+            reason: "",
+            expertise: "",
         },
-    })
+    });
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values)
-        // Here you would typically send the email/message
+    async function onSubmit(values: FormData) {
+        setIsSubmitting(true);
+        try {
+            await api.post('/api/contact', values);
+            toast.success('Your request has been submitted!', {
+                description: "We'll get back to you soon.",
+            });
+            reset();
+        } catch (error: any) {
+            const backendError = error.response?.data?.error;
+            toast.error('Failed to submit your request.', {
+                description: backendError ? `Error: ${backendError}` : 'Please try again later.',
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
     }
 
     const containerVariants = {
@@ -39,8 +66,11 @@ export default function ContactPage() {
         visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } },
     };
 
+    const inputBaseClass =
+        "w-full bg-zinc-900/50 border border-zinc-800 rounded-xl px-4 py-3 text-white placeholder:text-zinc-600 text-sm outline-none transition-all duration-300 focus:border-[#08B74F]/60 focus:ring-2 focus:ring-[#08B74F]/10 focus:bg-zinc-900";
+
     return (
-        <div className="bg-[#050B08] text-white min-h-screen flex flex-col items-center overflow-x-hidden relative w-full pt-32 pb-20 px-4 font-sans selection:bg-[#08B74F]/30 selection:text-white">
+        <div className="bg-[#050B08] text-white min-h-screen flex flex-col items-center justify-center overflow-x-hidden relative w-full pt-32 pb-20 px-4 font-sans selection:bg-[#08B74F]/30 selection:text-white">
             {/* Dynamic Background Blurs */}
             <BackgroundBlur />
 
@@ -50,7 +80,7 @@ export default function ContactPage() {
                 initial="hidden"
                 animate="visible"
             >
-                {/* Contact Info */}
+                {/* Left — Contact Info */}
                 <div className="flex flex-col justify-center">
                     <motion.div variants={itemVariants} className="mb-4 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#08B74F]/30 bg-[#08B74F]/5 text-[#08B74F] text-sm font-medium w-fit">
                         <MessageSquare className="w-4 h-4" /> Get in Touch
@@ -92,6 +122,106 @@ export default function ContactPage() {
                         </motion.div>
                     </div>
                 </div>
+
+                {/* Right — Join Us Form */}
+                <motion.div
+                    variants={itemVariants}
+                    className="relative"
+                >
+                    <div className="absolute -inset-px rounded-2xl bg-gradient-to-b from-[#08B74F]/20 via-transparent to-[#08B74F]/5 pointer-events-none" />
+                    <form
+                        onSubmit={handleSubmit(onSubmit)}
+                        className="relative bg-zinc-950/60 backdrop-blur-md border border-zinc-800/80 rounded-2xl p-8 space-y-6"
+                    >
+                        {/* Form Header */}
+                        <div className="mb-6">
+                            <h3 className="text-xl font-semibold flex items-center gap-2">
+                                <Sparkles className="w-5 h-5 text-[#08B74F]" />
+                                Join the FOSS Club
+                            </h3>
+                            <p className="text-zinc-500 text-sm mt-1">Fill in the details below and we&apos;ll reach out to you.</p>
+                        </div>
+
+                        {/* Name */}
+                        <div>
+                            <label htmlFor="contact-name" className="text-sm font-medium text-zinc-300 mb-1.5 flex items-center gap-1.5">
+                                <User className="w-3.5 h-3.5 text-[#08B74F]" /> Full Name
+                            </label>
+                            <input
+                                id="contact-name"
+                                type="text"
+                                placeholder="John Doe"
+                                className={inputBaseClass}
+                                {...register("name")}
+                            />
+                            {errors.name && <p className="text-red-400 text-xs mt-1.5">{errors.name.message}</p>}
+                        </div>
+
+                        {/* Email */}
+                        <div>
+                            <label htmlFor="contact-email" className="text-sm font-medium text-zinc-300 mb-1.5 flex items-center gap-1.5">
+                                <AtSign className="w-3.5 h-3.5 text-[#08B74F]" /> Email Address
+                            </label>
+                            <input
+                                id="contact-email"
+                                type="email"
+                                placeholder="you@example.com"
+                                className={inputBaseClass}
+                                {...register("email")}
+                            />
+                            {errors.email && <p className="text-red-400 text-xs mt-1.5">{errors.email.message}</p>}
+                        </div>
+
+                        {/* Reason to Join */}
+                        <div>
+                            <label htmlFor="contact-reason" className="text-sm font-medium text-zinc-300 mb-1.5 flex items-center gap-1.5">
+                                <FileText className="w-3.5 h-3.5 text-[#08B74F]" /> Why do you want to join?
+                            </label>
+                            <textarea
+                                id="contact-reason"
+                                rows={3}
+                                placeholder="Tell us what excites you about open-source..."
+                                className={`${inputBaseClass} resize-none`}
+                                {...register("reason")}
+                            />
+                            {errors.reason && <p className="text-red-400 text-xs mt-1.5">{errors.reason.message}</p>}
+                        </div>
+
+                        {/* Expertise */}
+                        <div>
+                            <label htmlFor="contact-expertise" className="text-sm font-medium text-zinc-300 mb-1.5 flex items-center gap-1.5">
+                                <Sparkles className="w-3.5 h-3.5 text-[#08B74F]" /> Your Expertise
+                            </label>
+                            <input
+                                id="contact-expertise"
+                                type="text"
+                                placeholder="e.g. React, Python, DevOps, UI/UX Design..."
+                                className={inputBaseClass}
+                                {...register("expertise")}
+                            />
+                            {errors.expertise && <p className="text-red-400 text-xs mt-1.5">{errors.expertise.message}</p>}
+                        </div>
+
+                        {/* Submit */}
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#08B74F] to-emerald-500 hover:from-[#07a346] hover:to-emerald-400 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-[#08B74F]/15 hover:shadow-[#08B74F]/25"
+                        >
+                            {isSubmitting ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    Submitting...
+                                </>
+                            ) : (
+                                <>
+                                    <Send className="w-4 h-4" />
+                                    Submit Request
+                                </>
+                            )}
+                        </button>
+                    </form>
+                </motion.div>
             </motion.div>
         </div>
     );

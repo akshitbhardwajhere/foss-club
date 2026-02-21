@@ -38,9 +38,9 @@ function Header() {
         : "bg-transparent border-transparent py-5"
         }`}
     >
-      <div className="max-w-7xl mx-auto px-4 md:px-8 pt-3 flex items-center justify-between w-full relative">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 pt-3 flex items-center justify-between relative">
         {/* Brand Logo */}
-        <Link href="/" className="flex items-center gap-3 group z-10">
+        <Link href="/" className="flex items-center gap-3 group z-10 shrink-0">
           <div className="w-10 h-10 rounded-xl bg-[#08B74F]/10 border border-[#08B74F]/20 flex items-center justify-center text-[#08B74F] group-hover:scale-110 transition-transform duration-300">
             <Terminal className="w-5 h-5" />
           </div>
@@ -49,8 +49,8 @@ function Header() {
           </span>
         </Link>
 
-        {/* Desktop Navigation - Absolutely centered */}
-        <nav className="hidden md:flex items-center gap-1 bg-zinc-900/40 backdrop-blur-md border border-zinc-800/50 rounded-full px-2 py-1.5 absolute left-1/2 -translate-x-1/2">
+        {/* Desktop Navigation - Absolutely centered (Hidden completely on mobile DOM to prevent overflow calculations) */}
+        <nav className="hidden lg:flex items-center gap-1 bg-zinc-900/40 backdrop-blur-md border border-zinc-800/50 rounded-full px-2 py-1.5 absolute left-1/2 -translate-x-1/2">
           {navlinks.map((link) => {
             const isActive = pathname === link.href;
             return (
@@ -76,7 +76,7 @@ function Header() {
 
         {/* Desktop CTA & Mobile Trigger */}
         <div className="flex items-center gap-3">
-          <div className="hidden md:block">
+          <div className="hidden lg:block">
             <Link href="/contact">
               <Button className="bg-[#08B74F] hover:bg-[#08B74F]/90 text-black font-bold rounded-full px-6 transition-all hover:scale-105 shadow-[0_0_20px_rgba(8,183,79,0.2)]">
                 Join Us
@@ -85,7 +85,7 @@ function Header() {
           </div>
 
           {/* Mobile Menu */}
-          <div className="md:hidden flex items-center">
+          <div className="lg:hidden flex items-center">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button

@@ -17,29 +17,32 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-[#050B08] text-white min-h-screen flex flex-col items-center font-sans selection:bg-[#08B74F]/30 selection:text-white">
+    <div className="bg-[#050B08] text-white min-h-screen flex flex-col items-center font-sans selection:bg-[#08B74F]/30 selection:text-white relative overflow-hidden w-full max-w-[100vw]">
       {/* Dynamic Background Blurs */}
       <BackgroundBlur />
 
       {/* Hero Section */}
       <motion.section
-        className="flex flex-col items-center justify-center min-h-screen pt-16 px-4 w-full max-w-8xl z-10"
+        className="flex flex-col items-center justify-center min-h-[100svh] pt-28 pb-16 md:pt-32 md:pb-24 lg:pt-32 lg:pb-32 px-4 max-w-7xl z-10 w-full overflow-hidden"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        <motion.div variants={itemVariants} className="mb-8 inline-flex items-center gap-3 px-5 py-2.5 rounded-full border border-[#08B74F]/20 bg-[#08B74F]/5 text-[#08B74F] text-sm font-semibold tracking-wide backdrop-blur-md shadow-[0_0_20px_rgba(8,183,79,0.1)] hover:bg-[#08B74F]/10 transition-colors cursor-default">
-          <Globe className="w-4 h-4" /> The Premier FOSS Community at NIT Srinagar
+        <motion.div variants={itemVariants} className="mb-8 flex flex-col sm:flex-row items-center text-center gap-2 sm:gap-3 px-4 sm:px-5 py-2 sm:py-2.5 rounded-3xl sm:rounded-full border border-[#08B74F]/20 bg-[#08B74F]/5 text-[#08B74F] text-xs sm:text-sm font-semibold tracking-wide backdrop-blur-md shadow-[0_0_20px_rgba(8,183,79,0.1)] hover:bg-[#08B74F]/10 transition-colors cursor-default">
+          <div className="flex items-center gap-2">
+            <Globe className="w-4 h-4 shrink-0" />
+            <span>The Premier FOSS Community</span>
+          </div>
+          <span className="hidden sm:inline">at NIT Srinagar</span>
+          <span className="sm:hidden text-[10px] opacity-80">at NIT Srinagar</span>
         </motion.div>
 
-        <motion.h1 variants={itemVariants} className="text-6xl md:text-8xl lg:text-9xl font-black text-center tracking-tighter leading-[1] mb-8 relative">
+        <motion.h1 variants={itemVariants} className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-black text-center tracking-tighter leading-[1] mb-8 relative">
           Innovate.<br />
           Collaborate.<br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#08B74F] via-emerald-400 to-[#08B74F] bg-[length:200%_auto] animate-gradient">
             Open Source.
           </span>
-          {/* Subtle noise/texture overlay for premium feel */}
-          <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay pointer-events-none rounded-xl" />
         </motion.h1>
 
         <motion.p variants={itemVariants} className="text-zinc-400 text-lg md:text-2xl text-center max-w-3xl mb-12 font-medium leading-relaxed">
@@ -58,7 +61,7 @@ export default function Home() {
 
       {/* Feature Showcase Grid - Bento Box Style */}
       <motion.section
-        className="w-full max-w-8xl px-4 py-24 z-10 border-t border-zinc-900/50"
+        className="w-full max-w-7xl px-4 sm:px-6 py-24 z-10 border-t border-zinc-900/50"
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}

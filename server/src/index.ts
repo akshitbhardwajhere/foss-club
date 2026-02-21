@@ -10,6 +10,7 @@ import blogRoutes from "./routes/blogRoutes";
 import teamRoutes from "./routes/teamRoutes";
 import statsRoutes from "./routes/statsRoutes";
 import uploadRoutes from "./routes/uploadRoutes";
+import contactRoutes from "./routes/contactRoutes";
 
 // Load env vars
 dotenv.config();
@@ -47,6 +48,7 @@ app.use("/api/events", eventRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/team", teamRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/contact", contactRoutes);
 
 // Basic route
 app.get("/", (req: Request, res: Response) => {
