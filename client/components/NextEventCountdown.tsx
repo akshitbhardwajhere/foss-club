@@ -86,29 +86,29 @@ export default function NextEventCountdown() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
-            className="mb-8 xl:mb-0 w-full max-w-xl mx-auto xl:fixed xl:top-32 xl:right-8 xl:w-auto xl:max-w-sm z-40 pointer-events-auto"
+            className="mb-8 2xl:mb-0 w-full max-w-xl mx-auto 2xl:fixed 2xl:top-32 2xl:right-8 2xl:w-auto 2xl:max-w-sm z-40 pointer-events-auto"
         >
             <Link href={`/events/${event.id}`} className="block group">
-                <div className="bg-zinc-900/60 backdrop-blur-xl xl:backdrop-blur-md border border-zinc-800/50 hover:border-[#08B74F]/50 rounded-2xl p-4 sm:p-5 transition-all duration-300 shadow-[0_0_30px_rgba(0,0,0,0.5)] xl:shadow-2xl group-hover:shadow-[0_0_40px_rgba(8,183,79,0.15)] group-hover:-translate-y-1">
+                <div className="bg-zinc-900/60 backdrop-blur-xl 2xl:backdrop-blur-md border border-zinc-800/50 hover:border-[#08B74F]/50 rounded-2xl p-4 sm:p-5 transition-all duration-300 shadow-[0_0_30px_rgba(0,0,0,0.5)] 2xl:shadow-2xl group-hover:shadow-[0_0_40px_rgba(8,183,79,0.15)] group-hover:-translate-y-1">
 
-                    <div className="flex flex-col xl:flex-col sm:flex-row items-center justify-between gap-4 xl:gap-5">
+                    <div className="flex flex-col items-center justify-center gap-4 md:gap-5">
 
                         {/* Event Info */}
-                        <div className="flex flex-col items-center sm:items-start xl:items-center flex-1 text-center sm:text-left xl:text-center w-full">
-                            <div className="flex items-center gap-1.5 text-[#08B74F] font-semibold text-[10px] xl:text-xs mb-1.5 sm:mb-2 uppercase tracking-wider bg-[#08B74F]/10 px-2 py-1 rounded-full border border-[#08B74F]/20">
-                                <CalendarClock className="w-3 xl:w-3.5 h-3 xl:h-3.5" />
+                        <div className="flex flex-col items-center text-center w-full">
+                            <div className="flex items-center justify-center gap-1.5 text-[#08B74F] font-semibold text-[10px] 2xl:text-xs mb-1.5 sm:mb-2 uppercase tracking-wider bg-[#08B74F]/10 px-3 py-1 rounded-full border border-[#08B74F]/20">
+                                <CalendarClock className="w-3 2xl:w-3.5 h-3 2xl:h-3.5" />
                                 <span>Upcoming Event</span>
                             </div>
-                            <h3 className="text-lg md:text-xl font-bold text-white mb-1.5 sm:mb-2 line-clamp-2 md:line-clamp-2 group-hover:text-[#08B74F] transition-colors leading-tight">
+                            <h3 className="text-lg md:text-xl font-bold text-white mb-2 group-hover:text-[#08B74F] transition-colors leading-tight">
                                 {event.title}
                             </h3>
-                            <span className="text-zinc-500 text-[11px] font-medium flex items-center gap-1 group-hover:text-zinc-400 transition-colors">
+                            <span className="text-zinc-500 text-[11px] font-medium flex items-center justify-center gap-1 group-hover:text-zinc-400 transition-colors">
                                 View Details <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                             </span>
                         </div>
 
                         {/* Divider */}
-                        <div className="w-full h-px bg-zinc-800/50 sm:hidden md:block my-1 opacity-50" />
+                        <div className="w-full h-px bg-zinc-800/50 my-1 opacity-50" />
 
                         {/* Countdown Blocks */}
                         <div className="flex items-center justify-center gap-2 md:gap-2 shrink-0">
