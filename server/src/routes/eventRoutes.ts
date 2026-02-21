@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getEvents,
+  getNextEvent,
   getEventById,
   createEvent,
   updateEvent,
@@ -11,6 +12,7 @@ import { protect } from "../middleware/authMiddleware";
 const router = express.Router();
 
 router.route("/").get(getEvents).post(protect, createEvent);
+router.route("/next").get(getNextEvent);
 
 router
   .route("/:id")

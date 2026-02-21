@@ -18,6 +18,7 @@ export default function ImageUpload({ onChange, value }: ImageUploadProps) {
     const [completedCrop, setCompletedCrop] = useState<PixelCrop | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [isRemoving, setIsRemoving] = useState(false);
+    const [dynamicAspect, setDynamicAspect] = useState<number | undefined>(1);
     const imgRef = useRef<HTMLImageElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -41,7 +42,7 @@ export default function ImageUpload({ onChange, value }: ImageUploadProps) {
                     unit: '%',
                     width: 70, // Create a 70% width crop by default
                 },
-                1, // Aspect ratio 1:1
+                1, // Aspect ratio 1:1 initially
                 width,
                 height
             ),
@@ -50,6 +51,36 @@ export default function ImageUpload({ onChange, value }: ImageUploadProps) {
         );
         setCrop(crop);
     }
+
+    // Determine if user is dragging a corner or a side handle
+    const handleDragStart = (e: React.PointerEvent<HTMLDivElement> | Event) => {
+        const target = e.target as HTMLElement;
+        // ReactCrop appends classes like "ReactCrop__drag-handle ord-nw"
+        if (target.className && typeof target.className === 'string') {
+            const isCorner = target.className.includes('ord-nw') ||
+                target.className.includes('ord-ne') ||
+                target.className.includes('ord-sw') ||
+                target.className.includes('ord-se');
+
+            const isSide = target.className.includes('ord-n ') ||
+                target.className.includes('ord-s ') ||
+                target.className.includes('ord-e ') ||
+                target.className.includes('ord-w ') ||
+                target.className.endsWith('ord-n') ||
+                target.className.endsWith('ord-s') ||
+                target.className.endsWith('ord-e') ||
+                target.className.endsWith('ord-w');
+
+            if (isCorner) {
+                setDynamicAspect(1);
+            } else if (isSide) {
+                setDynamicAspect(undefined);
+            } else {
+                // Clicking inside the mask to move it
+                setDynamicAspect(undefined);
+            }
+        }
+    };
 
     const uploadToCloudinary = async () => {
         if (!completedCrop || !imgRef.current) return;
@@ -163,7 +194,8 @@ export default function ImageUpload({ onChange, value }: ImageUploadProps) {
                             crop={crop}
                             onChange={(_, percentCrop) => setCrop(percentCrop)}
                             onComplete={(c) => setCompletedCrop(c)}
-                            aspect={1}
+                            onDragStart={handleDragStart}
+                            aspect={dynamicAspect}
                             className="max-h-[400px]"
                         >
                             {/* eslint-disable-next-line @next/next/no-img-element */}

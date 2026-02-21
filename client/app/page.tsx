@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowRight, Code2, Terminal, Globe } from 'lucide-react';
 import BackgroundBlur from '@/components/shared/BackgroundBlur';
+import NextEventCountdown from '@/components/NextEventCountdown';
 
 export default function Home() {
   const containerVariants = {
@@ -36,6 +37,8 @@ export default function Home() {
           <span className="hidden sm:inline">at NIT Srinagar</span>
           <span className="sm:hidden text-[10px] opacity-80">at NIT Srinagar</span>
         </motion.div>
+
+        <NextEventCountdown />
 
         <motion.h1 variants={itemVariants} className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-black text-center tracking-tighter leading-[1] mb-8 relative">
           Innovate.<br />

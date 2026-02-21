@@ -116,24 +116,24 @@ export default function EventDetailPage() {
                         </div>
                     )}
 
-                    <div className="p-8 md:p-12 relative -mt-20 flex flex-col items-center">
-                        <h1 className="text-4xl md:text-5xl font-black mb-6 text-white drop-shadow-md leading-tight tracking-tight text-center">
+                    <div className="px-8 md:px-12 pt-10 md:pt-16 pb-8 md:pb-12 relative flex flex-col items-center">
+                        <h1 className="text-4xl md:text-5xl font-black mb-6 text-white drop-shadow-md leading-tight tracking-tight text-center z-10">
                             {event.title}
                         </h1>
 
-                        <div className="flex flex-wrap justify-center items-center gap-6 mb-10 text-zinc-300">
-                            <div className="flex items-center gap-3 bg-zinc-800/50 px-4 py-2 rounded-full border border-zinc-700/50">
+                        <div className="flex flex-wrap justify-center items-center gap-6 mb-10 text-zinc-300 z-10">
+                            <div className="flex items-center gap-3 bg-zinc-800/50 px-4 py-2 rounded-full border border-zinc-700/50 backdrop-blur-sm">
                                 <Calendar className="w-5 h-5 text-[#08B74F]" />
                                 <span className="font-medium text-sm md:text-base">{`${new Date(event.date).getDate().toString().padStart(2, '0')}/${(new Date(event.date).getMonth() + 1).toString().padStart(2, '0')}/${new Date(event.date).getFullYear()}`}</span>
                             </div>
-                            <div className="flex items-center gap-3 bg-zinc-800/50 px-4 py-2 rounded-full border border-zinc-700/50">
+                            <div className="flex items-center gap-3 bg-zinc-800/50 px-4 py-2 rounded-full border border-zinc-700/50 backdrop-blur-sm">
                                 <MapPin className="w-5 h-5 text-[#08B74F]" />
                                 <span className="font-medium text-sm md:text-base">{event.location}</span>
                             </div>
                         </div>
 
-                        <div className="prose prose-invert max-w-3xl mx-auto text-zinc-300 text-left w-full mt-4">
-                            <h3 className="text-xl font-bold text-white mb-4 border-b border-zinc-800 pb-2 inline-block">Event Details</h3>
+                        <div className="prose prose-invert max-w-3xl mx-auto text-zinc-300 text-left w-full pt-8 border-t border-zinc-800/40">
+                            <h3 className="text-xl font-bold text-white mb-4 block">Event Details</h3>
                             <p className="whitespace-pre-wrap leading-relaxed text-lg text-zinc-400">
                                 {event.description}
                             </p>

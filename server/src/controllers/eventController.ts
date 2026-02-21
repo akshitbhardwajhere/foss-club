@@ -13,6 +13,26 @@ export const getEvents = async (req: Request, res: Response) => {
   }
 };
 
+export const getNextEvent = async (req: Request, res: Response) => {
+  try {
+    const nextEvent = await prisma.event.findFirst({
+      where: {
+        date: {
+          gt: new Date(), // Only events in the future
+        },
+      },
+      orderBy: {
+        date: "asc", // Get the chronologically closest one first
+      },
+    });
+
+    // It's perfectly normal for this to be null if there are no upcoming events
+    res.json(nextEvent);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
 export const getEventById = async (
   req: Request,
   res: Response,
