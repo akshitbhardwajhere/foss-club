@@ -36,7 +36,7 @@ export default function AdminDashboardPage() {
         try {
             await dispatch(logoutAdmin()).unwrap();
             toast.success("Successfully signed out.");
-            router.push('/admin/login');
+            router.push('/admin');
         } catch (error) {
             toast.error("Failed to sign out.");
         }

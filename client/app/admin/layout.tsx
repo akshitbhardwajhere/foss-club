@@ -32,12 +32,14 @@ export default function AdminLayout({
         }
     }, [dispatch, isAuthenticated]);
 
+    const publicAdminPaths = ['/admin/login', '/admin'];
+
     useEffect(() => {
         // Only run this logic on the client side after the component mounts
         if (isMounted && !loading) {
-            if (!isAuthenticated && pathname !== '/admin/login') {
-                router.push('/admin/login');
-            } else if (isAuthenticated && pathname === '/admin/login') {
+            if (!isAuthenticated && !publicAdminPaths.includes(pathname)) {
+                router.push('/admin');
+            } else if (isAuthenticated && publicAdminPaths.includes(pathname)) {
                 router.push('/admin/dashboard');
             }
         }
@@ -55,7 +57,7 @@ export default function AdminLayout({
     // Still validating redirect execution frame
     if (
         (isAuthenticated && pathname === '/admin/login') ||
-        (!isAuthenticated && pathname !== '/admin/login')
+        (!isAuthenticated && !publicAdminPaths.includes(pathname))
     ) {
         return (
             <div className="min-h-screen bg-zinc-950 flex items-center justify-center z-50">
@@ -64,7 +66,7 @@ export default function AdminLayout({
         );
     }
 
-    if (pathname === '/admin/login') {
+    if (publicAdminPaths.includes(pathname)) {
         return (
             <div className="min-h-screen bg-zinc-950 text-white selection:bg-[#08B74F] selection:text-black">
                 {children}
