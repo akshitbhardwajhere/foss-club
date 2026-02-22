@@ -98,11 +98,11 @@ function Header() {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
-                className="w-56 mt-2 bg-zinc-950 border border-zinc-800 text-white rounded-2xl overflow-hidden shadow-2xl p-2"
+                className="w-56 mt-2 bg-[#050B08]/90 backdrop-blur-lg border border-zinc-800/50 text-white rounded-2xl overflow-hidden shadow-2xl p-2"
               >
                 {/* Home */}
                 <Link href="/">
-                  <DropdownMenuItem className="focus:bg-zinc-900 focus:text-[#08B74F] cursor-pointer rounded-xl p-3 gap-3">
+                  <DropdownMenuItem className="text-white focus:bg-zinc-800/60 focus:text-[#08B74F] cursor-pointer rounded-xl p-3 gap-3">
                     <House className="w-5 h-5 text-zinc-400" />
                     <span className="font-medium">Home</span>
                   </DropdownMenuItem>
@@ -110,14 +110,14 @@ function Header() {
                 <DropdownMenuGroup>
                   {/* Events */}
                   <Link href="/events">
-                    <DropdownMenuItem className="focus:bg-zinc-900 focus:text-[#08B74F] cursor-pointer rounded-xl p-3 gap-3">
+                    <DropdownMenuItem className="text-white focus:bg-zinc-800/60 focus:text-[#08B74F] cursor-pointer rounded-xl p-3 gap-3">
                       <Calendar className="w-5 h-5 text-zinc-400" />
                       <span className="font-medium">Events</span>
                     </DropdownMenuItem>
                   </Link>
                   {/* Blogs */}
                   <Link href="/blogs">
-                    <DropdownMenuItem className="focus:bg-zinc-900 focus:text-[#08B74F] cursor-pointer rounded-xl p-3 gap-3">
+                    <DropdownMenuItem className="text-white focus:bg-zinc-800/60 focus:text-[#08B74F] cursor-pointer rounded-xl p-3 gap-3">
                       <BookOpen className="w-5 h-5 text-zinc-400" />
                       <span className="font-medium">Blogs</span>
                     </DropdownMenuItem>
@@ -127,21 +127,21 @@ function Header() {
                 <DropdownMenuGroup>
                   {/* Team */}
                   <Link href="/team">
-                    <DropdownMenuItem className="focus:bg-zinc-900 focus:text-[#08B74F] cursor-pointer rounded-xl p-3 gap-3">
+                    <DropdownMenuItem className="text-white focus:bg-zinc-800/60 focus:text-[#08B74F] cursor-pointer rounded-xl p-3 gap-3">
                       <Users className="w-5 h-5 text-zinc-400" />
                       <span className="font-medium">Team</span>
                     </DropdownMenuItem>
                   </Link>
                   {/* About */}
                   <Link href="/about">
-                    <DropdownMenuItem className="focus:bg-zinc-900 focus:text-[#08B74F] cursor-pointer rounded-xl p-3 gap-3">
+                    <DropdownMenuItem className="text-white focus:bg-zinc-800/60 focus:text-[#08B74F] cursor-pointer rounded-xl p-3 gap-3">
                       <Info className="w-5 h-5 text-zinc-400" />
                       <span className="font-medium">About Us</span>
                     </DropdownMenuItem>
                   </Link>
                   {/* Contact */}
                   <Link href="/contact">
-                    <DropdownMenuItem className="focus:bg-zinc-900 focus:text-[#08B74F] cursor-pointer rounded-xl p-3 gap-3">
+                    <DropdownMenuItem className="text-white focus:bg-zinc-800/60 focus:text-[#08B74F] cursor-pointer rounded-xl p-3 gap-3">
                       <Headset className="w-5 h-5 text-zinc-400" />
                       <span className="font-medium">Contact</span>
                     </DropdownMenuItem>
