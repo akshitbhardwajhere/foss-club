@@ -85,7 +85,7 @@ export default function Home() {
             },
             {
               title: "Hackathons",
-              desc: "Participate in elite coding competitions.",
+              desc: "Participate in coding competitions.",
               icon: <Globe className="w-8 h-8 text-[#08B74F]" />,
               colSpan: "col-span-1"
             },
@@ -102,7 +102,7 @@ export default function Home() {
               colSpan: "lg:col-span-2 md:col-span-1"
             },
           ].map((feature, i) => (
-            <div key={i} className={`bg-zinc-900/40 backdrop-blur-sm border border-zinc-800/50 p-10 rounded-[2rem] hover:border-[#08B74F]/40 transition-all duration-500 group flex flex-col justify-between hover:bg-zinc-900/60 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(8,183,79,0.1)] ${feature.colSpan}`}>
+            <div key={i} className={`z-[-1] bg-zinc-900/40 backdrop-blur-sm border border-zinc-800/50 p-10 rounded-[2rem] hover:border-[#08B74F]/40 transition-all duration-500 group flex flex-col justify-between hover:bg-zinc-900/60 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(8,183,79,0.1)] ${feature.colSpan}`}>
               <div>
                 <div className="w-16 h-16 rounded-2xl bg-[#08B74F]/10 border border-[#08B74F]/20 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:bg-[#08B74F]/20 transition-all duration-300 shadow-[inset_0_0_20px_rgba(8,183,79,0.05)]">
                   {feature.icon}

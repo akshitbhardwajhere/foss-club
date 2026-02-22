@@ -1,8 +1,6 @@
-'use client';
-
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CalendarClock, ArrowRight } from 'lucide-react';
+import { CalendarClock, ArrowRight, ChevronRight, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import api from '@/lib/axios';
 
@@ -23,6 +21,7 @@ export default function NextEventCountdown() {
     const [event, setEvent] = useState<Event | null>(null);
     const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
     const [loading, setLoading] = useState(true);
+    const [isCollapsed, setIsCollapsed] = useState(false);
 
     useEffect(() => {
         const fetchNextEvent = async () => {
@@ -83,59 +82,106 @@ export default function NextEventCountdown() {
 
     return (
         <motion.div
+            layout
             initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
-            className="mb-8 2xl:mb-0 w-full max-w-xl mx-auto 2xl:fixed 2xl:top-32 2xl:right-8 2xl:w-auto 2xl:max-w-sm z-40 pointer-events-auto"
+            animate={{
+                opacity: 1,
+                x: 0,
+                width: isCollapsed ? "48px" : "auto",
+                height: isCollapsed ? "48px" : "auto",
+            }}
+            transition={{
+                layout: { duration: 0.6, type: "spring", bounce: 0.3 },
+                opacity: { duration: 0.4 },
+                x: { delay: 0.5, duration: 0.6 }
+            }}
+            className={`mb-8 2xl:mb-0 w-full ${isCollapsed ? 'max-w-none' : 'max-w-xl'} mx-auto 2xl:fixed 2xl:top-32 2xl:right-8 2xl:w-auto 2xl:max-w-sm z-40 pointer-events-auto group/countdown`}
         >
-            <Link href={`/events/${event.id}`} className="block group">
-                <div className="bg-zinc-900/60 backdrop-blur-xl 2xl:backdrop-blur-md border border-zinc-800/50 hover:border-[#08B74F]/50 rounded-2xl p-4 sm:p-5 transition-all duration-300 shadow-[0_0_30px_rgba(0,0,0,0.5)] 2xl:shadow-2xl group-hover:shadow-[0_0_40px_rgba(8,183,79,0.15)] group-hover:-translate-y-1">
+            <div className="relative w-full h-full">
+                {/* Toggle Button - Only visible on 2xl where fixed */}
+                <button
+                    onClick={(e) => {
+                        e.preventDefault();
+                        setIsCollapsed(!isCollapsed);
+                    }}
+                    className="hidden 2xl:flex absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-zinc-800 border border-zinc-700 rounded-full items-center justify-center text-zinc-400 hover:text-[#08B74F] hover:border-[#08B74F]/50 transition-colors z-50 cursor-pointer shadow-lg"
+                >
+                    {isCollapsed ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
+                </button>
 
-                    <div className="flex flex-col items-center justify-center gap-4 md:gap-5">
-
-                        {/* Event Info */}
-                        <div className="flex flex-col items-center text-center w-full">
-                            <div className="flex items-center justify-center gap-1.5 text-[#08B74F] font-semibold text-[10px] 2xl:text-xs mb-1.5 sm:mb-2 uppercase tracking-wider bg-[#08B74F]/10 px-3 py-1 rounded-full border border-[#08B74F]/20">
-                                <CalendarClock className="w-3 2xl:w-3.5 h-3 2xl:h-3.5" />
-                                <span>Upcoming Event</span>
-                            </div>
-                            <h3 className="text-lg md:text-xl font-bold text-white mb-2 group-hover:text-[#08B74F] transition-colors leading-tight">
-                                {event.title}
-                            </h3>
-                            <span className="text-zinc-500 text-[11px] font-medium flex items-center justify-center gap-1 group-hover:text-zinc-400 transition-colors">
-                                View Details <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-                            </span>
-                        </div>
-
-                        {/* Divider */}
-                        <div className="w-full h-px bg-zinc-800/50 my-1 opacity-50" />
-
-                        {/* Countdown Blocks */}
-                        <div className="flex items-center justify-center gap-2 md:gap-2 shrink-0">
-                            {timeBlocks.map((block, i) => (
-                                <div key={block.label} className="flex flex-col items-center">
-                                    <div className="bg-zinc-950/80 border border-zinc-800 rounded-lg w-10 h-10 sm:w-12 sm:h-12 md:w-12 md:h-12 flex items-center justify-center mb-1 group-hover:border-[#08B74F]/30 transition-colors shadow-inner">
-                                        <AnimatePresence mode="popLayout">
-                                            <motion.span
-                                                key={block.value}
-                                                initial={{ y: 10, opacity: 0, scale: 0.8 }}
-                                                animate={{ y: 0, opacity: 1, scale: 1 }}
-                                                exit={{ y: -10, opacity: 0, scale: 0.8 }}
-                                                transition={{ duration: 0.2, ease: "easeOut" }}
-                                                className="text-lg sm:text-xl md:text-xl font-black text-white tabular-nums tracking-tighter"
-                                            >
-                                                {block.value}
-                                            </motion.span>
-                                        </AnimatePresence>
+                <div
+                    onClick={() => isCollapsed && setIsCollapsed(false)}
+                    className={`
+                        bg-zinc-900/60 backdrop-blur-xl 2xl:backdrop-blur-md border border-zinc-800/50 hover:border-[#08B74F]/50 
+                        transition-all duration-300 shadow-[0_0_30px_rgba(0,0,0,0.5)] 2xl:shadow-2xl 
+                        ${isCollapsed
+                            ? 'rounded-full w-12 h-12 flex items-center justify-center p-0 cursor-pointer hover:bg-[#08B74F]/20'
+                            : 'rounded-2xl p-4 sm:p-5 group-hover:shadow-[0_0_40px_rgba(8,183,79,0.15)] group-hover:-translate-y-1'
+                        }
+                    `}
+                >
+                    <AnimatePresence mode="wait">
+                        {isCollapsed ? (
+                            <motion.div
+                                key="collapsed"
+                                initial={{ scale: 0, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0, opacity: 0 }}
+                                className="text-[#08B74F]"
+                            >
+                                <CalendarClock className="w-6 h-6" />
+                            </motion.div>
+                        ) : (
+                            <motion.div
+                                key="expanded"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="flex flex-col items-center justify-center gap-4 md:gap-5 min-w-[280px]"
+                            >
+                                <Link href={`/events/${event.id}`} className="block group w-full">
+                                    <div className="flex flex-col items-center text-center w-full">
+                                        <div className="flex items-center justify-center gap-1.5 text-[#08B74F] font-semibold text-[10px] 2xl:text-xs mb-1.5 sm:mb-2 uppercase tracking-wider bg-[#08B74F]/10 px-3 py-1 rounded-full border border-[#08B74F]/20">
+                                            <CalendarClock className="w-3 2xl:w-3.5 h-3 2xl:h-3.5" />
+                                            <span>Upcoming Event</span>
+                                        </div>
+                                        <h3 className="text-lg md:text-xl font-bold text-white mb-2 group-hover:text-[#08B74F] transition-colors leading-tight">
+                                            {event.title}
+                                        </h3>
+                                        <span className="text-zinc-500 text-[11px] font-medium flex items-center justify-center gap-1 group-hover:text-zinc-400 transition-colors">
+                                            View Details <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                                        </span>
                                     </div>
-                                    <span className="text-[8px] sm:text-[9px] md:text-[9px] font-semibold text-zinc-500 uppercase tracking-widest">{block.label}</span>
-                                </div>
-                            ))}
-                        </div>
 
-                    </div>
+                                    <div className="w-full h-px bg-zinc-800/50 my-1 opacity-50" />
+
+                                    <div className="flex items-center justify-center gap-2 md:gap-2 shrink-0">
+                                        {timeBlocks.map((block, i) => (
+                                            <div key={block.label} className="flex flex-col items-center">
+                                                <div className="bg-zinc-950/80 border border-zinc-800 rounded-lg w-10 h-10 sm:w-12 sm:h-12 md:w-12 md:h-12 flex items-center justify-center mb-1 group-hover:border-[#08B74F]/30 transition-colors shadow-inner">
+                                                    <AnimatePresence mode="popLayout">
+                                                        <motion.span
+                                                            key={block.value}
+                                                            initial={{ y: 10, opacity: 0, scale: 0.8 }}
+                                                            animate={{ y: 0, opacity: 1, scale: 1 }}
+                                                            exit={{ y: -10, opacity: 0, scale: 0.8 }}
+                                                            transition={{ duration: 0.2, ease: "easeOut" }}
+                                                            className="text-lg sm:text-xl md:text-xl font-black text-white tabular-nums tracking-tighter"
+                                                        >
+                                                            {block.value}
+                                                        </motion.span>
+                                                    </AnimatePresence>
+                                                </div>
+                                                <span className="text-[8px] sm:text-[9px] md:text-[9px] font-semibold text-zinc-500 uppercase tracking-widest">{block.label}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </Link>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
-            </Link>
+            </div>
         </motion.div>
     );
 }
