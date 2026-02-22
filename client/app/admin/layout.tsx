@@ -1,5 +1,8 @@
 'use client';
 
+// Note: per-page metadata is handled in child layout.tsx files.
+// This shared layout handles auth guarding for the entire /admin section.
+
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAppSelector, useAppDispatch } from '@/lib/store';
