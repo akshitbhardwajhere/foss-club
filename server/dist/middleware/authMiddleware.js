@@ -18,13 +18,13 @@ const prisma_1 = __importDefault(require("../config/prisma"));
 const protect = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     let token;
     // Log request details for debugging
-    const origin = req.get('origin');
-    const referer = req.get('referer');
+    const origin = req.get("origin");
+    const referer = req.get("referer");
     console.log(`\n[AUTH] ${req.method} ${req.path}`);
     console.log(`  Origin: ${origin}`);
     console.log(`  Referer: ${referer}`);
     console.log(`  Cookies: ${JSON.stringify(req.cookies)}`);
-    console.log(`  Authorization header: ${req.headers.authorization ? 'present' : 'missing'}`);
+    console.log(`  Authorization header: ${req.headers.authorization ? "present" : "missing"}`);
     // Check for token in cookies first, fallback to Authorization header
     if (req.cookies.jwt) {
         token = req.cookies.jwt;
