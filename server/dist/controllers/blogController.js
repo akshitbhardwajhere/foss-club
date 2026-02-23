@@ -80,7 +80,7 @@ const updateBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                     content: content || undefined,
                     author: author || undefined,
                     tags: tags ? { set: tags } : undefined,
-                    imageUrl: imageUrl || undefined,
+                    imageUrl: imageUrl === "" ? null : imageUrl || undefined,
                 },
             });
             res.json(updatedBlog);

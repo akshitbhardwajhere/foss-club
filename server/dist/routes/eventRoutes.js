@@ -8,6 +8,7 @@ const eventController_1 = require("../controllers/eventController");
 const authMiddleware_1 = require("../middleware/authMiddleware");
 const router = express_1.default.Router();
 router.route("/").get(eventController_1.getEvents).post(authMiddleware_1.protect, eventController_1.createEvent);
+router.route("/next").get(eventController_1.getNextEvent);
 router
     .route("/:id")
     .get(eventController_1.getEventById)

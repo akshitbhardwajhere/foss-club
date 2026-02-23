@@ -11,14 +11,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteCloudinaryImage = void 0;
 const cloudinary_1 = require("cloudinary");
-// Configure Cloudinary with environment variables
-// Expects: CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET
-cloudinary_1.v2.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-    secure: true,
-});
+let isConfigured = false;
+// Lazy initialization: configure Cloudinary only when first needed,
+// after dotenv.config() has loaded environment variables in index.ts.
+function ensureConfigured() {
+    if (!isConfigured) {
+        cloudinary_1.v2.config({
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY,
+            api_secret: process.env.CLOUDINARY_API_SECRET,
+            secure: true,
+        });
+        isConfigured = true;
+    }
+}
 /**
  * Extracts the public ID from a Cloudinary URL and deletes the asset from Cloudinary storage.
  * @param imageUrl The full secure_url or url returned from a Cloudinary upload
@@ -26,6 +32,7 @@ cloudinary_1.v2.config({
 const deleteCloudinaryImage = (imageUrl) => __awaiter(void 0, void 0, void 0, function* () {
     if (!imageUrl)
         return false;
+    ensureConfigured();
     try {
         // A standard Cloudinary URL looks like:
         // https://res.cloudinary.com/cloud_name/image/upload/v1234567890/folder_name/public_id.jpg

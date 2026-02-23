@@ -102,9 +102,9 @@ const updateTeamMember = (req, res) => __awaiter(void 0, void 0, void 0, functio
                 name,
                 role,
                 email,
-                githubUrl,
-                linkedinUrl,
-                imageUrl,
+                githubUrl: githubUrl === "" ? null : githubUrl,
+                linkedinUrl: linkedinUrl === "" ? null : linkedinUrl,
+                imageUrl: imageUrl === "" ? null : imageUrl,
             },
         });
         res.json(updatedTeamMember);

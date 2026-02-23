@@ -17,6 +17,7 @@ dotenv.config();
 
 // Connect to database securely
 import connectDB from "./config/db";
+import prisma from "./config/prisma";
 connectDB();
 
 const app: Express = express();
@@ -49,6 +50,22 @@ app.use("/api/blogs", blogRoutes);
 app.use("/api/team", teamRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/contact", contactRoutes);
+
+// Health check endpoint
+app.get("/health", async (req: Request, res: Response) => {
+  try {
+    // Test database connection
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({ status: "ok", message: "Server and database are healthy" });
+  } catch (error) {
+    console.error("Health check failed:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Database connection failed",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+});
 
 // Basic route
 app.get("/", (req: Request, res: Response) => {
