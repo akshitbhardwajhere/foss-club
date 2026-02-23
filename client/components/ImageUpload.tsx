@@ -154,7 +154,7 @@ export default function ImageUpload({ onChange, value }: ImageUploadProps) {
                         type="button"
                         onClick={handleRemove}
                         disabled={isRemoving}
-                        className="absolute top-2 right-2 bg-red-500/80 hover:bg-red-600 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-10 disabled:opacity-50"
+                        className="absolute top-2 right-2 bg-red-500/80 hover:bg-red-600 text-white rounded-full p-1.5 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity z-10 disabled:opacity-50"
                         title="Remove Image"
                     >
                         {isRemoving ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}
