@@ -14,12 +14,25 @@ const generateToken = (id: string) => {
 };
 
 const setTokenCookie = (res: Response, token: string) => {
-  res.cookie("jwt", token, {
+  const isProduction = process.env.NODE_ENV === "production";
+  const cookieOptions: any = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax", // Changed from "strict" to "lax" to allow cross-origin requests
+    secure: isProduction, // HTTPS only in production
+    sameSite: isProduction ? "none" : "lax", // 'none' for cross-origin in production, 'lax' for development
+    path: "/",
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+  };
+
+  console.log("Setting cookie with options:", {
+    httpOnly: cookieOptions.httpOnly,
+    secure: cookieOptions.secure,
+    sameSite: cookieOptions.sameSite,
+    path: cookieOptions.path,
+    maxAge: cookieOptions.maxAge,
+    nodeEnv: process.env.NODE_ENV,
   });
+
+  res.cookie("jwt", token, cookieOptions);
 };
 
 export const loginAdmin = async (

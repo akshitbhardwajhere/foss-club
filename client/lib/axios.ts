@@ -9,8 +9,7 @@ const api = axios.create({
   withCredentials: true, // Crucial for passing HttpOnly JWT cookies to the backend
 });
 
-// We can add interceptors here later if we need to universally catch 401 Unauthorized errors
-// and dispatch Redux logout actions.
+// Response interceptor to handle errors
 api.interceptors.response.use(
   (response) => response,
   (error) => {
