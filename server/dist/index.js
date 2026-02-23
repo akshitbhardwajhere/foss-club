@@ -32,13 +32,28 @@ const prisma_1 = __importDefault(require("./config/prisma"));
 (0, db_1.default)();
 const app = (0, express_1.default)();
 // Middleware
-const allowedOrigins = ["http://localhost:3000", process.env.CLIENT_URL].filter(Boolean);
+// Allow localhost for development and use CLIENT_URL from env for production
+const allowedOrigins = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    process.env.CLIENT_URL,
+    process.env.FRONTEND_URL,
+    "https://foss.nitsri.ac.in",
+    "https://www.foss.nitsri.ac.in",
+].filter(Boolean);
+console.log("Allowed CORS origins:", allowedOrigins);
 app.use((0, cors_1.default)({
     origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
+        console.log("CORS request from origin:", origin);
+        if (!origin) {
+            // Allow requests with no origin (like mobile apps or curl requests)
+            callback(null, true);
+        }
+        else if (allowedOrigins.includes(origin)) {
             callback(null, true);
         }
         else {
+            console.warn("CORS blocked request from:", origin, "Allowed:", allowedOrigins);
             callback(new Error("Not allowed by CORS"));
         }
     },
@@ -76,5 +91,9 @@ app.get("/", (req, res) => {
 });
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`\n=== FOSS Club Server Started ===`);
+    console.log(`Port: ${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`CORS Allowed Origins: ${allowedOrigins.join(", ")}`);
+    console.log(`============================\n`);
 });

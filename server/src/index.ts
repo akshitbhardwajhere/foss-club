@@ -23,16 +23,34 @@ connectDB();
 const app: Express = express();
 
 // Middleware
-const allowedOrigins = ["http://localhost:3000", process.env.CLIENT_URL].filter(
-  Boolean,
-) as string[];
+// Allow localhost for development and use CLIENT_URL from env for production
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  process.env.CLIENT_URL,
+  process.env.FRONTEND_URL,
+  "https://foss.nitsri.ac.in",
+  "https://www.foss.nitsri.ac.in",
+].filter(Boolean) as string[];
+
+console.log("Allowed CORS origins:", allowedOrigins);
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      console.log("CORS request from origin:", origin);
+      if (!origin) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        callback(null, true);
+      } else if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
+        console.warn(
+          "CORS blocked request from:",
+          origin,
+          "Allowed:",
+          allowedOrigins,
+        );
         callback(new Error("Not allowed by CORS"));
       }
     },
@@ -75,5 +93,9 @@ app.get("/", (req: Request, res: Response) => {
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`\n=== FOSS Club Server Started ===`);
+  console.log(`Port: ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
+  console.log(`CORS Allowed Origins: ${allowedOrigins.join(", ")}`);
+  console.log(`============================\n`);
 });
