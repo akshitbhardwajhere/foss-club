@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { BookOpen, Tag } from 'lucide-react';
 import Link from 'next/link';
+import { stripHtml } from '@/lib/utils';
 
 interface Blog {
     id: string;
@@ -52,7 +53,7 @@ export default function BlogCard({ blog, index }: BlogCardProps) {
                     </div>
 
                     <h2 className="text-2xl font-bold mb-3 group-hover:text-[#08B74F] transition-colors line-clamp-2">{blog.title}</h2>
-                    <p className="text-zinc-400 text-sm mb-6 line-clamp-3 leading-relaxed">{blog.content}</p>
+                    <p className="text-zinc-400 text-sm mb-6 line-clamp-3 leading-relaxed">{stripHtml(blog.content)}</p>
 
                     <div className="flex items-center justify-between text-zinc-500 text-xs mt-auto border-t border-zinc-800/50 pt-4 font-medium uppercase tracking-wider">
                         <span className="text-zinc-300 shadow-sm">{blog.author}</span>

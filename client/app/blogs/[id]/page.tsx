@@ -6,6 +6,7 @@ import api from "@/lib/axios";
 import { motion } from "framer-motion";
 import { BookOpen, Tag, ArrowLeft, Clock, User, ChevronUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { stripHtml } from "@/lib/utils";
 
 interface Blog {
   id: string;
@@ -42,7 +43,8 @@ function ReadingProgress() {
 }
 
 function estimateReadTime(content: string): number {
-  const words = content.trim().split(/\s+/).length;
+  const plainText = stripHtml(content);
+  const words = plainText.trim().split(/\s+/).length;
   return Math.max(1, Math.ceil(words / 200));
 }
 
