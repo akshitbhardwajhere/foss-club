@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
-import nodemailer from "nodemailer";
-
-// We'll initialize the transporter inside the function to ensure env vars are loaded
+import { Client } from "node-mailjet";
 
 function buildEmailHtml(data: {
   name: string;
@@ -191,59 +189,87 @@ export const submitContactForm = async (
       return;
     }
 
+    // Validate environment variables
+    if (
+      !process.env.MAILJET_API_KEY ||
+      !process.env.MAILJET_API_SECRET ||
+      !process.env.MAILJET_FROM_EMAIL
+    ) {
+      res.status(500).json({
+        message:
+          "Email service is not properly configured. Please try again later.",
+      });
+      return;
+    }
+
     const adminHtml = buildEmailHtml({ name, email, reason, expertise });
     const userHtml = buildAutoReplyHtml(name);
 
-    const transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST || "smtp.gmail.com",
-      port: Number(process.env.EMAIL_PORT) || 587,
-      secure: process.env.EMAIL_PORT === "465",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
+    // Initialize Mailjet client
+    const mailjet = new Client({
+      apiKey: process.env.MAILJET_API_KEY,
+      apiSecret: process.env.MAILJET_API_SECRET,
     });
 
-    try {
-      // Send notification to FOSS Club admin
-      await transporter.sendMail({
-        from: {
-          name: "FOSS Club NIT Srinagar",
-          address: process.env.EMAIL_USER as string,
-        },
-        to: "akshitbhardwaj257448@gmail.com",
-        subject: `New Membership Request from ${name}`,
-        html: adminHtml,
-      });
+    const adminEmail =
+      process.env.ADMIN_EMAIL || "akshitbhardwaj257448@gmail.com";
 
-      // Send auto-reply to the user
-      await transporter.sendMail({
-        from: {
-          name: "FOSS Club NIT Srinagar",
-          address: process.env.EMAIL_USER as string,
-        },
-        to: email,
-        subject: "We've received your FOSS Club request!",
-        html: userHtml,
-      });
+    // Return success immediately to avoid timeout
+    res
+      .status(201)
+      .json({ message: "Your request has been submitted successfully!" });
 
-      res
-        .status(201)
-        .json({ message: "Your request has been submitted successfully!" });
-    } catch (emailError: any) {
-      // Still return success as the form was submitted - email is secondary
-      // This handles cases where SMTP is blocked (e.g., Render free tier)
-      res.status(201).json({
-        message:
-          "Your request has been submitted successfully! We'll review it soon.",
-        note: "Email notification may be delayed due to infrastructure limitations.",
-      });
-    }
+    // Send emails asynchronously (fire and forget)
+    (async () => {
+      try {
+        // Send notification to FOSS Club admin
+        const adminResponse = await mailjet
+          .post("send", { version: "v3.1" })
+          .request({
+            Messages: [
+              {
+                From: {
+                  Email: process.env.MAILJET_FROM_EMAIL,
+                  Name: "FOSS Club NIT Srinagar",
+                },
+                To: [
+                  {
+                    Email: adminEmail,
+                  },
+                ],
+                Subject: `New Membership Request from ${name}`,
+                TextPart: `New membership request from ${name} (${email})\n\nReason:\n${reason}\n\nExpertise:\n${expertise}`,
+                HTMLPart: adminHtml,
+              },
+            ],
+          });
+
+        // Send auto-reply to the user
+        const userResponse = await mailjet
+          .post("send", { version: "v3.1" })
+          .request({
+            Messages: [
+              {
+                From: {
+                  Email: process.env.MAILJET_FROM_EMAIL,
+                  Name: "FOSS Club NIT Srinagar",
+                },
+                To: [
+                  {
+                    Email: email,
+                  },
+                ],
+                Subject: "We've received your FOSS Club request!",
+                TextPart: `Hi ${name},\n\nThank you for your interest in joining the FOSS Club at NIT Srinagar! We have received your membership request and will review it soon.\n\nBest regards,\nThe FOSS Club Team`,
+                HTMLPart: userHtml,
+              },
+            ],
+          });
+      } catch (emailError: any) {
+        // Email errors are logged but don't affect form submission response
+      }
+    })();
   } catch (error: any) {
-    console.error(
-      "Contact form error:",
-      error instanceof Error ? error.message : error,
-    );
     res.status(500).json({
       message: "Failed to submit your request. Please try again later.",
     });
