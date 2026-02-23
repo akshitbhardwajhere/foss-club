@@ -3,7 +3,7 @@
 // Note: per-page metadata is handled in child layout.tsx files.
 // This shared layout handles auth guarding for the entire /admin section.
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAppSelector, useAppDispatch } from "@/lib/store";
 import { checkAuth } from "@/lib/features/authSlice";
@@ -22,19 +22,21 @@ export default function AdminLayout({
   const { isAuthenticated, loading } = useAppSelector((state) => state.auth);
   const [isMounted, setIsMounted] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const hasCheckedAuthRef = useRef(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
   useEffect(() => {
-    // Dispatch checkAuth on mount. It hits /api/admin/me
-    // and either hydrates user state from the HttpOnly cookie or fails securely.
-    // Only check once on initial mount (when loading is still true)
-    if (loading) {
+    // Dispatch checkAuth only once on initial mount.
+    // It hits /api/admin/me and either hydrates user state from the HttpOnly cookie or fails securely.
+    // Using a ref ensures this only runs once, preventing conflicts with login flows.
+    if (!hasCheckedAuthRef.current) {
       dispatch(checkAuth());
+      hasCheckedAuthRef.current = true;
     }
-  }, [dispatch, loading]);
+  }, [dispatch]);
 
   const publicAdminPaths = ["/admin/login", "/admin"];
 
