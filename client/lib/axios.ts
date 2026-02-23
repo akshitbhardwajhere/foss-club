@@ -13,8 +13,6 @@ const api = axios.create({
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Log errors centrally before throwing them to specific catch blocks
-    console.error("API Error Response:", error.response?.data || error.message);
     return Promise.reject(error);
   },
 );

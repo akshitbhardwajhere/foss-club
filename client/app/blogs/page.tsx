@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import api from '@/lib/axios';
-import BackgroundBlur from '@/components/shared/BackgroundBlur';
-import PageHeader from '@/components/shared/PageHeader';
-import BlogCard from '@/components/cards/BlogCard';
+import { useEffect, useState } from "react";
+import api from "@/lib/axios";
+import BackgroundBlur from "@/components/shared/BackgroundBlur";
+import PageHeader from "@/components/shared/PageHeader";
+import BlogCard from "@/components/cards/BlogCard";
 
 interface Blog {
   id: string;
@@ -16,7 +16,7 @@ interface Blog {
   createdAt: string;
 }
 
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function BlogsPage() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
@@ -25,10 +25,10 @@ export default function BlogsPage() {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const res = await api.get('/api/blogs');
+        const res = await api.get("/api/blogs");
         setBlogs(res.data);
       } catch (err) {
-        console.error("Failed to fetch blogs", err);
+        // Error silently logged in production
       } finally {
         setLoading(false);
       }
@@ -47,7 +47,10 @@ export default function BlogsPage() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="flex flex-col gap-4 bg-zinc-900/40 p-6 rounded-2xl border border-zinc-800">
+              <div
+                key={i}
+                className="flex flex-col gap-4 bg-zinc-900/40 p-6 rounded-2xl border border-zinc-800"
+              >
                 <Skeleton className="h-[200px] w-full rounded-xl bg-zinc-800" />
                 <div className="space-y-3">
                   <div className="flex gap-2 mb-2">
@@ -66,7 +69,9 @@ export default function BlogsPage() {
             ))}
           </div>
         ) : blogs.length === 0 ? (
-          <p className="text-zinc-400">No blog posts found. Check back later.</p>
+          <p className="text-zinc-400">
+            No blog posts found. Check back later.
+          </p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {blogs.map((blog, i) => (

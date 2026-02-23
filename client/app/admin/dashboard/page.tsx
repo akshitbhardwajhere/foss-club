@@ -65,10 +65,8 @@ export default function AdminDashboardPage() {
       try {
         setStatsError(null);
         const res = await api.get("/api/admin/stats");
-        console.log("Stats response:", res.data);
         setStats(res.data);
       } catch (err: any) {
-        console.error("Failed to load dashboard stats", err);
         const errorMsg =
           err.response?.data?.error ||
           err.response?.data?.message ||

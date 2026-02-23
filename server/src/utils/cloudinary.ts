@@ -60,10 +60,11 @@ export const deleteCloudinaryImage = async (
 
     // Call Cloudinary SDK to destroy the asset
     const result = await cloudinary.uploader.destroy(publicId);
-    console.log(`Cloudinary deletion result for ${publicId}:`, result);
     return result.result === "ok";
   } catch (error) {
-    console.error("Error attempting to delete image from Cloudinary:", error);
+    if (process.env.NODE_ENV !== "production") {
+      console.error("Cloudinary deletion error");
+    }
     return false;
   }
 };

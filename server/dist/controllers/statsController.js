@@ -16,9 +16,7 @@ exports.getDashboardStats = void 0;
 const prisma_1 = __importDefault(require("../config/prisma"));
 const getDashboardStats = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log("Fetching dashboard stats...");
         const totalEvents = yield prisma_1.default.event.count();
-        console.log("Total events:", totalEvents);
         const upcomingEvents = yield prisma_1.default.event.count({
             where: {
                 date: {
@@ -26,7 +24,6 @@ const getDashboardStats = (req, res) => __awaiter(void 0, void 0, void 0, functi
                 },
             },
         });
-        console.log("Upcoming events:", upcomingEvents);
         const pastEvents = yield prisma_1.default.event.count({
             where: {
                 date: {
@@ -34,11 +31,8 @@ const getDashboardStats = (req, res) => __awaiter(void 0, void 0, void 0, functi
                 },
             },
         });
-        console.log("Past events:", pastEvents);
         const totalTeamMembers = yield prisma_1.default.teamMember.count();
-        console.log("Total team members:", totalTeamMembers);
         const totalBlogs = yield prisma_1.default.blog.count();
-        console.log("Total blogs:", totalBlogs);
         res.json({
             events: {
                 total: totalEvents,
@@ -54,7 +48,7 @@ const getDashboardStats = (req, res) => __awaiter(void 0, void 0, void 0, functi
         });
     }
     catch (error) {
-        console.error("Stats fetch error:", error);
+        console.error("Stats fetch error");
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
         res.status(500).json({
             message: "Error fetching dashboard stats",

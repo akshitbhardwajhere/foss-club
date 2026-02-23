@@ -57,11 +57,12 @@ const deleteCloudinaryImage = (imageUrl) => __awaiter(void 0, void 0, void 0, fu
             return false;
         // Call Cloudinary SDK to destroy the asset
         const result = yield cloudinary_1.v2.uploader.destroy(publicId);
-        console.log(`Cloudinary deletion result for ${publicId}:`, result);
         return result.result === "ok";
     }
     catch (error) {
-        console.error("Error attempting to delete image from Cloudinary:", error);
+        if (process.env.NODE_ENV !== "production") {
+            console.error("Cloudinary deletion error");
+        }
         return false;
     }
 });

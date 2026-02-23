@@ -25,19 +25,11 @@ const setTokenCookie = (res, token) => {
     const isProduction = process.env.NODE_ENV === "production";
     const cookieOptions = {
         httpOnly: true,
-        secure: isProduction, // HTTPS only in production
-        sameSite: isProduction ? "none" : "lax", // 'none' for cross-origin in production, 'lax' for development
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax",
         path: "/",
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        maxAge: 30 * 24 * 60 * 60 * 1000,
     };
-    console.log("Setting cookie with options:", {
-        httpOnly: cookieOptions.httpOnly,
-        secure: cookieOptions.secure,
-        sameSite: cookieOptions.sameSite,
-        path: cookieOptions.path,
-        maxAge: cookieOptions.maxAge,
-        nodeEnv: process.env.NODE_ENV,
-    });
     res.cookie("jwt", token, cookieOptions);
 };
 const loginAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -47,7 +39,6 @@ const loginAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         if (admin && (yield bcryptjs_1.default.compare(password, admin.passwordHash))) {
             const token = generateToken(admin.id);
             setTokenCookie(res, token);
-            console.log("Admin logged in:", email, "| Token cookie set");
             res.json({
                 id: admin.id,
                 email: admin.email,
@@ -55,12 +46,13 @@ const loginAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             });
         }
         else {
-            console.warn("Login failed for email:", email);
             res.status(401).json({ message: "Invalid email or password" });
         }
     }
     catch (error) {
-        console.error("Login error:", error);
+        if (process.env.NODE_ENV !== "production") {
+            console.error("Login error");
+        }
         res.status(500).json({ message: "Server error" });
     }
 });

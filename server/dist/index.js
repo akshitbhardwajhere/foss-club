@@ -41,19 +41,24 @@ const allowedOrigins = [
     "https://foss.nitsri.ac.in",
     "https://www.foss.nitsri.ac.in",
 ].filter(Boolean);
-console.log("Allowed CORS origins:", allowedOrigins);
+if (process.env.NODE_ENV !== "production") {
+    console.log("Allowed CORS origins:", allowedOrigins);
+}
 app.use((0, cors_1.default)({
     origin: function (origin, callback) {
-        console.log("CORS request from origin:", origin);
+        if (process.env.NODE_ENV !== "production") {
+            console.log("CORS request from origin:", origin);
+        }
         if (!origin) {
-            // Allow requests with no origin (like mobile apps or curl requests)
             callback(null, true);
         }
         else if (allowedOrigins.includes(origin)) {
             callback(null, true);
         }
         else {
-            console.warn("CORS blocked request from:", origin, "Allowed:", allowedOrigins);
+            if (process.env.NODE_ENV !== "production") {
+                console.error("CORS blocked request from:", origin);
+            }
             callback(new Error("Not allowed by CORS"));
         }
     },
@@ -77,7 +82,9 @@ app.get("/health", (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         res.json({ status: "ok", message: "Server and database are healthy" });
     }
     catch (error) {
-        console.error("Health check failed:", error);
+        if (process.env.NODE_ENV !== "production") {
+            console.error("Health check failed:", error);
+        }
         res.status(500).json({
             status: "error",
             message: "Database connection failed",
@@ -91,9 +98,7 @@ app.get("/", (req, res) => {
 });
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`\n=== FOSS Club Server Started ===`);
-    console.log(`Port: ${PORT}`);
-    console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
-    console.log(`CORS Allowed Origins: ${allowedOrigins.join(", ")}`);
-    console.log(`============================\n`);
+    if (process.env.NODE_ENV !== "production") {
+        console.log(`=== FOSS Club Server Started ===`);
+    }
 });

@@ -70,10 +70,12 @@ const createTeamMember = (req, res) => __awaiter(void 0, void 0, void 0, functio
         res.status(201).json(teamMember);
     }
     catch (error) {
-        console.error("Failed to create team member:", error);
+        if (process.env.NODE_ENV !== "production") {
+            console.error("Team member creation error");
+        }
         res
             .status(500)
-            .json({ message: "Failed to create team member", error: String(error) });
+            .json({ message: "Failed to create team member" });
     }
 });
 exports.createTeamMember = createTeamMember;
@@ -161,7 +163,9 @@ const reorderTeamMembers = (req, res) => __awaiter(void 0, void 0, void 0, funct
         res.json({ message: "Team members reordered successfully" });
     }
     catch (error) {
-        console.error("Reorder error:", error);
+        if (process.env.NODE_ENV !== "production") {
+            console.error("Team reorder error");
+        }
         res.status(500).json({ message: "Failed to reorder team members" });
     }
 });

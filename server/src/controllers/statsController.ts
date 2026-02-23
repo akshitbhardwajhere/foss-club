@@ -6,10 +6,7 @@ export const getDashboardStats = async (
   res: Response,
 ): Promise<void> => {
   try {
-    console.log("Fetching dashboard stats...");
-
     const totalEvents = await prisma.event.count();
-    console.log("Total events:", totalEvents);
 
     const upcomingEvents = await prisma.event.count({
       where: {
@@ -18,7 +15,6 @@ export const getDashboardStats = async (
         },
       },
     });
-    console.log("Upcoming events:", upcomingEvents);
 
     const pastEvents = await prisma.event.count({
       where: {
@@ -27,13 +23,10 @@ export const getDashboardStats = async (
         },
       },
     });
-    console.log("Past events:", pastEvents);
 
     const totalTeamMembers = await prisma.teamMember.count();
-    console.log("Total team members:", totalTeamMembers);
 
     const totalBlogs = await prisma.blog.count();
-    console.log("Total blogs:", totalBlogs);
 
     res.json({
       events: {
@@ -49,7 +42,7 @@ export const getDashboardStats = async (
       },
     });
   } catch (error) {
-    console.error("Stats fetch error:", error);
+    console.error("Stats fetch error");
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
     res.status(500).json({

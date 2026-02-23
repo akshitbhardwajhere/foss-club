@@ -204,36 +204,47 @@ export const submitContactForm = async (
       },
     });
 
-    // Send notification to FOSS Club admin
-    await transporter.sendMail({
-      from: {
-        name: "FOSS Club NIT Srinagar",
-        address: process.env.EMAIL_USER as string,
-      },
-      to: "akshitbhardwaj257448@gmail.com",
-      subject: `New Membership Request from ${name}`,
-      html: adminHtml,
-    });
+    try {
+      // Send notification to FOSS Club admin
+      await transporter.sendMail({
+        from: {
+          name: "FOSS Club NIT Srinagar",
+          address: process.env.EMAIL_USER as string,
+        },
+        to: "akshitbhardwaj257448@gmail.com",
+        subject: `New Membership Request from ${name}`,
+        html: adminHtml,
+      });
 
-    // Send auto-reply to the user
-    await transporter.sendMail({
-      from: {
-        name: "FOSS Club NIT Srinagar",
-        address: process.env.EMAIL_USER as string,
-      },
-      to: email,
-      subject: "We've received your FOSS Club request!",
-      html: userHtml,
-    });
+      // Send auto-reply to the user
+      await transporter.sendMail({
+        from: {
+          name: "FOSS Club NIT Srinagar",
+          address: process.env.EMAIL_USER as string,
+        },
+        to: email,
+        subject: "We've received your FOSS Club request!",
+        html: userHtml,
+      });
 
-    res
-      .status(201)
-      .json({ message: "Your request has been submitted successfully!" });
+      res
+        .status(201)
+        .json({ message: "Your request has been submitted successfully!" });
+    } catch (emailError: any) {
+      // Still return success as the form was submitted - email is secondary
+      // This handles cases where SMTP is blocked (e.g., Render free tier)
+      res.status(201).json({
+        message:
+          "Your request has been submitted successfully! We'll review it soon.",
+        note: "Email notification may be delayed due to infrastructure limitations.",
+      });
+    }
   } catch (error: any) {
-    console.error("Contact form email error:", error);
+    if (process.env.NODE_ENV !== "production") {
+      console.error("Contact form error");
+    }
     res.status(500).json({
-      message: "Failed to send your request. Please try again later.",
-      error: String(error),
+      message: "Failed to submit your request. Please try again later.",
     });
   }
 };

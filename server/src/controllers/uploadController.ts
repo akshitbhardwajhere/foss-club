@@ -23,14 +23,15 @@ export const removeCloudinaryImage = async (
     } else {
       // Still return 200 so the frontend can clear the form state
       // The image may not exist in Cloudinary or the URL may not be valid
-      console.warn("Cloudinary deletion returned false for:", imageUrl);
       res.status(200).json({
         message: "Image reference cleared (Cloudinary asset may not exist)",
       });
     }
   } catch (error) {
-    console.error("Error in removeCloudinaryImage controller:", error);
     // Still return 200 so the UI isn't blocked
+    if (process.env.NODE_ENV !== "production") {
+      console.error("Image deletion error");
+    }
     res
       .status(200)
       .json({ message: "Image reference cleared (cleanup error logged)" });
