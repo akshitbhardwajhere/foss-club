@@ -60,7 +60,7 @@ const protect = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
             next();
         }
         catch (error) {
-            console.error("Auth error: Token verification failed");
+            console.error("Auth error: Token verification failed:", error instanceof Error ? error.message : error);
             res.status(401).json({ message: "Not authorized, token failed" });
         }
     }

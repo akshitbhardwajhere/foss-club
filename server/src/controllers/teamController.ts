@@ -65,9 +65,10 @@ export const createTeamMember = async (
 
     res.status(201).json(teamMember);
   } catch (error) {
-    if (process.env.NODE_ENV !== "production") {
-      console.error("Team member creation error");
-    }
+    console.error(
+      "Team member creation error:",
+      error instanceof Error ? error.message : error,
+    );
     res.status(500).json({ message: "Failed to create team member" });
   }
 };
@@ -179,9 +180,10 @@ export const reorderTeamMembers = async (
 
     res.json({ message: "Team members reordered successfully" });
   } catch (error) {
-    if (process.env.NODE_ENV !== "production") {
-      console.error("Team reorder error");
-    }
+    console.error(
+      "Team reorder error:",
+      error instanceof Error ? error.message : error,
+    );
     res.status(500).json({ message: "Failed to reorder team members" });
   }
 };

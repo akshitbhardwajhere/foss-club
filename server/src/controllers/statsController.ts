@@ -42,7 +42,10 @@ export const getDashboardStats = async (
       },
     });
   } catch (error) {
-    console.error("Stats fetch error");
+    console.error(
+      "Stats fetch error:",
+      error instanceof Error ? error.message : error,
+    );
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
     res.status(500).json({

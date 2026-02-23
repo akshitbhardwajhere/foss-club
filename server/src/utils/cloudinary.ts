@@ -62,9 +62,10 @@ export const deleteCloudinaryImage = async (
     const result = await cloudinary.uploader.destroy(publicId);
     return result.result === "ok";
   } catch (error) {
-    if (process.env.NODE_ENV !== "production") {
-      console.error("Cloudinary deletion error");
-    }
+    console.error(
+      "Cloudinary deletion error:",
+      error instanceof Error ? error.message : error,
+    );
     return false;
   }
 };

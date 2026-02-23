@@ -48,9 +48,10 @@ export const loginAdmin = async (
       res.status(401).json({ message: "Invalid email or password" });
     }
   } catch (error) {
-    if (process.env.NODE_ENV !== "production") {
-      console.error("Login error");
-    }
+    console.error(
+      "Login error:",
+      error instanceof Error ? error.message : error,
+    );
     res.status(500).json({ message: "Server error" });
   }
 };

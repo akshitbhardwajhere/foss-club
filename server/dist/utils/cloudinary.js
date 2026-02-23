@@ -60,9 +60,7 @@ const deleteCloudinaryImage = (imageUrl) => __awaiter(void 0, void 0, void 0, fu
         return result.result === "ok";
     }
     catch (error) {
-        if (process.env.NODE_ENV !== "production") {
-            console.error("Cloudinary deletion error");
-        }
+        console.error("Cloudinary deletion error:", error instanceof Error ? error.message : error);
         return false;
     }
 });

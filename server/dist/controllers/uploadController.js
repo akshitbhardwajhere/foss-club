@@ -35,9 +35,7 @@ const removeCloudinaryImage = (req, res) => __awaiter(void 0, void 0, void 0, fu
     }
     catch (error) {
         // Still return 200 so the UI isn't blocked
-        if (process.env.NODE_ENV !== "production") {
-            console.error("Image deletion error");
-        }
+        console.error("Image deletion error:", error instanceof Error ? error.message : error);
         res
             .status(200)
             .json({ message: "Image reference cleared (cleanup error logged)" });

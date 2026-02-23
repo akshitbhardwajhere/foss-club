@@ -240,9 +240,10 @@ export const submitContactForm = async (
       });
     }
   } catch (error: any) {
-    if (process.env.NODE_ENV !== "production") {
-      console.error("Contact form error");
-    }
+    console.error(
+      "Contact form error:",
+      error instanceof Error ? error.message : error,
+    );
     res.status(500).json({
       message: "Failed to submit your request. Please try again later.",
     });

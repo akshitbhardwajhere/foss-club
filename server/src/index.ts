@@ -76,9 +76,10 @@ app.get("/health", async (req: Request, res: Response) => {
     await prisma.$queryRaw`SELECT 1`;
     res.json({ status: "ok", message: "Server and database are healthy" });
   } catch (error) {
-    if (process.env.NODE_ENV !== "production") {
-      console.error("Health check failed:", error);
-    }
+    console.error(
+      "Health check failed:",
+      error instanceof Error ? error.message : error,
+    );
     res.status(500).json({
       status: "error",
       message: "Database connection failed",
