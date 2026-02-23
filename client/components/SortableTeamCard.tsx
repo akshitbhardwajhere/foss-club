@@ -48,7 +48,7 @@ export function SortableTeamCard({ member, onEdit, onDelete }: SortableTeamCardP
             <div
                 {...attributes}
                 {...listeners}
-                className="absolute top-4 left-4 w-8 h-8 rounded-full text-zinc-500 cursor-grab active:cursor-grabbing flex items-center justify-center hover:bg-zinc-800 hover:text-white transition-colors"
+                className="absolute top-4 left-4 w-8 h-8 rounded-full text-zinc-500 cursor-grab active:cursor-grabbing flex items-center justify-center hover:bg-zinc-800 hover:text-white transition-colors touch-none"
                 title="Drag to reorder"
             >
                 <GripVertical className="w-4 h-4" />
