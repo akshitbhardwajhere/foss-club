@@ -19,9 +19,10 @@ export default function AdminLayout({
   const router = useRouter();
   const pathname = usePathname();
   const dispatch = useAppDispatch();
-  const { isAuthenticated, loading } = useAppSelector((state) => state.auth);
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
   const [isMounted, setIsMounted] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
   const hasCheckedAuthRef = useRef(false);
 
   useEffect(() => {
@@ -33,7 +34,9 @@ export default function AdminLayout({
     // It hits /api/admin/me and either hydrates user state from the HttpOnly cookie or fails securely.
     // Using a ref ensures this only runs once, preventing conflicts with login flows.
     if (!hasCheckedAuthRef.current) {
-      dispatch(checkAuth());
+      dispatch(checkAuth()).finally(() => {
+        setAuthChecked(true);
+      });
       hasCheckedAuthRef.current = true;
     }
   }, [dispatch]);
@@ -42,32 +45,20 @@ export default function AdminLayout({
 
   useEffect(() => {
     // Only run this logic on the client side after the component mounts
-    if (isMounted && !loading) {
+    if (isMounted && authChecked) {
       if (!isAuthenticated && !publicAdminPaths.includes(pathname)) {
         router.push("/admin");
       } else if (isAuthenticated && publicAdminPaths.includes(pathname)) {
         router.push("/admin/dashboard");
       }
     }
-  }, [isAuthenticated, loading, pathname, router, isMounted]);
+  }, [isAuthenticated, pathname, router, isMounted, authChecked]);
 
-  // Prevent rendering the page while checking auth status to avoid flashing
-  if (!isMounted || loading) {
+  // Single loader for initial auth check only
+  if (!isMounted || !authChecked) {
     return (
       <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
         <Terminal className="w-10 h-10 text-[#08B74F] animate-pulse" />
-      </div>
-    );
-  }
-
-  // Still validating redirect execution frame
-  if (
-    (isAuthenticated && pathname === "/admin/login") ||
-    (!isAuthenticated && !publicAdminPaths.includes(pathname))
-  ) {
-    return (
-      <div className="min-h-screen bg-zinc-950 flex items-center justify-center z-50">
-        <Terminal className="w-10 h-10 text-[#08B74F]" />
       </div>
     );
   }
