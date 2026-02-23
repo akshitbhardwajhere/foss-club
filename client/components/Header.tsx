@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Calendar, Headset, Info, Menu, Terminal, Users, BookOpen, House } from "lucide-react";
+import { Calendar, Headset, Info, Menu, Users, BookOpen, House } from "lucide-react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { Button } from "./ui/button";
 import { navlinks } from "@/data/navlinks";
 import {
@@ -41,8 +42,14 @@ function Header() {
       <div className="max-w-7xl mx-auto px-4 md:px-8 pt-3 flex items-center justify-between relative">
         {/* Brand Logo */}
         <Link href="/" className="flex items-center gap-3 group z-10 shrink-0">
-          <div className="w-10 h-10 rounded-xl bg-[#08B74F]/10 border border-[#08B74F]/20 flex items-center justify-center text-[#08B74F] group-hover:scale-110 transition-transform duration-300">
-            <Terminal className="w-5 h-5" />
+          <div className="w-10 h-10 rounded-full bg-[#08B74F]/10 border border-[#08B74F]/20 flex items-center justify-center text-[#08B74F] group-hover:scale-110 transition-transform duration-300 overflow-hidden">
+            <Image
+              src="/icon.png"
+              alt="FOSS Logo"
+              width={38}
+              height={38}
+              className="object-cover"
+            />
           </div>
           <span className="text-xl font-bold tracking-tight text-white group-hover:text-[#08B74F] transition-colors duration-300">
             FOSS <span className="text-zinc-500 font-medium">NIT Srinagar</span>
