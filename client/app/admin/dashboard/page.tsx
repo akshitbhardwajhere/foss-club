@@ -41,6 +41,8 @@ export default function AdminDashboardPage() {
     try {
       await dispatch(logoutAdmin()).unwrap();
       toast.success("Successfully signed out.");
+      // Add a small delay to ensure state is fully updated before redirect
+      await new Promise((resolve) => setTimeout(resolve, 100));
       router.push("/admin");
     } catch (error) {
       toast.error("Failed to sign out.");

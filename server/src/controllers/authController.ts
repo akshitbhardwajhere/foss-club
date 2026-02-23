@@ -60,8 +60,12 @@ export const logoutAdmin = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
+  const isProduction = process.env.NODE_ENV === "production";
   res.cookie("jwt", "", {
     httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    path: "/",
     expires: new Date(0),
   });
   res.status(200).json({ message: "Logged out successfully" });
