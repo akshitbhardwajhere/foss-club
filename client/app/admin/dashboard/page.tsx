@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useAppDispatch } from "@/lib/store";
+import { useAppDispatch, useAppSelector } from "@/lib/store";
 import { logoutAdmin } from "@/lib/features/authSlice";
 import { useRouter } from "next/navigation";
 import {
@@ -33,6 +33,9 @@ import { toast } from "sonner";
 export default function AdminDashboardPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const { isAuthenticated, loading: authLoading } = useAppSelector(
+    (state) => state.auth,
+  );
 
   const handleLogout = async () => {
     try {
@@ -54,6 +57,11 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     const fetchStats = async () => {
+      // Only fetch stats if authenticated
+      if (!isAuthenticated || authLoading) {
+        return;
+      }
+
       try {
         setStatsError(null);
         const res = await api.get("/api/admin/stats");
@@ -73,7 +81,7 @@ export default function AdminDashboardPage() {
       }
     };
     fetchStats();
-  }, []);
+  }, [isAuthenticated, authLoading]);
 
   const containerVariants = {
     hidden: { opacity: 0 },

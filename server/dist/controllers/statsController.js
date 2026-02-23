@@ -58,7 +58,7 @@ const getDashboardStats = (req, res) => __awaiter(void 0, void 0, void 0, functi
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
         res.status(500).json({
             message: "Error fetching dashboard stats",
-            error: errorMessage
+            error: errorMessage,
         });
     }
 });

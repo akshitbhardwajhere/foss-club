@@ -66,7 +66,7 @@ app.get("/health", (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         res.status(500).json({
             status: "error",
             message: "Database connection failed",
-            error: error instanceof Error ? error.message : "Unknown error"
+            error: error instanceof Error ? error.message : "Unknown error",
         });
     }
 }));

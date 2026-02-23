@@ -25,7 +25,7 @@ const setTokenCookie = (res, token) => {
     res.cookie("jwt", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "lax", // Changed from "strict" to "lax" to allow cross-origin requests
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 };
@@ -36,6 +36,7 @@ const loginAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         if (admin && (yield bcryptjs_1.default.compare(password, admin.passwordHash))) {
             const token = generateToken(admin.id);
             setTokenCookie(res, token);
+            console.log("Admin logged in:", email, "| Token cookie set");
             res.json({
                 id: admin.id,
                 email: admin.email,
@@ -43,10 +44,12 @@ const loginAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             });
         }
         else {
+            console.warn("Login failed for email:", email);
             res.status(401).json({ message: "Invalid email or password" });
         }
     }
     catch (error) {
+        console.error("Login error:", error);
         res.status(500).json({ message: "Server error" });
     }
 });
