@@ -67,7 +67,7 @@ export default function AdminLayout({
   ) {
     return (
       <div className="min-h-screen bg-zinc-950 flex items-center justify-center z-50">
-        <div className="w-8 h-8 rounded-full border-2 border-[#08B74F] border-t-transparent animate-spin" />
+        <Terminal className="w-10 h-10 text-[#08B74F]" />
       </div>
     );
   }
