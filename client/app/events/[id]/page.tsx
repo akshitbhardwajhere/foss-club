@@ -21,6 +21,8 @@ export default function EventDetailPage() {
   const router = useRouter();
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
+  const [registrationLink, setRegistrationLink] = useState("");
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -28,6 +30,24 @@ export default function EventDetailPage() {
         if (params.id) {
           const res = await api.get(`/api/events/${params.id}`);
           setEvent(res.data);
+
+          try {
+            const configRes = await api.get(`/api/registration/config/${params.id}`);
+            console.log("Config Result Data:", configRes.data);
+            const isValid = new Date(configRes.data.validUntil) > new Date();
+            const isPast = new Date(res.data.date) < new Date();
+            console.log("Is valid limit?", isValid, "Is past?", isPast);
+
+            if (configRes.data && isValid && !isPast) {
+              setIsRegistrationOpen(true);
+              const eventNameForUrl = res.data.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+              setRegistrationLink(`/events/registration/${eventNameForUrl}?id=${params.id}`);
+            } else {
+              setIsRegistrationOpen(false);
+            }
+          } catch (configErr) {
+            console.error("Config fetch error:", configErr);
+          }
         }
       } catch (err) {
         // Error silently logged in production
@@ -146,7 +166,25 @@ export default function EventDetailPage() {
               </div>
             </div>
 
-            <div className="prose prose-invert max-w-3xl mx-auto text-zinc-300 text-left w-full pt-8 border-t border-zinc-800/40">
+            {isRegistrationOpen && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="mb-10 z-10 w-full flex justify-center border-t border-zinc-800/40 pt-8 mt-[-1rem]"
+              >
+                <button
+                  onClick={() => router.push(registrationLink)}
+                  className="px-8 py-3.5 bg-[#08B74F] hover:bg-[#08B74F]/90 text-black font-bold text-lg rounded-xl shadow-[0_0_20px_rgba(8,183,79,0.3)] hover:shadow-[0_0_30px_rgba(8,183,79,0.5)] transition-all flex items-center gap-2 transform hover:-translate-y-1"
+                >
+                  Register Now
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </button>
+              </motion.div>
+            )}
+
+            <div className={`prose prose-invert max-w-3xl mx-auto text-zinc-300 text-left w-full ${!isRegistrationOpen ? 'pt-8 border-t border-zinc-800/40' : ''}`}>
               <h3 className="text-xl font-bold text-white mb-4 block">
                 Event Details
               </h3>

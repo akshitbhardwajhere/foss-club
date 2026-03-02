@@ -11,6 +11,7 @@ import teamRoutes from "./routes/teamRoutes";
 import statsRoutes from "./routes/statsRoutes";
 import uploadRoutes from "./routes/uploadRoutes";
 import contactRoutes from "./routes/contactRoutes";
+import registrationRoutes from "./routes/registrationRoutes";
 
 // Load env vars
 dotenv.config();
@@ -68,6 +69,7 @@ app.use("/api/blogs", blogRoutes);
 app.use("/api/team", teamRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/registration", registrationRoutes);
 
 // Health check endpoint
 app.get("/health", async (req: Request, res: Response) => {

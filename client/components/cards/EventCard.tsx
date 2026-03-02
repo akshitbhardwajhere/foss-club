@@ -12,6 +12,7 @@ interface Event {
     date: string;
     location: string;
     imageUrl?: string;
+    registrationConfig?: any;
 }
 
 interface EventCardProps {
@@ -21,6 +22,8 @@ interface EventCardProps {
 }
 
 export default function EventCard({ event, index, isPast }: EventCardProps) {
+    const isRegistrationValid = event.registrationConfig && new Date(event.registrationConfig.validUntil) > new Date() && !isPast;
+
     return (
         <Link href={`/events/${event.id}`}>
             <motion.div
@@ -66,6 +69,13 @@ export default function EventCard({ event, index, isPast }: EventCardProps) {
                             <MapPin className="w-4 h-4 text-[#08B74F]" />
                             <span className="truncate">{event.location}</span>
                         </div>
+                        {isRegistrationValid && (
+                            <div className="mt-4 flex">
+                                <span className="text-xs font-bold px-4 py-2 bg-[#08B74F]/10 text-[#08B74F] border border-[#08B74F]/20 rounded-lg transition-colors w-full text-center">
+                                    Registrations are live
+                                </span>
+                            </div>
+                        )}
                     </div>
                 </div>
             </motion.div>

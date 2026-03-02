@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { CalendarDays, Edit3, Plus, MapPin } from "lucide-react";
+import { CalendarDays, Edit3, Plus, MapPin, Link as LinkIcon, Users } from "lucide-react";
 import api from "@/lib/axios";
 import { formatDate } from "@/lib/utils";
 
@@ -25,6 +25,8 @@ import AdminPageHeader from "@/components/admin/AdminPageHeader";
 import AdminFormWrapper from "@/components/admin/AdminFormWrapper";
 import ConfirmDeleteDialog from "@/components/admin/ConfirmDeleteDialog";
 import AdminTableSkeleton from "@/components/admin/AdminTableSkeleton";
+import ReleaseFormModal from "@/components/admin/ReleaseFormModal";
+import ViewRegistrationsModal from "@/components/admin/ViewRegistrationsModal";
 import { toast } from "sonner";
 
 interface EventItem {
@@ -35,6 +37,7 @@ interface EventItem {
   date: string;
   location: string;
   imageUrl?: string;
+  registrationConfig?: any;
 }
 
 const EVENT_CATEGORIES = [
@@ -58,6 +61,8 @@ export default function EventsAdminPage() {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
+  const [isReleaseModalOpen, setIsReleaseModalOpen] = useState(false);
+  const [isRegistrationsModalOpen, setIsRegistrationsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -104,7 +109,7 @@ export default function EventsAdminPage() {
       title: event.title || "",
       category: event.category || "",
       date: event.date
-        ? new Date(event.date).toISOString().slice(0, 16).replace("T", ", ")
+        ? new Date(event.date).toISOString().slice(0, 16)
         : "",
       location: event.location || "",
       description: event.description || "",
@@ -136,8 +141,8 @@ export default function EventsAdminPage() {
       );
       toast.error(
         error.response?.data?.message ||
-          error.message ||
-          "Failed to publish event",
+        error.message ||
+        "Failed to publish event",
       );
     } finally {
       setIsSubmitting(false);
@@ -161,23 +166,37 @@ export default function EventsAdminPage() {
           subtitle="View, edit, or create new upcoming events"
         />
         {!isCreating && (
-          <button
-            onClick={() => {
-              setIsCreating(true);
-              setEditingId(null);
-              form.reset({
-                title: "",
-                category: "",
-                date: "",
-                location: "",
-                description: "",
-                imageUrl: "",
-              });
-            }}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#08B74F] text-black font-bold hover:bg-[#08B74F]/90 transition-colors w-full md:w-auto justify-center"
-          >
-            <Plus className="w-5 h-5" /> Create Event
-          </button>
+          <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+            <button
+              onClick={() => setIsRegistrationsModalOpen(true)}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-600/20 text-purple-400 border border-purple-500/20 font-bold hover:bg-purple-600/30 transition-colors w-full md:w-auto justify-center"
+            >
+              <Users className="w-5 h-5" /> Registrations
+            </button>
+            <button
+              onClick={() => setIsReleaseModalOpen(true)}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600/20 text-blue-400 border border-blue-500/20 font-bold hover:bg-blue-600/30 transition-colors w-full md:w-auto justify-center"
+            >
+              <LinkIcon className="w-5 h-5" /> Release Form
+            </button>
+            <button
+              onClick={() => {
+                setIsCreating(true);
+                setEditingId(null);
+                form.reset({
+                  title: "",
+                  category: "",
+                  date: "",
+                  location: "",
+                  description: "",
+                  imageUrl: "",
+                });
+              }}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#08B74F] text-black font-bold hover:bg-[#08B74F]/90 transition-colors w-full md:w-auto justify-center"
+            >
+              <Plus className="w-5 h-5" /> Create Event
+            </button>
+          </div>
         )}
       </div>
 
@@ -466,11 +485,10 @@ export default function EventsAdminPage() {
                         </td>
                         <td className="px-6 py-4 hidden sm:table-cell">
                           <span
-                            className={`px-3 py-1 rounded-full text-xs font-medium border ${
-                              !isPast
-                                ? "border-[#08B74F]/30 bg-[#08B74F]/10 text-[#08B74F]"
-                                : "border-red-700 bg-red-500/10 text-red-500"
-                            }`}
+                            className={`px-3 py-1 rounded-full text-xs font-medium border ${!isPast
+                              ? "border-[#08B74F]/30 bg-[#08B74F]/10 text-[#08B74F]"
+                              : "border-red-700 bg-red-500/10 text-red-500"
+                              }`}
                           >
                             {isPast ? "Completed" : "Upcoming"}
                           </span>
@@ -519,6 +537,17 @@ export default function EventsAdminPage() {
           </div>
         </motion.div>
       )}
+
+      <ReleaseFormModal
+        isOpen={isReleaseModalOpen}
+        onClose={() => setIsReleaseModalOpen(false)}
+        events={events}
+      />
+      <ViewRegistrationsModal
+        isOpen={isRegistrationsModalOpen}
+        onClose={() => setIsRegistrationsModalOpen(false)}
+        events={events}
+      />
     </div>
   );
 }

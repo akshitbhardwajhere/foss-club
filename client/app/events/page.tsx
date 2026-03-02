@@ -13,6 +13,7 @@ interface Event {
   date: string;
   location: string;
   imageUrl?: string;
+  registrationConfig?: any;
 }
 
 import { Skeleton } from "@/components/ui/skeleton";

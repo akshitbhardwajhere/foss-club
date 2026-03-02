@@ -8,6 +8,7 @@ interface Event {
     id: string;
     title: string;
     date: string;
+    registrationConfig?: any;
 }
 
 interface TimeLeft {
@@ -22,12 +23,26 @@ export default function NextEventCountdown() {
     const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
     const [loading, setLoading] = useState(true);
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
+    const [registrationLink, setRegistrationLink] = useState("");
 
     useEffect(() => {
         const fetchNextEvent = async () => {
             try {
                 const res = await api.get('/api/events/next');
-                setEvent(res.data);
+                if (res.data) {
+                    setEvent(res.data);
+                    try {
+                        const configRes = await api.get(`/api/registration/config/${res.data.id}`);
+                        if (configRes.data && new Date(configRes.data.validUntil) > new Date()) {
+                            setIsRegistrationOpen(true);
+                            const eventNameForUrl = res.data.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+                            setRegistrationLink(`/events/registration/${eventNameForUrl}?id=${res.data.id}`);
+                        }
+                    } catch (configErr) {
+                        // Form not released or closed
+                    }
+                }
             } catch (error) {
                 console.error("Failed to fetch next event", error);
             } finally {
@@ -155,26 +170,41 @@ export default function NextEventCountdown() {
 
                                     <div className="w-full h-px bg-zinc-800/50 my-1 opacity-50" />
 
-                                    <div className="flex items-center justify-center gap-2 md:gap-2 shrink-0">
-                                        {timeBlocks.map((block, i) => (
-                                            <div key={block.label} className="flex flex-col items-center">
-                                                <div className="bg-zinc-950/80 border border-zinc-800 rounded-lg w-10 h-10 sm:w-12 sm:h-12 md:w-12 md:h-12 flex items-center justify-center mb-1 group-hover:border-[#08B74F]/30 transition-colors shadow-inner">
-                                                    <AnimatePresence mode="popLayout">
-                                                        <motion.span
-                                                            key={block.value}
-                                                            initial={{ y: 10, opacity: 0, scale: 0.8 }}
-                                                            animate={{ y: 0, opacity: 1, scale: 1 }}
-                                                            exit={{ y: -10, opacity: 0, scale: 0.8 }}
-                                                            transition={{ duration: 0.2, ease: "easeOut" }}
-                                                            className="text-lg sm:text-xl md:text-xl font-black text-white tabular-nums tracking-tighter"
-                                                        >
-                                                            {block.value}
-                                                        </motion.span>
-                                                    </AnimatePresence>
+                                    <div className="flex flex-col w-full items-center justify-center">
+                                        <div className="flex items-center justify-center gap-2 md:gap-2 shrink-0">
+                                            {timeBlocks.map((block, i) => (
+                                                <div key={block.label} className="flex flex-col items-center">
+                                                    <div className="bg-zinc-950/80 border border-zinc-800 rounded-lg w-10 h-10 sm:w-12 sm:h-12 md:w-12 md:h-12 flex items-center justify-center mb-1 group-hover:border-[#08B74F]/30 transition-colors shadow-inner">
+                                                        <AnimatePresence mode="popLayout">
+                                                            <motion.span
+                                                                key={block.value}
+                                                                initial={{ y: 10, opacity: 0, scale: 0.8 }}
+                                                                animate={{ y: 0, opacity: 1, scale: 1 }}
+                                                                exit={{ y: -10, opacity: 0, scale: 0.8 }}
+                                                                transition={{ duration: 0.2, ease: "easeOut" }}
+                                                                className="text-lg sm:text-xl md:text-xl font-black text-white tabular-nums tracking-tighter"
+                                                            >
+                                                                {block.value}
+                                                            </motion.span>
+                                                        </AnimatePresence>
+                                                    </div>
+                                                    <span className="text-[8px] sm:text-[9px] md:text-[9px] font-semibold text-zinc-500 uppercase tracking-widest">{block.label}</span>
                                                 </div>
-                                                <span className="text-[8px] sm:text-[9px] md:text-[9px] font-semibold text-zinc-500 uppercase tracking-widest">{block.label}</span>
-                                            </div>
-                                        ))}
+                                            ))}
+                                        </div>
+
+                                        {isRegistrationOpen && (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    window.location.href = registrationLink;
+                                                }}
+                                                className="mt-5 w-full bg-[#08B74F] hover:bg-[#08B74F]/90 text-black py-2.5 rounded-xl font-bold text-sm shadow-[0_0_15px_rgba(8,183,79,0.3)] transition-all flex items-center justify-center gap-2 z-50 pointer-events-auto cursor-pointer"
+                                            >
+                                                Register Now
+                                                <ArrowRight className="w-4 h-4" />
+                                            </button>
+                                        )}
                                     </div>
                                 </Link>
                             </motion.div>

@@ -8,13 +8,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.submitContactForm = void 0;
-const nodemailer_1 = __importDefault(require("nodemailer"));
-// We'll initialize the transporter inside the function to ensure env vars are loaded
+const node_mailjet_1 = require("node-mailjet");
 function buildEmailHtml(data) {
     return `
 <!DOCTYPE html>
@@ -191,53 +187,79 @@ const submitContactForm = (req, res) => __awaiter(void 0, void 0, void 0, functi
             res.status(400).json({ message: "All fields are required." });
             return;
         }
+        // Validate environment variables
+        if (!process.env.MAILJET_API_KEY ||
+            !process.env.MAILJET_API_SECRET ||
+            !process.env.MAILJET_FROM_EMAIL) {
+            res.status(500).json({
+                message: "Email service is not properly configured. Please try again later.",
+            });
+            return;
+        }
         const adminHtml = buildEmailHtml({ name, email, reason, expertise });
         const userHtml = buildAutoReplyHtml(name);
-        const transporter = nodemailer_1.default.createTransport({
-            host: process.env.EMAIL_HOST || "smtp.gmail.com",
-            port: Number(process.env.EMAIL_PORT) || 587,
-            secure: process.env.EMAIL_PORT === "465",
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
-            },
+        // Initialize Mailjet client
+        const mailjet = new node_mailjet_1.Client({
+            apiKey: process.env.MAILJET_API_KEY,
+            apiSecret: process.env.MAILJET_API_SECRET,
         });
-        try {
-            // Send notification to FOSS Club admin
-            yield transporter.sendMail({
-                from: {
-                    name: "FOSS Club NIT Srinagar",
-                    address: process.env.EMAIL_USER,
-                },
-                to: "akshitbhardwaj257448@gmail.com",
-                subject: `New Membership Request from ${name}`,
-                html: adminHtml,
-            });
-            // Send auto-reply to the user
-            yield transporter.sendMail({
-                from: {
-                    name: "FOSS Club NIT Srinagar",
-                    address: process.env.EMAIL_USER,
-                },
-                to: email,
-                subject: "We've received your FOSS Club request!",
-                html: userHtml,
-            });
-            res
-                .status(201)
-                .json({ message: "Your request has been submitted successfully!" });
-        }
-        catch (emailError) {
-            // Still return success as the form was submitted - email is secondary
-            // This handles cases where SMTP is blocked (e.g., Render free tier)
-            res.status(201).json({
-                message: "Your request has been submitted successfully! We'll review it soon.",
-                note: "Email notification may be delayed due to infrastructure limitations.",
-            });
-        }
+        const adminEmail = process.env.ADMIN_EMAIL || "akshitbhardwaj257448@gmail.com";
+        // Return success immediately to avoid timeout
+        res
+            .status(201)
+            .json({ message: "Your request has been submitted successfully!" });
+        // Send emails asynchronously (fire and forget)
+        (() => __awaiter(void 0, void 0, void 0, function* () {
+            try {
+                // Send notification to FOSS Club admin
+                const adminResponse = yield mailjet
+                    .post("send", { version: "v3.1" })
+                    .request({
+                    Messages: [
+                        {
+                            From: {
+                                Email: process.env.MAILJET_FROM_EMAIL,
+                                Name: "FOSS Club NIT Srinagar",
+                            },
+                            To: [
+                                {
+                                    Email: adminEmail,
+                                },
+                            ],
+                            Subject: `New Membership Request from ${name}`,
+                            TextPart: `New membership request from ${name} (${email})\n\nReason:\n${reason}\n\nExpertise:\n${expertise}`,
+                            HTMLPart: adminHtml,
+                        },
+                    ],
+                });
+                // Send auto-reply to the user
+                const userResponse = yield mailjet
+                    .post("send", { version: "v3.1" })
+                    .request({
+                    Messages: [
+                        {
+                            From: {
+                                Email: process.env.MAILJET_FROM_EMAIL,
+                                Name: "FOSS Club NIT Srinagar",
+                            },
+                            To: [
+                                {
+                                    Email: email,
+                                },
+                            ],
+                            Subject: "We've received your FOSS Club request!",
+                            TextPart: `Hi ${name},\n\nThank you for your interest in joining the FOSS Club at NIT Srinagar! We have received your membership request and will review it soon.\n\nBest regards,\nThe FOSS Club Team`,
+                            HTMLPart: userHtml,
+                        },
+                    ],
+                });
+            }
+            catch (emailError) {
+                // Email errors are logged but don't affect form submission response
+            }
+        }))();
     }
     catch (error) {
-        console.error("Contact form error:", error instanceof Error ? error.message : error);
         res.status(500).json({
             message: "Failed to submit your request. Please try again later.",
         });
