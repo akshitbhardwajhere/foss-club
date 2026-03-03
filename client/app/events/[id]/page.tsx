@@ -22,7 +22,9 @@ export default function EventDetailPage() {
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
+  const [isRegistrationClosed, setIsRegistrationClosed] = useState(false);
   const [registrationLink, setRegistrationLink] = useState("");
+
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -42,6 +44,8 @@ export default function EventDetailPage() {
               setIsRegistrationOpen(true);
               const eventNameForUrl = res.data.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
               setRegistrationLink(`/events/registration/${eventNameForUrl}?id=${params.id}`);
+            } else if (configRes.data && !isValid && !isPast) {
+              setIsRegistrationClosed(true);
             } else {
               setIsRegistrationOpen(false);
             }
@@ -166,7 +170,7 @@ export default function EventDetailPage() {
               </div>
             </div>
 
-            {isRegistrationOpen && (
+            {isRegistrationOpen ? (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -182,9 +186,19 @@ export default function EventDetailPage() {
                   </svg>
                 </button>
               </motion.div>
-            )}
+            ) : isRegistrationClosed ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="mb-10 z-10 w-full flex justify-center border-t border-zinc-800/40 pt-8 mt-[-1rem]"
+              >
+                <div className="px-8 py-3.5 bg-zinc-800 text-zinc-400 font-bold text-lg rounded-xl border border-zinc-700 flex items-center gap-2 cursor-not-allowed">
+                  Registrations are closed
+                </div>
+              </motion.div>
+            ) : null}
 
-            <div className={`prose prose-invert max-w-3xl mx-auto text-zinc-300 text-left w-full ${!isRegistrationOpen ? 'pt-8 border-t border-zinc-800/40' : ''}`}>
+            <div className={`prose prose-invert max-w-3xl mx-auto text-zinc-300 text-left w-full ${(!isRegistrationOpen && !isRegistrationClosed) ? 'pt-8 border-t border-zinc-800/40' : ''}`}>
               <h3 className="text-xl font-bold text-white mb-4 block">
                 Event Details
               </h3>

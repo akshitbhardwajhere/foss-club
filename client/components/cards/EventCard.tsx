@@ -23,6 +23,7 @@ interface EventCardProps {
 
 export default function EventCard({ event, index, isPast }: EventCardProps) {
     const isRegistrationValid = event.registrationConfig && new Date(event.registrationConfig.validUntil) > new Date() && !isPast;
+    const isRegistrationClosed = event.registrationConfig && new Date(event.registrationConfig.validUntil) <= new Date() && !isPast;
 
     return (
         <Link href={`/events/${event.id}`}>
@@ -69,13 +70,23 @@ export default function EventCard({ event, index, isPast }: EventCardProps) {
                             <MapPin className="w-4 h-4 text-[#08B74F]" />
                             <span className="truncate">{event.location}</span>
                         </div>
-                        {isRegistrationValid && (
+                        {isRegistrationValid ? (
                             <div className="mt-4 flex">
-                                <span className="text-xs font-bold px-4 py-2 bg-[#08B74F]/10 text-[#08B74F] border border-[#08B74F]/20 rounded-lg transition-colors w-full text-center">
+                                <span className="text-xs font-bold px-4 py-2 bg-[#08B74F]/10 text-[#08B74F] border border-[#08B74F]/20 rounded-lg transition-colors w-full flex items-center justify-center gap-2">
+                                    <span className="relative flex h-2 w-2">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#08B74F] opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-[#08B74F]"></span>
+                                    </span>
                                     Registrations are live
                                 </span>
                             </div>
-                        )}
+                        ) : isRegistrationClosed ? (
+                            <div className="mt-4 flex">
+                                <span className="text-xs font-bold px-4 py-2 bg-zinc-800/50 text-zinc-400 border border-zinc-700/50 rounded-lg transition-colors w-full text-center">
+                                    Registrations are closed
+                                </span>
+                            </div>
+                        ) : null}
                     </div>
                 </div>
             </motion.div>

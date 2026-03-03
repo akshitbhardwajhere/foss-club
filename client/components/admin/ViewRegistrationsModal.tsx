@@ -90,20 +90,16 @@ export default function ViewRegistrationsModal({ isOpen, onClose, events }: View
                                         required
                                     >
                                         <option value="" disabled>Choose an event dashboard</option>
-                                        <optgroup label="Upcoming Events">
-                                            {registrationEvents.filter(e => new Date(e.date) > new Date()).map((event) => (
-                                                <option key={event.id} value={event.id} className="bg-zinc-900">
-                                                    {event.title}
-                                                </option>
-                                            ))}
-                                        </optgroup>
-                                        <optgroup label="Completed Events">
-                                            {registrationEvents.filter(e => new Date(e.date) <= new Date()).map((event) => (
-                                                <option key={event.id} value={event.id} className="bg-zinc-900">
-                                                    {event.title}
-                                                </option>
-                                            ))}
-                                        </optgroup>
+                                        {registrationEvents.filter(e => new Date(e.date) > new Date()).map((event) => (
+                                            <option key={event.id} value={event.id} className="bg-zinc-900">
+                                                {event.title}
+                                            </option>
+                                        ))}
+                                        {registrationEvents.filter(e => new Date(e.date) <= new Date()).map((event) => (
+                                            <option key={event.id} value={event.id} className="bg-zinc-900">
+                                                {event.title}
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
 

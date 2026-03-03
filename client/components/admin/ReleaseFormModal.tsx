@@ -59,6 +59,13 @@ export default function ReleaseFormModal({ isOpen, onClose, events }: ReleaseFor
         toast.success("Link copied to clipboard!");
     };
 
+    const handleClose = () => {
+        if (generatedLink) {
+            window.location.reload();
+        }
+        onClose();
+    };
+
     if (!isOpen) return null;
 
     return (
@@ -82,7 +89,7 @@ export default function ReleaseFormModal({ isOpen, onClose, events }: ReleaseFor
                             </div>
                         </div>
                         <button
-                            onClick={onClose}
+                            onClick={handleClose}
                             className="p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800 transition-colors"
                         >
                             <X className="w-5 h-5" />
@@ -163,7 +170,7 @@ export default function ReleaseFormModal({ isOpen, onClose, events }: ReleaseFor
                                 </div>
 
                                 <Button
-                                    onClick={onClose}
+                                    onClick={handleClose}
                                     className="w-full mt-4 h-11 rounded-xl bg-zinc-800 text-white hover:bg-zinc-700 font-bold"
                                 >
                                     Done

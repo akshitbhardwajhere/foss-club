@@ -24,6 +24,7 @@ export default function NextEventCountdown() {
     const [loading, setLoading] = useState(true);
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
+    const [isRegistrationClosed, setIsRegistrationClosed] = useState(false);
     const [registrationLink, setRegistrationLink] = useState("");
 
     useEffect(() => {
@@ -34,10 +35,14 @@ export default function NextEventCountdown() {
                     setEvent(res.data);
                     try {
                         const configRes = await api.get(`/api/registration/config/${res.data.id}`);
-                        if (configRes.data && new Date(configRes.data.validUntil) > new Date()) {
-                            setIsRegistrationOpen(true);
-                            const eventNameForUrl = res.data.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-                            setRegistrationLink(`/events/registration/${eventNameForUrl}?id=${res.data.id}`);
+                        if (configRes.data) {
+                            if (new Date(configRes.data.validUntil) > new Date()) {
+                                setIsRegistrationOpen(true);
+                                const eventNameForUrl = res.data.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+                                setRegistrationLink(`/events/registration/${eventNameForUrl}?id=${res.data.id}`);
+                            } else {
+                                setIsRegistrationClosed(true);
+                            }
                         }
                     } catch (configErr) {
                         // Form not released or closed
@@ -192,8 +197,7 @@ export default function NextEventCountdown() {
                                                 </div>
                                             ))}
                                         </div>
-
-                                        {isRegistrationOpen && (
+                                        {isRegistrationOpen ? (
                                             <button
                                                 onClick={(e) => {
                                                     e.preventDefault();
@@ -204,7 +208,11 @@ export default function NextEventCountdown() {
                                                 Register Now
                                                 <ArrowRight className="w-4 h-4" />
                                             </button>
-                                        )}
+                                        ) : isRegistrationClosed ? (
+                                            <div className="mt-5 w-full bg-zinc-800 text-zinc-400 py-2.5 rounded-xl font-bold text-sm border border-zinc-700 flex items-center justify-center cursor-not-allowed">
+                                                Registrations are closed
+                                            </div>
+                                        ) : null}
                                     </div>
                                 </Link>
                             </motion.div>
