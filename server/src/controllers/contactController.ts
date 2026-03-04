@@ -22,7 +22,7 @@ function buildEmailHtml(data: {
   return `
     <div style="font-family: Arial, sans-serif; background-color: #050B08; color: #ffffff; padding: 40px; margin: 0; max-width: 600px; border-radius: 12px; border: 1px solid #1b3123;">
       <div style="text-align: center; margin-bottom: 30px;">
-        <h1 style="color: #08B74F; margin: 0; font-size: 28px;">New Community Request</h1>
+        <h1 style="color: #08B74F; margin: 0; font-size: 28px;">New Community Application</h1>
       </div>
       
       <p style="color: #e4e4e7; font-size: 16px; line-height: 1.5; margin-bottom: 24px;">
