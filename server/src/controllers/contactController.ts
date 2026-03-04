@@ -170,7 +170,7 @@ export const submitContactForm = async (
                 new Date().toISOString(),
                 name,
                 email,
-                phone,
+                `'${phone}`,
                 institute,
                 enrollment,
                 expertise,
