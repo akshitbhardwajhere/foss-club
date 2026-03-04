@@ -105,12 +105,15 @@ export default function EventsAdminPage() {
   };
 
   const handleEdit = (event: EventItem) => {
+    let localDateString = "";
+    if (event.date) {
+      const d = new Date(event.date);
+      localDateString = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+    }
     form.reset({
       title: event.title || "",
       category: event.category || "",
-      date: event.date
-        ? new Date(event.date).toISOString().slice(0, 16)
-        : "",
+      date: localDateString,
       location: event.location || "",
       description: event.description || "",
       imageUrl: event.imageUrl || "",
@@ -123,11 +126,15 @@ export default function EventsAdminPage() {
     setIsSubmitting(true);
     setError(null);
     try {
+      const payload = {
+        ...values,
+        date: new Date(values.date).toISOString(),
+      };
       if (editingId) {
-        await api.put(`/api/events/${editingId}`, values);
+        await api.put(`/api/events/${editingId}`, payload);
         toast.success("Event updated successfully.");
       } else {
-        await api.post("/api/events", values);
+        await api.post("/api/events", payload);
         toast.success("New event published!");
       }
       await fetchEvents();

@@ -39,7 +39,7 @@ export default function ReleaseFormModal({ isOpen, onClose, events }: ReleaseFor
         try {
             await api.post("/api/registration/config", {
                 eventId: selectedEventId,
-                validUntil,
+                validUntil: new Date(validUntil).toISOString(),
             });
 
             const eventNameForUrl = upcomingEvents.find(e => e.id === selectedEventId)?.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
