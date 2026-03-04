@@ -17,6 +17,7 @@ export default function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
         { label: 'Events', href: '/admin/events', icon: CalendarDays },
         { label: 'Members', href: '/admin/team', icon: Users },
         { label: 'Blogs', href: '/admin/blogs', icon: Rss },
+        { label: 'FOSS Community', href: '/admin/queries', icon: Terminal },
     ];
 
     return (

@@ -12,6 +12,7 @@ import {
   AtSign,
   FileText,
   Sparkles,
+  Phone,
 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -21,16 +22,37 @@ import api from "@/lib/axios";
 import BackgroundBlur from "@/components/shared/BackgroundBlur";
 import PageHeader from "@/components/shared/PageHeader";
 
-const formSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  email: z.string().email({ message: "Please enter a valid email address." }),
-  reason: z
-    .string()
-    .min(10, { message: "Please tell us more (at least 10 characters)." }),
-  expertise: z
-    .string()
-    .min(2, { message: "Expertise must be at least 2 characters." }),
-});
+const formSchema = z
+  .object({
+    name: z.string().min(2, { message: "Name must be at least 2 characters." }),
+    email: z.string().email({ message: "Please enter a valid email address." }),
+    phone: z.string().min(10, { message: "Please enter a valid phone number." }),
+    isNitSrinagar: z.string().min(1, { message: "Please select if you are from NIT Srinagar." }),
+    institute: z.string().optional(),
+    enrollment: z.string().optional(),
+    expertise: z
+      .string()
+      .min(2, { message: "Expertise must be at least 2 characters." }),
+  })
+  .superRefine((data, ctx) => {
+    if (data.isNitSrinagar === "yes") {
+      if (!data.enrollment || data.enrollment.trim().length < 2) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Enrollment number is required.",
+          path: ["enrollment"],
+        });
+      }
+    } else if (data.isNitSrinagar === "no") {
+      if (!data.institute || data.institute.trim().length < 2) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Institute name must be at least 2 characters.",
+          path: ["institute"],
+        });
+      }
+    }
+  });
 
 type FormData = z.infer<typeof formSchema>;
 
@@ -41,21 +63,35 @@ export default function ContactPage() {
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       email: "",
-      reason: "",
+      phone: "",
+      isNitSrinagar: undefined, // Let it be undefined initially for the select placeholder
+      institute: "",
+      enrollment: "",
       expertise: "",
     },
   });
 
+  const isNitSrinagarValue = watch("isNitSrinagar");
+
   async function onSubmit(values: FormData) {
     setIsSubmitting(true);
     try {
-      await api.post("/api/contact", values);
+      // Map conditionally rendered fields so backend receives appropriate defaults
+      const payload = { ...values };
+      if (values.isNitSrinagar === "yes") {
+        payload.institute = "NIT Srinagar";
+      } else {
+        payload.enrollment = "N/A";
+      }
+
+      await api.post("/api/contact", payload);
       toast.success("Your request has been submitted!", {
         description: "We'll get back to you soon.",
       });
@@ -133,7 +169,13 @@ export default function ContactPage() {
           >
             Have a question, want to collaborate, or just want to say hi?
             We&apos;d love to hear from you.
-            <p className="text-zinc-500 mt-2 text-sm max-w-[90%]">
+            <div className="mt-6 p-4 rounded-xl bg-[#08B74F]/10 border border-[#08B74F]/20 text-sm">
+              <p className="font-semibold text-[#A7F3D0] mb-1">Building the FOSS Community</p>
+              <p className="text-zinc-400 leading-relaxed">
+                Please note that our upcoming events and workshops will be exclusively available to registered FOSS Community members. Fill out the form below to join us!
+              </p>
+            </div>
+            <p className="text-zinc-500 mt-6 text-sm max-w-[90%]">
               Send us a message and we&apos;ll respond as soon as possible.
             </p>
           </motion.div>
@@ -178,7 +220,7 @@ export default function ContactPage() {
             <div className="mb-6">
               <h3 className="text-xl font-semibold flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-[#08B74F]" />
-                Join the FOSS Club
+                Join the FOSS Community
               </h3>
               <p className="text-zinc-500 text-sm mt-1">
                 Fill in the details below and we&apos;ll reach out to you.
@@ -229,28 +271,111 @@ export default function ContactPage() {
               )}
             </div>
 
-            {/* Reason to Join */}
+            {/* Phone */}
             <div>
               <label
-                htmlFor="contact-reason"
+                htmlFor="contact-phone"
                 className="text-sm font-medium text-zinc-300 mb-1.5 flex items-center gap-1.5"
               >
-                <FileText className="w-3.5 h-3.5 text-[#08B74F]" /> Why do you
-                want to join?
+                <Phone className="w-3.5 h-3.5 text-[#08B74F]" /> Phone Number
               </label>
-              <textarea
-                id="contact-reason"
-                rows={3}
-                placeholder="Tell us what excites you about open-source..."
-                className={`${inputBaseClass} resize-none`}
-                {...register("reason")}
+              <input
+                id="contact-phone"
+                type="tel"
+                placeholder="+91XXXXXXXXXX"
+                className={inputBaseClass}
+                {...register("phone")}
               />
-              {errors.reason && (
+              {errors.phone && (
                 <p className="text-red-400 text-xs mt-1.5">
-                  {errors.reason.message}
+                  {errors.phone.message}
                 </p>
               )}
             </div>
+
+            {/* Is NIT Srinagar? */}
+            <div>
+              <label
+                htmlFor="contact-isnitsrinagar"
+                className="text-sm font-medium text-zinc-300 mb-1.5 flex items-center gap-1.5"
+              >
+                <MapPin className="w-3.5 h-3.5 text-[#08B74F]" /> Are you from NIT Srinagar?
+              </label>
+              <select
+                id="contact-isnitsrinagar"
+                className={`${inputBaseClass} appearance-none cursor-pointer`}
+                {...register("isNitSrinagar")}
+              >
+                <option value="" disabled>Select an option</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select>
+              {errors.isNitSrinagar && (
+                <p className="text-red-400 text-xs mt-1.5">
+                  {errors.isNitSrinagar.message}
+                </p>
+              )}
+            </div>
+
+            {/* Institute (Conditional) */}
+            {isNitSrinagarValue === "no" && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden"
+              >
+                <label
+                  htmlFor="contact-institute"
+                  className="text-sm font-medium text-zinc-300 mb-1.5 flex items-center gap-1.5"
+                >
+                  <MapPin className="w-3.5 h-3.5 text-[#08B74F]" /> Institute Name
+                </label>
+                <input
+                  id="contact-institute"
+                  type="text"
+                  placeholder="e.g. IIT Delhi"
+                  className={inputBaseClass}
+                  {...register("institute")}
+                />
+                {errors.institute && (
+                  <p className="text-red-400 text-xs mt-1.5">
+                    {errors.institute.message}
+                  </p>
+                )}
+              </motion.div>
+            )}
+
+            {/* Enrollment (Conditional) */}
+            {isNitSrinagarValue === "yes" && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden"
+              >
+                <label
+                  htmlFor="contact-enrollment"
+                  className="text-sm font-medium text-zinc-300 mb-1.5 flex items-center gap-1.5"
+                >
+                  <FileText className="w-3.5 h-3.5 text-[#08B74F]" /> Enrollment Number
+                </label>
+                <input
+                  id="contact-enrollment"
+                  type="text"
+                  placeholder="202XB...XXX"
+                  className={inputBaseClass}
+                  {...register("enrollment")}
+                />
+                {errors.enrollment && (
+                  <p className="text-red-400 text-xs mt-1.5">
+                    {errors.enrollment.message}
+                  </p>
+                )}
+              </motion.div>
+            )}
 
             {/* Expertise */}
             <div>
@@ -289,13 +414,13 @@ export default function ContactPage() {
               ) : (
                 <>
                   <Send className="w-4 h-4" />
-                  Submit Request
+                  Join the FOSS Community
                 </>
               )}
             </button>
           </form>
         </motion.div>
-      </motion.div>
-    </div>
+      </motion.div >
+    </div >
   );
 }

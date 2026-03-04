@@ -11,6 +11,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.submitContactForm = void 0;
 const node_mailjet_1 = require("node-mailjet");
+const google_1 = require("../config/google");
+const SHEET_ID = process.env.GOOGLE_SHEET_ID;
 function buildEmailHtml(data) {
     return `
 <!DOCTYPE html>
@@ -195,6 +197,25 @@ const submitContactForm = (req, res) => __awaiter(void 0, void 0, void 0, functi
                 message: "Email service is not properly configured. Please try again later.",
             });
             return;
+        }
+        // Attempt to append to Google Sheets
+        if (SHEET_ID) {
+            try {
+                yield google_1.sheets.spreadsheets.values.append({
+                    spreadsheetId: SHEET_ID,
+                    range: "Sheet1!A:E",
+                    valueInputOption: "USER_ENTERED",
+                    requestBody: {
+                        values: [
+                            [new Date().toISOString(), name, email, reason, expertise],
+                        ],
+                    },
+                });
+            }
+            catch (sheetError) {
+                console.error("Failed to append to Google Sheets:", sheetError);
+                // Continue even if sheet append fails to still send email
+            }
         }
         const adminHtml = buildEmailHtml({ name, email, reason, expertise });
         const userHtml = buildAutoReplyHtml(name);

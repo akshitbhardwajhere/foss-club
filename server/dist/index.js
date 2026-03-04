@@ -25,6 +25,7 @@ const statsRoutes_1 = __importDefault(require("./routes/statsRoutes"));
 const uploadRoutes_1 = __importDefault(require("./routes/uploadRoutes"));
 const contactRoutes_1 = __importDefault(require("./routes/contactRoutes"));
 const registrationRoutes_1 = __importDefault(require("./routes/registrationRoutes"));
+const sheetRoutes_1 = __importDefault(require("./routes/sheetRoutes"));
 // Load env vars
 dotenv_1.default.config();
 // Connect to database securely
@@ -76,6 +77,7 @@ app.use("/api/team", teamRoutes_1.default);
 app.use("/api/upload", uploadRoutes_1.default);
 app.use("/api/contact", contactRoutes_1.default);
 app.use("/api/registration", registrationRoutes_1.default);
+app.use("/api/sheet", sheetRoutes_1.default);
 // Health check endpoint
 app.get("/health", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {

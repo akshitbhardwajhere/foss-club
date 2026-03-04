@@ -19,6 +19,7 @@ const getEvents = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const events = yield prisma_1.default.event.findMany({
             orderBy: { createdAt: "desc" },
+            include: { registrationConfig: true },
         });
         res.json(events);
     }
@@ -38,6 +39,7 @@ const getNextEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             orderBy: {
                 date: "asc", // Get the chronologically closest one first
             },
+            include: { registrationConfig: true },
         });
         // It's perfectly normal for this to be null if there are no upcoming events
         res.json(nextEvent);
@@ -50,7 +52,10 @@ exports.getNextEvent = getNextEvent;
 const getEventById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id = req.params.id;
-        const event = yield prisma_1.default.event.findUnique({ where: { id } });
+        const event = yield prisma_1.default.event.findUnique({
+            where: { id },
+            include: { registrationConfig: true },
+        });
         if (event) {
             res.json(event);
         }
