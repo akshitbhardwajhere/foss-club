@@ -5,7 +5,10 @@ import axios from "axios";
 // point to the deployed server backend URL seamlessly.
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000",
+  baseURL: (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000").replace(
+    /\/$/,
+    "",
+  ),
   withCredentials: true, // Crucial for passing HttpOnly JWT cookies to the backend
 });
 
