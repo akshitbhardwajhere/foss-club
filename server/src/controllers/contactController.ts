@@ -219,15 +219,15 @@ export const submitContactForm = async (
               {
                 From: {
                   Email: process.env.MAILJET_FROM_EMAIL,
-                  Name: "FOSS Community NIT Srinagar",
+                  Name: "FOSS Club NIT Srinagar",
                 },
                 To: [
                   {
                     Email: adminEmail,
                   },
                 ],
-                Subject: `New Membership Request from ${name}`,
-                TextPart: `New membership request from ${name} (${email})\n\nPhone: ${phone}\nInstitute: ${institute}\nEnrollment: ${enrollment}\n\nExpertise:\n${expertise}`,
+                Subject: `New Community Application from ${name}`,
+                TextPart: `New community application from ${name} (${email})\n\nPhone: ${phone}\nInstitute: ${institute}\nEnrollment: ${enrollment}\n\nExpertise:\n${expertise}`,
                 HTMLPart: adminHtml,
               },
             ],
@@ -241,15 +241,15 @@ export const submitContactForm = async (
               {
                 From: {
                   Email: process.env.MAILJET_FROM_EMAIL,
-                  Name: "FOSS Community NIT Srinagar",
+                  Name: "FOSS Club NIT Srinagar",
                 },
                 To: [
                   {
                     Email: email,
                   },
                 ],
-                Subject: "We've received your FOSS Community request!",
-                TextPart: `Hi ${name},\n\nThank you for your interest in joining the FOSS Community at NIT Srinagar! We have received your membership request and will review it soon.\n\nBest regards,\nThe FOSS Team`,
+                Subject: "We've received your FOSS Community application!",
+                TextPart: `Hi ${name},\n\nThank you for your interest in joining the FOSS Community at NIT Srinagar! We have received your community application and will review it soon.\n\nBest regards,\nThe FOSS Team`,
                 HTMLPart: userHtml,
               },
             ],
