@@ -34,6 +34,14 @@ export const sendRegistrationEmail = async (
         Your registration will be fully confirmed only upon replying to this email. Please hit "Reply" and let us know you're ready to participate!
       </p>
 
+       <p style="color: #e4e4e7; font-size: 16px; line-height: 1.5;">
+        Check the event details for more information. This will give you a brief overview of the event and help us plan accordingly. For hackathon, the details are given in the event details page. You have to come prepared with your laptop and charger.
+      </p>
+
+       <p style="color: #e4e4e7; font-size: 16px; line-height: 1.5;">
+        Bring your own water bottle. The filler will be provided at the venue. We support sustainable practices.
+      </p>
+
       <div style="text-align: center; margin-top: 40px; margin-bottom: 40px;">
         <a href="${eventUrl}" style="background-color: #08B74F; color: #000000; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block;">
           Event Details
