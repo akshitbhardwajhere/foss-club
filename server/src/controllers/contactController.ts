@@ -33,7 +33,7 @@ function buildEmailHtml(data: {
         <h3 style="color: #08B74F; margin-top: 0; margin-bottom: 16px; font-size: 18px;">Applicant Details</h3>
         <p style="color: #e4e4e7; font-size: 16px; line-height: 1.5; margin: 8px 0;"><strong>Name:</strong> ${data.name}</p>
         <p style="color: #e4e4e7; font-size: 16px; line-height: 1.5; margin: 8px 0;"><strong>Email:</strong> <a href="mailto:${data.email}" style="color: #08B74F; text-decoration: none;">${data.email}</a></p>
-        <p style="color: #e4e4e7; font-size: 16px; line-height: 1.5; margin: 8px 0;"><strong>Phone:</strong> ${data.phone}</p>
+        <p style="color: #e4e4e7; font-size: 16px; line-height: 1.5; margin: 8px 0;"><strong>Phone:</strong> ${data.phone || "Not provided"}</p>
         ${organizationDetail}
       </div>
 
@@ -139,8 +139,10 @@ export const submitContactForm = async (
   try {
     const { name, email, phone, institute, enrollment, expertise } = req.body;
 
-    if (!name || !email || !phone || !institute || !enrollment || !expertise) {
-      res.status(400).json({ message: "All fields are required." });
+    if (!name || !email || !institute || !enrollment || !expertise) {
+      res
+        .status(400)
+        .json({ message: "All fields except phone are required." });
       return;
     }
 
@@ -170,7 +172,7 @@ export const submitContactForm = async (
                 new Date().toISOString(),
                 name,
                 email,
-                `'${phone}`,
+                phone ? `'${phone}` : "",
                 institute,
                 enrollment,
                 expertise,
@@ -227,7 +229,7 @@ export const submitContactForm = async (
                   },
                 ],
                 Subject: `New Community Application from ${name}`,
-                TextPart: `New community application from ${name} (${email})\n\nPhone: ${phone}\nInstitute: ${institute}\nEnrollment: ${enrollment}\n\nExpertise:\n${expertise}`,
+                TextPart: `New community application from ${name} (${email})\n\nPhone: ${phone || "Not provided"}\nInstitute: ${institute}\nEnrollment: ${enrollment}\n\nExpertise:\n${expertise}`,
                 HTMLPart: adminHtml,
               },
             ],

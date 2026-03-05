@@ -26,7 +26,7 @@ const formSchema = z
   .object({
     name: z.string().min(2, { message: "Name must be at least 2 characters." }),
     email: z.string().email({ message: "Please enter a valid email address." }),
-    phone: z.string().min(10, { message: "Please enter a valid phone number." }),
+    phone: z.string().refine((val) => !val || val.length >= 10, { message: "Please enter a valid phone number." }).optional(),
     isNitSrinagar: z.string().min(1, { message: "Please select if you are from NIT Srinagar." }),
     institute: z.string().optional(),
     enrollment: z.string().optional(),
@@ -277,7 +277,7 @@ export default function ContactPage() {
                 htmlFor="contact-phone"
                 className="text-sm font-medium text-zinc-300 mb-1.5 flex items-center gap-1.5"
               >
-                <Phone className="w-3.5 h-3.5 text-[#08B74F]" /> Phone Number
+                <Phone className="w-3.5 h-3.5 text-[#08B74F]" /> Phone Number <span className="text-zinc-500 font-normal ml-1">(Optional)</span>
               </label>
               <input
                 id="contact-phone"

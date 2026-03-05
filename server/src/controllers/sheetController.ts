@@ -33,7 +33,7 @@ export const addEntry = async (req: Request, res: Response) => {
             new Date().toISOString(),
             name,
             email,
-            `'${phone}`, // prepend single quote to force text formatting (left-align)
+            phone ? `'${phone}` : "", // prepend single quote to force text formatting (left-align)
             institute,
             enrollment,
             expertise,
@@ -60,7 +60,16 @@ export const updateEntry = async (req: Request, res: Response) => {
       range: `Sheet1!B${rowIndex}:G${rowIndex}`,
       valueInputOption: "USER_ENTERED",
       requestBody: {
-        values: [[name, email, `'${phone}`, institute, enrollment, expertise]],
+        values: [
+          [
+            name,
+            email,
+            phone ? `'${phone}` : "",
+            institute,
+            enrollment,
+            expertise,
+          ],
+        ],
       },
     });
 
