@@ -97,7 +97,7 @@ function buildAutoReplyHtml(name: string) {
               </p>
               
               <p style="margin:0 0 30px 0;font-size:15px;color:#D4D4D8;line-height:1.6;">
-                Our core team is currently reviewing applications and will reach out to you shortly with updates or next steps regarding your onboarding process.
+                Our core team is currently reviewing applications and will reach out to you shortly with updates or next steps regarding your onboarding process, if approved.
               </p>
               
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-left:3px solid #08B74F;background-color:#0A1610;margin-top:10px;">
