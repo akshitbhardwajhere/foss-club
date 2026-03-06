@@ -29,6 +29,7 @@ model Event {
   date        DateTime
   location    String
   imageUrl    String?
+  documentUrl String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   registrationConfig EventRegistrationConfig?

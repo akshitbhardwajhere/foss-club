@@ -1,5 +1,9 @@
 import { Request, Response } from "express";
-import { deleteCloudinaryImage } from "../utils/cloudinary";
+import {
+  deleteCloudinaryImage,
+  deleteCloudinaryResource,
+  uploadBufferToCloudinary,
+} from "../utils/cloudinary";
 
 export const removeCloudinaryImage = async (
   req: Request,
@@ -36,5 +40,78 @@ export const removeCloudinaryImage = async (
     res
       .status(200)
       .json({ message: "Image reference cleared (cleanup error logged)" });
+  }
+};
+export const removeCloudinaryDocument = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const { documentUrl } = req.body;
+
+    if (!documentUrl) {
+      res.status(400).json({ message: "Document URL is required" });
+      return;
+    }
+
+    const success = await deleteCloudinaryResource(documentUrl, "raw");
+
+    if (success) {
+      res
+        .status(200)
+        .json({ message: "Document successfully deleted from Cloudinary" });
+    } else {
+      res.status(200).json({
+        message: "Document reference cleared (Cloudinary asset may not exist)",
+      });
+    }
+  } catch (error) {
+    console.error(
+      "Document deletion error:",
+      error instanceof Error ? error.message : error,
+    );
+    res
+      .status(200)
+      .json({ message: "Document reference cleared (cleanup error logged)" });
+  }
+};
+
+/**
+ * POST /api/upload/document  (protected)
+ * Accepts a multipart/form-data request with a 'file' field containing a PDF.
+ * Uploads to Cloudinary server-side so access_mode=public is guaranteed,
+ * avoiding the 401 that occurs with unsigned direct-to-Cloudinary uploads.
+ */
+export const uploadDocument = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const file = (req as any).file as Express.Multer.File | undefined;
+
+    if (!file) {
+      res.status(400).json({ message: "No file provided" });
+      return;
+    }
+
+    if (file.mimetype !== "application/pdf") {
+      res.status(400).json({ message: "Only PDF files are accepted" });
+      return;
+    }
+
+    const MAX_BYTES = 10 * 1024 * 1024; // 10 MB
+    if (file.size > MAX_BYTES) {
+      res.status(400).json({ message: "PDF must be smaller than 10 MB" });
+      return;
+    }
+
+    const secureUrl = await uploadBufferToCloudinary(file.buffer);
+    res.status(200).json({ url: secureUrl });
+  } catch (error) {
+    console.error(
+      "Document upload error:",
+      error instanceof Error ? error.message : error,
+    );
+    res.status(500).json({ message: "Failed to upload document" });
   }
 };

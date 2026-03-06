@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import ImageUpload from "@/components/ImageUpload";
+import PdfUpload from "@/components/PdfUpload";
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
 import AdminFormWrapper from "@/components/admin/AdminFormWrapper";
 import ConfirmDeleteDialog from "@/components/admin/ConfirmDeleteDialog";
@@ -37,6 +38,7 @@ interface EventItem {
   date: string;
   location: string;
   imageUrl?: string;
+  documentUrl?: string;
   registrationConfig?: any;
 }
 
@@ -53,6 +55,7 @@ const formSchema = z.object({
   location: z.string().min(1, { message: "Location empty." }),
   description: z.string().min(10, { message: "Description needed." }),
   imageUrl: z.string().optional(),
+  documentUrl: z.string().optional(),
 });
 
 const TABLE_COLUMNS = ["Event Details", "Date", "Status", "Actions"];
@@ -76,6 +79,7 @@ export default function EventsAdminPage() {
       location: "",
       description: "",
       imageUrl: "",
+      documentUrl: "",
     },
   });
 
@@ -117,6 +121,7 @@ export default function EventsAdminPage() {
       location: event.location || "",
       description: event.description || "",
       imageUrl: event.imageUrl || "",
+      documentUrl: event.documentUrl || "",
     });
     setEditingId(event.id);
     setIsCreating(true);
@@ -197,6 +202,7 @@ export default function EventsAdminPage() {
                   location: "",
                   description: "",
                   imageUrl: "",
+                  documentUrl: "",
                 });
               }}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#08B74F] text-black font-bold hover:bg-[#08B74F]/90 transition-colors w-full md:w-auto justify-center"
@@ -394,6 +400,29 @@ export default function EventsAdminPage() {
                         <FormMessage />
                         <p className="text-[10px] text-zinc-500 mt-1">
                           16:9 ratio, max 2MB.
+                        </p>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="documentUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs font-medium text-zinc-300 mb-1 block">
+                          Event Brochure / Document{" "}
+                          <span className="text-zinc-500 font-normal">(optional)</span>
+                        </FormLabel>
+                        <FormControl>
+                          <PdfUpload
+                            value={field.value || ""}
+                            onChange={(url) => field.onChange(url)}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                        <p className="text-[10px] text-zinc-500 mt-1">
+                          PDF only, max 10MB. Users will see a download button.
                         </p>
                       </FormItem>
                     )}

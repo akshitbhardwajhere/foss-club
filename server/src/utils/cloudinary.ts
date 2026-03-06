@@ -2,6 +2,8 @@ import { v2 as cloudinary } from "cloudinary";
 
 let isConfigured = false;
 
+type CloudinaryResourceType = "image" | "raw" | "video";
+
 // Lazy initialization: configure Cloudinary only when first needed,
 // after dotenv.config() has loaded environment variables in index.ts.
 function ensureConfigured() {
@@ -17,27 +19,28 @@ function ensureConfigured() {
 }
 
 /**
- * Extracts the public ID from a Cloudinary URL and deletes the asset from Cloudinary storage.
- * @param imageUrl The full secure_url or url returned from a Cloudinary upload
+ * Extracts the public ID from a Cloudinary URL and deletes the asset.
+ * @param assetUrl  The full secure_url returned from a Cloudinary upload
+ * @param resourceType  'image' (default) | 'raw' | 'video'
  */
-export const deleteCloudinaryImage = async (
-  imageUrl: string | null | undefined,
+export const deleteCloudinaryResource = async (
+  assetUrl: string | null | undefined,
+  resourceType: CloudinaryResourceType = "image",
 ): Promise<boolean> => {
-  if (!imageUrl) return false;
+  if (!assetUrl) return false;
 
   ensureConfigured();
 
   try {
     // A standard Cloudinary URL looks like:
-    // https://res.cloudinary.com/cloud_name/image/upload/v1234567890/folder_name/public_id.jpg
-    // We need to extract 'folder_name/public_id' without the extension
+    // https://res.cloudinary.com/cloud_name/<type>/upload/v123.../folder/public_id.ext
+    // We need to extract 'folder/public_id' without the extension.
 
-    const parts = imageUrl.split("/");
-    // Get the part after 'upload/' (which includes version, folder, and filename)
+    const parts = assetUrl.split("/");
     const uploadIndex = parts.findIndex((p) => p === "upload");
-    if (uploadIndex === -1) return false; // Not a valid cloudinary URL
+    if (uploadIndex === -1) return false;
 
-    // Skip the version string (which starts with 'v' followed by numbers)
+    // Skip the version segment (e.g. 'v1234567890')
     let startIndex = uploadIndex + 1;
     if (
       parts[startIndex] &&
@@ -47,10 +50,7 @@ export const deleteCloudinaryImage = async (
       startIndex++;
     }
 
-    // Join the remaining parts (folder + filename)
     const fileWithExtension = parts.slice(startIndex).join("/");
-
-    // Remove the extension to get the clean public ID
     const publicId = fileWithExtension.substring(
       0,
       fileWithExtension.lastIndexOf("."),
@@ -58,8 +58,9 @@ export const deleteCloudinaryImage = async (
 
     if (!publicId) return false;
 
-    // Call Cloudinary SDK to destroy the asset
-    const result = await cloudinary.uploader.destroy(publicId);
+    const result = await cloudinary.uploader.destroy(publicId, {
+      resource_type: resourceType,
+    });
     return result.result === "ok";
   } catch (error) {
     console.error(
@@ -68,4 +69,43 @@ export const deleteCloudinaryImage = async (
     );
     return false;
   }
+};
+
+/**
+ * Convenience wrapper that deletes an image asset (resource_type = 'image').
+ * Kept for backward compatibility.
+ */
+export const deleteCloudinaryImage = (
+  imageUrl: string | null | undefined,
+): Promise<boolean> => deleteCloudinaryResource(imageUrl, "image");
+
+/**
+ * Uploads a raw Buffer to Cloudinary as a raw resource with public access.
+ * Using server-side upload ensures access_mode: 'public' is honoured,
+ * unlike unsigned client-side uploads which default to private for raw files.
+ */
+export const uploadBufferToCloudinary = (
+  buffer: Buffer,
+  folder: string = "event-documents",
+): Promise<string> => {
+  ensureConfigured();
+
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        resource_type: "raw",
+        type: "upload", // "upload" = publicly accessible (vs "private" / "authenticated")
+        folder,
+      },
+      (error, result) => {
+        if (error || !result) {
+          console.error("[cloudinary] upload_stream error:", error);
+          reject(error ?? new Error("Cloudinary upload returned no result"));
+        } else {
+          resolve(result.secure_url);
+        }
+      },
+    );
+    uploadStream.end(buffer);
+  });
 };
