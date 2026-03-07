@@ -38,6 +38,10 @@ export const sendRegistrationEmail = async (
         Check the event details for more information. This will give you a brief overview of the event and help us plan accordingly. For hackathon, the details are given in the event details page. You have to come prepared with your laptop and charger.
       </p>
 
+      <p style="color: #e4e4e7; font-size: 16px; line-height: 1.5;">
+        You have to come prepared with your projects and showcase during the event.
+      </p>
+
        <p style="color: #e4e4e7; font-size: 16px; line-height: 1.5;">
         Bring your own water bottle. The filler will be provided at the venue. We support sustainable practices.
       </p>
