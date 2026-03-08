@@ -244,7 +244,7 @@ export default function EventDetailPage() {
                       )}
                     </div>
                     <div className="text-left">
-                      <p className="text-sm font-semibold text-white leading-none mb-0.5">Event Brochure</p>
+                      <p className="text-sm font-semibold text-white leading-none mb-0.5">What to do</p>
                       <p className="text-xs text-zinc-500">
                         {isDownloading ? "Downloading…" : "Download PDF"}
                       </p>
