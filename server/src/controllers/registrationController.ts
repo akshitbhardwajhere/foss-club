@@ -156,8 +156,8 @@ export const stopRegistration = async (req: Request, res: Response) => {
   try {
     const { eventId } = req.params;
 
-    if (!eventId) {
-      return res.status(400).json({ message: "Event ID is required" });
+    if (typeof eventId !== "string") {
+      return res.status(400).json({ message: "Invalid event ID" });
     }
 
     const config = await prisma.eventRegistrationConfig.findUnique({
@@ -190,9 +190,9 @@ export const getEventRegistrations = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const eventId = req.params.eventId as string;
+    const { eventId } = req.params;
 
-    if (!eventId) {
+    if (typeof eventId !== "string") {
       res.status(400).json({ message: "Event ID is required" });
       return;
     }
