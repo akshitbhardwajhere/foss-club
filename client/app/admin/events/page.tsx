@@ -2,7 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { CalendarDays, Edit3, Plus, MapPin, Link as LinkIcon, Users } from "lucide-react";
+import {
+  CalendarDays,
+  Edit3,
+  Plus,
+  MapPin,
+  Link as LinkIcon,
+  Users,
+  StopCircle,
+} from "lucide-react";
 import api from "@/lib/axios";
 import { formatDate } from "@/lib/utils";
 
@@ -28,6 +36,7 @@ import ConfirmDeleteDialog from "@/components/admin/ConfirmDeleteDialog";
 import AdminTableSkeleton from "@/components/admin/AdminTableSkeleton";
 import ReleaseFormModal from "@/components/admin/ReleaseFormModal";
 import ViewRegistrationsModal from "@/components/admin/ViewRegistrationsModal";
+import ConfirmActionDialog from "@/components/admin/ConfirmActionDialog";
 import { toast } from "sonner";
 
 interface EventItem {
@@ -65,7 +74,8 @@ export default function EventsAdminPage() {
   const [loading, setLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
   const [isReleaseModalOpen, setIsReleaseModalOpen] = useState(false);
-  const [isRegistrationsModalOpen, setIsRegistrationsModalOpen] = useState(false);
+  const [isRegistrationsModalOpen, setIsRegistrationsModalOpen] =
+    useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -108,11 +118,23 @@ export default function EventsAdminPage() {
     }
   };
 
+  const handleStopRegistration = async (eventId: string, title: string) => {
+    try {
+      await api.patch(`/api/registration/stop/${eventId}`);
+      await fetchEvents();
+      toast.success(`Registrations for "${title}" have been stopped.`);
+    } catch (error) {
+      toast.error("Failed to stop registrations. Please try again.");
+    }
+  };
+
   const handleEdit = (event: EventItem) => {
     let localDateString = "";
     if (event.date) {
       const d = new Date(event.date);
-      localDateString = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+      localDateString = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 16);
     }
     form.reset({
       title: event.title || "",
@@ -153,8 +175,8 @@ export default function EventsAdminPage() {
       );
       toast.error(
         error.response?.data?.message ||
-        error.message ||
-        "Failed to publish event",
+          error.message ||
+          "Failed to publish event",
       );
     } finally {
       setIsSubmitting(false);
@@ -412,7 +434,9 @@ export default function EventsAdminPage() {
                       <FormItem>
                         <FormLabel className="text-xs font-medium text-zinc-300 mb-1 block">
                           Event Brochure / Document{" "}
-                          <span className="text-zinc-500 font-normal">(optional)</span>
+                          <span className="text-zinc-500 font-normal">
+                            (optional)
+                          </span>
                         </FormLabel>
                         <FormControl>
                           <PdfUpload
@@ -521,16 +545,41 @@ export default function EventsAdminPage() {
                         </td>
                         <td className="px-6 py-4 hidden sm:table-cell">
                           <span
-                            className={`px-3 py-1 rounded-full text-xs font-medium border ${!isPast
-                              ? "border-[#08B74F]/30 bg-[#08B74F]/10 text-[#08B74F]"
-                              : "border-red-700 bg-red-500/10 text-red-500"
-                              }`}
+                            className={`px-3 py-1 rounded-full text-xs font-medium border ${
+                              !isPast
+                                ? "border-[#08B74F]/30 bg-[#08B74F]/10 text-[#08B74F]"
+                                : "border-red-700 bg-red-500/10 text-red-500"
+                            }`}
                           >
                             {isPast ? "Completed" : "Upcoming"}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-right">
                           <div className="flex items-center justify-end gap-2">
+                            {event.registrationConfig &&
+                              new Date(event.registrationConfig.validUntil) >
+                                new Date() && (
+                                <ConfirmActionDialog
+                                  trigger={
+                                    <button
+                                      title="Stop Registrations"
+                                      className="flex items-center justify-center w-8 h-8 rounded-lg bg-orange-500/10 text-orange-400 hover:bg-orange-500/20 transition-colors"
+                                    >
+                                      <StopCircle className="w-4 h-4" />
+                                    </button>
+                                  }
+                                  title="Stop Registrations?"
+                                  description={`This will immediately close the registration form for "${event.title}". No new registrations will be accepted.`}
+                                  actionLabel="Stop Registrations"
+                                  actionClassName="!bg-orange-600 hover:!bg-orange-700 !text-white"
+                                  onConfirm={() =>
+                                    handleStopRegistration(
+                                      event.id,
+                                      event.title,
+                                    )
+                                  }
+                                />
+                              )}
                             <button
                               onClick={() => handleEdit(event)}
                               className="flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700 transition-colors"

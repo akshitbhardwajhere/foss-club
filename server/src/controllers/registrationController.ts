@@ -151,6 +151,39 @@ export const submitRegistration = async (req: Request, res: Response) => {
   }
 };
 
+// Admin Route to stop (close early) the registration form for an event
+export const stopRegistration = async (req: Request, res: Response) => {
+  try {
+    const { eventId } = req.params;
+
+    if (!eventId) {
+      return res.status(400).json({ message: "Event ID is required" });
+    }
+
+    const config = await prisma.eventRegistrationConfig.findUnique({
+      where: { eventId },
+    });
+
+    if (!config) {
+      return res
+        .status(404)
+        .json({ message: "Registration config not found for this event" });
+    }
+
+    const updated = await prisma.eventRegistrationConfig.update({
+      where: { eventId },
+      data: {
+        validUntil: new Date(Date.now() - 1000), // Set 1 second in the past to immediately close
+      },
+    });
+
+    res.status(200).json(updated);
+  } catch (error) {
+    console.error("Stop Registration Error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 // Admin Route to fetch all registrations for a specific event
 export const getEventRegistrations = async (
   req: Request,
