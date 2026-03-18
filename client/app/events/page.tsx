@@ -40,6 +40,20 @@ export default function EventsPage() {
     fetchEvents();
   }, []);
 
+  const filteredEvents = events.filter((evt) => {
+    const now = new Date();
+    const eventDate = new Date(evt.date);
+    const isLive = now.toDateString() === eventDate.toDateString();
+    const isActuallyPast = eventDate < now && !isLive;
+
+    if (filter === "live") return isLive;
+    if (filter === "upcoming") return !isActuallyPast && !isLive;
+    if (filter === "completed") return isActuallyPast;
+    return true;
+  });
+
+  const emptyFilterLabel = filter === "all" ? "" : ` ${filter}`;
+
   return (
     <div className="bg-[#050B08] text-white min-h-screen flex flex-col items-center overflow-x-hidden relative w-full pt-32 pb-20 px-4 font-sans selection:bg-[#08B74F]/30 selection:text-white">
       {/* Dynamic Background Blurs */}
@@ -104,36 +118,24 @@ export default function EventsPage() {
               </div>
             ))}
           </div>
-        ) : events.length === 0 ? (
-          <p className="text-zinc-400">No events found. Check back later.</p>
+        ) : filteredEvents.length === 0 ? (
+          <p className="text-zinc-400">No{emptyFilterLabel} events.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {events
-              .filter((evt) => {
-                const now = new Date();
-                const eventDate = new Date(evt.date);
-                const isLive = now.toDateString() === eventDate.toDateString();
-                const isActuallyPast = eventDate < now && !isLive;
-
-                if (filter === "live") return isLive;
-                if (filter === "upcoming") return !isActuallyPast && !isLive;
-                if (filter === "completed") return isActuallyPast;
-                return true;
-              })
-              .map((evt, i) => {
-                const now = new Date();
-                const eventDate = new Date(evt.date);
-                const isLive = now.toDateString() === eventDate.toDateString();
-                const isActuallyPast = eventDate < now && !isLive;
-                return (
-                  <EventCard
-                    key={evt.id}
-                    event={evt}
-                    index={i}
-                    isPast={isActuallyPast}
-                  />
-                );
-              })}
+            {filteredEvents.map((evt, i) => {
+              const now = new Date();
+              const eventDate = new Date(evt.date);
+              const isLive = now.toDateString() === eventDate.toDateString();
+              const isActuallyPast = eventDate < now && !isLive;
+              return (
+                <EventCard
+                  key={evt.id}
+                  event={evt}
+                  index={i}
+                  isPast={isActuallyPast}
+                />
+              );
+            })}
           </div>
         )}
       </div>
