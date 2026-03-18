@@ -33,10 +33,13 @@ export const getEvents = async (req: Request, res: Response) => {
 
 export const getNextEvent = async (req: Request, res: Response) => {
   try {
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
     const nextEvent = await prisma.event.findFirst({
       where: {
         date: {
-          gt: new Date(), // Only events in the future
+          gte: startOfToday, // Include live events happening today
         },
       },
       orderBy: {
@@ -148,7 +151,8 @@ export const updateEvent = async (
           description: description || undefined,
           category: category || undefined,
           date: date ? new Date(date) : undefined,
-          isDateTentative: isDateTentative !== undefined ? isDateTentative : undefined,
+          isDateTentative:
+            isDateTentative !== undefined ? isDateTentative : undefined,
           location: location || undefined,
           imageUrl: imageUrl === "" ? null : imageUrl || undefined,
           documentUrl: documentUrl === "" ? null : documentUrl || undefined,

@@ -22,7 +22,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<"all" | "upcoming" | "completed">("all");
+  const [filter, setFilter] = useState<
+    "all" | "live" | "upcoming" | "completed"
+  >("all");
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -48,9 +50,11 @@ export default function EventsPage() {
           title={
             filter === "completed"
               ? "Past Events"
-              : filter === "upcoming"
-                ? "Upcoming Events"
-                : "All Events"
+              : filter === "live"
+                ? "Live Events"
+                : filter === "upcoming"
+                  ? "Upcoming Events"
+                  : "All Events"
           }
         />
 
@@ -60,6 +64,12 @@ export default function EventsPage() {
             className={`px-6 py-2 rounded-full font-medium transition-colors ${filter === "all" ? "bg-[#08B74F] text-black" : "bg-zinc-800/50 text-zinc-400 hover:text-white hover:bg-zinc-700"}`}
           >
             All
+          </button>
+          <button
+            onClick={() => setFilter("live")}
+            className={`px-6 py-2 rounded-full font-medium transition-colors ${filter === "live" ? "bg-[#08B74F] text-black" : "bg-zinc-800/50 text-zinc-400 hover:text-white hover:bg-zinc-700"}`}
+          >
+            Live
           </button>
           <button
             onClick={() => setFilter("upcoming")}
@@ -102,18 +112,19 @@ export default function EventsPage() {
               .filter((evt) => {
                 const now = new Date();
                 const eventDate = new Date(evt.date);
-                const isToday = now.toDateString() === eventDate.toDateString();
-                const isActuallyPast = eventDate < now && !isToday;
-                
-                if (filter === "upcoming") return !isActuallyPast;
+                const isLive = now.toDateString() === eventDate.toDateString();
+                const isActuallyPast = eventDate < now && !isLive;
+
+                if (filter === "live") return isLive;
+                if (filter === "upcoming") return !isActuallyPast && !isLive;
                 if (filter === "completed") return isActuallyPast;
                 return true;
               })
               .map((evt, i) => {
                 const now = new Date();
                 const eventDate = new Date(evt.date);
-                const isToday = now.toDateString() === eventDate.toDateString();
-                const isActuallyPast = eventDate < now && !isToday;
+                const isLive = now.toDateString() === eventDate.toDateString();
+                const isActuallyPast = eventDate < now && !isLive;
                 return (
                   <EventCard
                     key={evt.id}
