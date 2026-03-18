@@ -1,10 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ArrowUpDown } from "lucide-react";
 import api from "@/lib/axios";
 import BackgroundBlur from "@/components/shared/BackgroundBlur";
 import PageHeader from "@/components/shared/PageHeader";
 import EventCard from "@/components/cards/EventCard";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Event {
   id: string;
@@ -25,6 +33,9 @@ export default function EventsPage() {
   const [filter, setFilter] = useState<
     "all" | "live" | "upcoming" | "completed"
   >("all");
+  const [monthSort, setMonthSort] = useState<"default" | "asc" | "desc">(
+    "default",
+  );
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -50,6 +61,17 @@ export default function EventsPage() {
     if (filter === "upcoming") return !isActuallyPast && !isLive;
     if (filter === "completed") return isActuallyPast;
     return true;
+  });
+
+  const sortedFilteredEvents = [...filteredEvents].sort((a, b) => {
+    if (monthSort === "default") return 0;
+
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    const monthKeyA = dateA.getFullYear() * 12 + dateA.getMonth();
+    const monthKeyB = dateB.getFullYear() * 12 + dateB.getMonth();
+
+    return monthSort === "asc" ? monthKeyA - monthKeyB : monthKeyB - monthKeyA;
   });
 
   const emptyFilterLabel = filter === "all" ? "" : ` ${filter}`;
@@ -97,6 +119,38 @@ export default function EventsPage() {
           >
             Completed
           </button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                aria-label="Sort events"
+                className="w-10 h-10 rounded-full bg-zinc-800/50 border border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-700 transition-colors flex items-center justify-center"
+              >
+                <ArrowUpDown className="w-4 h-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              className="bg-zinc-900 border-zinc-800 text-zinc-200 data-[state=open]:duration-200 data-[state=closed]:duration-150 data-[state=open]:ease-out data-[state=closed]:ease-in"
+            >
+              <DropdownMenuRadioGroup
+                value={monthSort}
+                onValueChange={(value) =>
+                  setMonthSort(value as "default" | "asc" | "desc")
+                }
+              >
+                <DropdownMenuRadioItem value="default">
+                  Default
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="asc">
+                  Month: Oldest First
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="desc">
+                  Month: Newest First
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {loading ? (
@@ -118,11 +172,11 @@ export default function EventsPage() {
               </div>
             ))}
           </div>
-        ) : filteredEvents.length === 0 ? (
+        ) : sortedFilteredEvents.length === 0 ? (
           <p className="text-zinc-400">No{emptyFilterLabel} events.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredEvents.map((evt, i) => {
+            {sortedFilteredEvents.map((evt, i) => {
               const now = new Date();
               const eventDate = new Date(evt.date);
               const isLive = now.toDateString() === eventDate.toDateString();
