@@ -100,19 +100,26 @@ export default function EventsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {events
               .filter((evt) => {
-                const isPast = new Date(evt.date) < new Date();
-                if (filter === "upcoming") return !isPast;
-                if (filter === "completed") return isPast;
+                const now = new Date();
+                const eventDate = new Date(evt.date);
+                const isToday = now.toDateString() === eventDate.toDateString();
+                const isActuallyPast = eventDate < now && !isToday;
+                
+                if (filter === "upcoming") return !isActuallyPast;
+                if (filter === "completed") return isActuallyPast;
                 return true;
               })
               .map((evt, i) => {
-                const isPast = new Date(evt.date) < new Date();
+                const now = new Date();
+                const eventDate = new Date(evt.date);
+                const isToday = now.toDateString() === eventDate.toDateString();
+                const isActuallyPast = eventDate < now && !isToday;
                 return (
                   <EventCard
                     key={evt.id}
                     event={evt}
                     index={i}
-                    isPast={isPast}
+                    isPast={isActuallyPast}
                   />
                 );
               })}

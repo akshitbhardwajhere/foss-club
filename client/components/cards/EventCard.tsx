@@ -24,8 +24,14 @@ interface EventCardProps {
 }
 
 export default function EventCard({ event, index, isPast }: EventCardProps) {
-    const isRegistrationValid = event.registrationConfig && new Date(event.registrationConfig.validUntil) > new Date() && !isPast;
-    const isRegistrationClosed = event.registrationConfig && new Date(event.registrationConfig.validUntil) <= new Date() && !isPast;
+    const now = new Date();
+    const eventDate = new Date(event.date);
+    const isToday = now.toDateString() === eventDate.toDateString();
+    const isActuallyPast = eventDate < now && !isToday;
+    const isLive = isToday;
+
+    const isRegistrationValid = event.registrationConfig && new Date(event.registrationConfig.validUntil) > new Date() && !isActuallyPast;
+    const isRegistrationClosed = event.registrationConfig && new Date(event.registrationConfig.validUntil) <= new Date() && !isActuallyPast;
 
     return (
         <Link href={`/events/${event.id}`}>
@@ -41,9 +47,19 @@ export default function EventCard({ event, index, isPast }: EventCardProps) {
                             {event.category}
                         </span>
                     )}
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-md shadow-lg ${isPast ? 'bg-zinc-800/80 text-zinc-300 border border-zinc-700' : 'bg-[#08B74F] text-black border border-[#08B74F]/50'}`}>
-                        {isPast ? 'Completed' : 'Upcoming'}
-                    </span>
+                    {isLive ? (
+                        <div className="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold backdrop-blur-md shadow-lg bg-[#08B74F] text-black border border-[#08B74F]/50">
+                            <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-black"></span>
+                            </span>
+                            LIVE
+                        </div>
+                    ) : (
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-md shadow-lg ${isActuallyPast ? 'bg-zinc-800/80 text-zinc-300 border border-zinc-700' : 'bg-[#08B74F] text-black border border-[#08B74F]/50'}`}>
+                            {isActuallyPast ? 'Completed' : 'Upcoming'}
+                        </span>
+                    )}
                 </div>
 
                 {event.imageUrl ? (

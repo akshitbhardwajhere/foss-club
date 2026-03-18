@@ -145,7 +145,11 @@ export default function EventDetailPage() {
     );
   }
 
-  const isPast = new Date(event.date) < new Date();
+  const now = new Date();
+  const eventDate = new Date(event.date);
+  const isToday = now.toDateString() === eventDate.toDateString();
+  const isActuallyPast = eventDate < now && !isToday;
+  const isLive = isToday;
 
   return (
     <div className="bg-[#050B08] text-white min-h-screen flex flex-col items-center overflow-x-hidden relative w-full pt-32 pb-20 px-4 font-sans selection:bg-[#08B74F]/30 selection:text-white">
@@ -165,11 +169,21 @@ export default function EventDetailPage() {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="absolute top-6 right-6 z-10">
-            <span
-              className={`px-4 py-2 rounded-full text-sm font-bold backdrop-blur-md shadow-lg ${isPast ? "bg-zinc-800/90 text-zinc-300 border border-zinc-700" : "bg-[#08B74F]/90 text-black border border-[#08B74F]/50 backdrop-blur-xl"}`}
-            >
-              {isPast ? "Completed" : "Upcoming"}
-            </span>
+            {isLive ? (
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold backdrop-blur-md shadow-lg bg-[#08B74F] text-black border border-[#08B74F]/50">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-black"></span>
+                </span>
+                LIVE
+              </div>
+            ) : (
+              <span
+                className={`px-4 py-2 rounded-full text-sm font-bold backdrop-blur-md shadow-lg ${isActuallyPast ? "bg-zinc-800/90 text-zinc-300 border border-zinc-700" : "bg-[#08B74F]/90 text-black border border-[#08B74F]/50 backdrop-blur-xl"}`}
+              >
+                {isActuallyPast ? "Completed" : "Upcoming"}
+              </span>
+            )}
           </div>
 
           {event.imageUrl ? (
