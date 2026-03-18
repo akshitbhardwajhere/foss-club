@@ -49,6 +49,7 @@ interface EventItem {
   imageUrl?: string;
   documentUrl?: string;
   registrationConfig?: any;
+  isDateTentative?: boolean;
 }
 
 const EVENT_CATEGORIES = [
@@ -65,6 +66,7 @@ const formSchema = z.object({
   description: z.string().min(10, { message: "Description needed." }),
   imageUrl: z.string().optional(),
   documentUrl: z.string().optional(),
+  isDateTentative: z.boolean().optional(),
 });
 
 const TABLE_COLUMNS = ["Event Details", "Date", "Status", "Actions"];
@@ -90,6 +92,7 @@ export default function EventsAdminPage() {
       description: "",
       imageUrl: "",
       documentUrl: "",
+      isDateTentative: false,
     },
   });
 
@@ -131,10 +134,14 @@ export default function EventsAdminPage() {
   const handleEdit = (event: EventItem) => {
     let localDateString = "";
     if (event.date) {
-      const d = new Date(event.date);
-      localDateString = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
-        .toISOString()
-        .slice(0, 16);
+      if (event.isDateTentative) {
+        localDateString = event.date.slice(0, 7);
+      } else {
+        const d = new Date(event.date);
+        localDateString = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
+          .toISOString()
+          .slice(0, 16);
+      }
     }
     form.reset({
       title: event.title || "",
@@ -144,6 +151,7 @@ export default function EventsAdminPage() {
       description: event.description || "",
       imageUrl: event.imageUrl || "",
       documentUrl: event.documentUrl || "",
+      isDateTentative: event.isDateTentative || false,
     });
     setEditingId(event.id);
     setIsCreating(true);
@@ -225,6 +233,7 @@ export default function EventsAdminPage() {
                   description: "",
                   imageUrl: "",
                   documentUrl: "",
+                  isDateTentative: false,
                 });
               }}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#08B74F] text-black font-bold hover:bg-[#08B74F]/90 transition-colors w-full md:w-auto justify-center"
@@ -335,12 +344,43 @@ export default function EventsAdminPage() {
                       name="date"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-xs font-medium text-zinc-300">
-                            Date & Time <span className="text-red-500">*</span>
-                          </FormLabel>
+                          <div className="flex items-center justify-between mb-1">
+                            <FormLabel className="text-xs font-medium text-zinc-300">
+                              Date & Time <span className="text-red-500">*</span>
+                            </FormLabel>
+                            <FormField
+                              control={form.control}
+                              name="isDateTentative"
+                              render={({ field: isTentativeField }) => (
+                                <div className="flex items-center gap-1.5">
+                                  <input
+                                    type="checkbox"
+                                    id="isTentative"
+                                    checked={isTentativeField.value}
+                                    onChange={(e) => {
+                                      const isTentative = e.target.checked;
+                                      isTentativeField.onChange(isTentative);
+                                      const currentDate = form.getValues().date;
+                                      if (currentDate) {
+                                        if (isTentative && currentDate.length >= 7) {
+                                          form.setValue("date", currentDate.slice(0, 7));
+                                        } else if (!isTentative && currentDate.length === 7) {
+                                          form.setValue("date", `${currentDate}-01T12:00`);
+                                        }
+                                      }
+                                    }}
+                                    className="w-3 h-3 rounded bg-[#111e16] border-[#08B74F] text-[#08B74F] cursor-pointer"
+                                  />
+                                  <label htmlFor="isTentative" className="text-[10px] text-zinc-400 cursor-pointer hover:text-zinc-300">
+                                    Tentative Month/Year
+                                  </label>
+                                </div>
+                              )}
+                            />
+                          </div>
                           <FormControl>
                             <Input
-                              type="datetime-local"
+                              type={form.watch("isDateTentative") ? "month" : "datetime-local"}
                               className="bg-[#111e16] border-[#1b3123] h-10 px-3 focus-visible:ring-[#08B74F] text-white text-sm w-full block [color-scheme:dark]"
                               {...field}
                             />
@@ -535,13 +575,17 @@ export default function EventsAdminPage() {
                                 {event.title}
                               </p>
                               <p className="text-xs text-zinc-500 md:hidden">
-                                {formatDate(event.date)}
+                                {event.isDateTentative 
+                                  ? new Date(event.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+                                  : formatDate(event.date)}
                               </p>
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4 text-zinc-400 text-sm hidden md:table-cell">
-                          {formatDate(event.date)}
+                          {event.isDateTentative 
+                            ? new Date(event.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+                            : formatDate(event.date)}
                         </td>
                         <td className="px-6 py-4 hidden sm:table-cell">
                           <span

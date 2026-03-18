@@ -13,6 +13,7 @@ interface Event {
     location: string;
     imageUrl?: string;
     registrationConfig?: any;
+    isDateTentative?: boolean;
 }
 
 interface EventCardProps {
@@ -64,7 +65,11 @@ export default function EventCard({ event, index, isPast }: EventCardProps) {
                     <div className="mt-auto space-y-2">
                         <div className="flex items-center gap-2 text-zinc-500 text-sm font-medium">
                             <Calendar className="w-4 h-4 text-[#08B74F]" />
-                            <span>{`${new Date(event.date).getDate().toString().padStart(2, '0')}/${(new Date(event.date).getMonth() + 1).toString().padStart(2, '0')}/${new Date(event.date).getFullYear()}`}</span>
+                            <span>
+                                {event.isDateTentative 
+                                    ? `${['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][new Date(event.date).getMonth()]} ${new Date(event.date).getFullYear()}`
+                                    : `${new Date(event.date).getDate().toString().padStart(2, '0')}/${(new Date(event.date).getMonth() + 1).toString().padStart(2, '0')}/${new Date(event.date).getFullYear()}`}
+                            </span>
                         </div>
                         <div className="flex items-center gap-2 text-zinc-500 text-sm font-medium border-t border-zinc-800/50 pt-2">
                             <MapPin className="w-4 h-4 text-[#08B74F]" />

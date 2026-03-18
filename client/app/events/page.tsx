@@ -14,6 +14,7 @@ interface Event {
   location: string;
   imageUrl?: string;
   registrationConfig?: any;
+  isDateTentative?: boolean;
 }
 
 import { Skeleton } from "@/components/ui/skeleton";

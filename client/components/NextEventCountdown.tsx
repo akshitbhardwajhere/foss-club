@@ -9,6 +9,7 @@ interface Event {
     title: string;
     date: string;
     registrationConfig?: any;
+    isDateTentative?: boolean;
 }
 
 interface TimeLeft {
@@ -176,8 +177,13 @@ export default function NextEventCountdown() {
                                     <div className="w-full h-px bg-zinc-800/50 my-1 opacity-50" />
 
                                     <div className="flex flex-col w-full items-center justify-center">
-                                        <div className="flex items-center justify-center gap-2 md:gap-2 shrink-0">
-                                            {timeBlocks.map((block, i) => (
+                                        {event.isDateTentative ? (
+                                            <div className="text-sm md:text-base font-bold text-zinc-300 px-6 py-4 bg-zinc-950/80 border border-zinc-800 rounded-2xl shadow-inner group-hover:border-[#08B74F]/30 transition-colors uppercase tracking-widest text-center mb-2 mt-2 w-full">
+                                                Coming in {new Date(event.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center justify-center gap-2 md:gap-2 shrink-0">
+                                                {timeBlocks.map((block, i) => (
                                                 <div key={block.label} className="flex flex-col items-center">
                                                     <div className="bg-zinc-950/80 border border-zinc-800 rounded-lg w-10 h-10 sm:w-12 sm:h-12 md:w-12 md:h-12 flex items-center justify-center mb-1 group-hover:border-[#08B74F]/30 transition-colors shadow-inner">
                                                         <AnimatePresence mode="popLayout">
@@ -197,6 +203,7 @@ export default function NextEventCountdown() {
                                                 </div>
                                             ))}
                                         </div>
+                                        )}
                                         {isRegistrationOpen ? (
                                             <button
                                                 onClick={(e) => {

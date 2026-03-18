@@ -16,6 +16,7 @@ interface Event {
   location: string;
   imageUrl?: string;
   documentUrl?: string;
+  isDateTentative?: boolean;
 }
 
 export default function EventDetailPage() {
@@ -195,7 +196,11 @@ export default function EventDetailPage() {
             <div className="flex flex-wrap justify-center items-center gap-6 mb-10 text-zinc-300 z-10">
               <div className="flex items-center gap-3 bg-zinc-800/50 px-4 py-2 rounded-full border border-zinc-700/50 backdrop-blur-sm">
                 <Calendar className="w-5 h-5 text-[#08B74F]" />
-                <span className="font-medium text-sm md:text-base">{`${new Date(event.date).getDate().toString().padStart(2, "0")}/${(new Date(event.date).getMonth() + 1).toString().padStart(2, "0")}/${new Date(event.date).getFullYear()}`}</span>
+                <span className="font-medium text-sm md:text-base">
+                  {event.isDateTentative
+                    ? `${['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][new Date(event.date).getMonth()]} ${new Date(event.date).getFullYear()}`
+                    : `${new Date(event.date).getDate().toString().padStart(2, "0")}/${(new Date(event.date).getMonth() + 1).toString().padStart(2, "0")}/${new Date(event.date).getFullYear()}`}
+                </span>
               </div>
               <div className="flex items-center gap-3 bg-zinc-800/50 px-4 py-2 rounded-full border border-zinc-700/50 backdrop-blur-sm">
                 <MapPin className="w-5 h-5 text-[#08B74F]" />

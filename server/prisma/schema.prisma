@@ -27,6 +27,7 @@ model Event {
   description String
   category    String
   date        DateTime
+  isDateTentative Boolean @default(false)
   location    String
   imageUrl    String?
   documentUrl String?
