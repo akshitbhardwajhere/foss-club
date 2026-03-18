@@ -22,21 +22,22 @@ model Admin {
 }
 
 model Event {
-  id          String   @id @default(uuid())
-  title       String
-  description String
-  category    String
-  date        DateTime
-  isDateTentative Boolean @default(false)
-  location    String
-  imageUrl    String?
-  documentUrl String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id                 String                   @id @default(uuid())
+  title              String
+  description        String
+  category           String
+  date               DateTime
+  isDateTentative    Boolean                  @default(false)
+  location           String
+  imageUrl           String?
+  documentUrl        String?
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
   registrationConfig EventRegistrationConfig?
+
+  @@index([createdAt])
+  @@index([date])
 }
-
-
 
 model Blog {
   id        String   @id @default(uuid())
@@ -47,39 +48,43 @@ model Blog {
   imageUrl  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([createdAt])
 }
 
 model TeamMember {
-  id        String   @id @default(uuid())
-  name      String
-  role      String
-  email     String   @unique
-  githubUrl String?
+  id          String   @id @default(uuid())
+  name        String
+  role        String
+  email       String   @unique
+  githubUrl   String?
   linkedinUrl String?
-  imageUrl  String?
-  order     Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  imageUrl    String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([order])
 }
 
 model EventRegistrationConfig {
-  id          String   @id @default(uuid())
-  eventId     String   @unique
-  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  validUntil  DateTime
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+  id         String   @id @default(uuid())
+  eventId    String   @unique
+  event      Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  validUntil DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
   registrations EventRegistration[]
 }
 
 model EventRegistration {
-  id             String   @id @default(uuid())
-  configId       String
-  config         EventRegistrationConfig @relation(fields: [configId], references: [id], onDelete: Cascade)
-  
+  id       String                  @id @default(uuid())
+  configId String
+  config   EventRegistrationConfig @relation(fields: [configId], references: [id], onDelete: Cascade)
+
   name           String
-  email          String   
+  email          String
   institute      String
   enrollmentNo   String?
   branch         String
@@ -87,9 +92,9 @@ model EventRegistration {
   teamName       String?
   teamMembers    String[] // Array of strings for team members
   areaOfInterest String
-  
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([configId, email])
 }

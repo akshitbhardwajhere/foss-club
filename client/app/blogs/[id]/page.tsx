@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { BookOpen, Tag, ArrowLeft, Clock, User, ChevronUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { stripHtml } from "@/lib/utils";
+import Image from "next/image";
 
 interface Blog {
   id: string;
@@ -175,11 +176,13 @@ export default function BlogDetailPage() {
           {/* Hero image */}
           {blog.imageUrl ? (
             <div className="relative w-full h-[280px] md:h-[420px] overflow-hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={blog.imageUrl}
                 alt={blog.title}
+                fill
+                priority
                 className="w-full h-full object-cover"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
               />
             </div>
           ) : (

@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { Calendar, MapPin } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Event {
     id: string;
@@ -47,8 +48,7 @@ export default function EventCard({ event, index, isPast }: EventCardProps) {
 
                 {event.imageUrl ? (
                     <div className="relative h-48 w-full overflow-hidden">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={event.imageUrl} alt={event.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        <Image src={event.imageUrl} alt={event.title} fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
                         <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/80 to-transparent" />
                     </div>
                 ) : (

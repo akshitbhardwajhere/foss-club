@@ -33,20 +33,18 @@ export default function NextEventCountdown() {
             try {
                 const res = await api.get('/api/events/next');
                 if (res.data) {
-                    setEvent(res.data);
-                    try {
-                        const configRes = await api.get(`/api/registration/config/${res.data.id}`);
-                        if (configRes.data) {
-                            if (new Date(configRes.data.validUntil) > new Date()) {
-                                setIsRegistrationOpen(true);
-                                const eventNameForUrl = res.data.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-                                setRegistrationLink(`/events/registration/${eventNameForUrl}?id=${res.data.id}`);
-                            } else {
-                                setIsRegistrationClosed(true);
-                            }
+                    const eventData = res.data;
+                    setEvent(eventData);
+                    
+                    if (eventData.registrationConfig) {
+                        const isValid = new Date(eventData.registrationConfig.validUntil) > new Date();
+                        if (isValid) {
+                            setIsRegistrationOpen(true);
+                            const eventNameForUrl = eventData.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+                            setRegistrationLink(`/events/registration/${eventNameForUrl}?id=${eventData.id}`);
+                        } else {
+                            setIsRegistrationClosed(true);
                         }
-                    } catch (configErr) {
-                        // Form not released or closed
                     }
                 }
             } catch (error) {

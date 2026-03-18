@@ -5,6 +5,15 @@ import { deleteCloudinaryImage } from "../utils/cloudinary";
 export const getBlogs = async (req: Request, res: Response) => {
   try {
     const blogs = await prisma.blog.findMany({
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        author: true,
+        tags: true,
+        imageUrl: true,
+        createdAt: true,
+      },
       orderBy: { createdAt: "desc" },
     });
     res.json(blogs);

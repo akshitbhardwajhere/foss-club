@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { BookOpen, Tag } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { stripHtml } from '@/lib/utils';
 
 interface Blog {
@@ -31,8 +32,7 @@ export default function BlogCard({ blog, index }: BlogCardProps) {
             >
                 {blog.imageUrl ? (
                     <div className="relative w-full h-48 overflow-hidden">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={blog.imageUrl} alt={blog.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        <Image src={blog.imageUrl} alt={blog.title} fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
                         <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/80 to-transparent" />
                     </div>
                 ) : (

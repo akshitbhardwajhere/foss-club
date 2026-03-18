@@ -8,8 +8,22 @@ import {
 export const getEvents = async (req: Request, res: Response) => {
   try {
     const events = await prisma.event.findMany({
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        category: true,
+        date: true,
+        isDateTentative: true,
+        location: true,
+        imageUrl: true,
+        registrationConfig: {
+          select: {
+            validUntil: true,
+          },
+        },
+      },
       orderBy: { createdAt: "desc" },
-      include: { registrationConfig: true },
     });
     res.json(events);
   } catch (error) {

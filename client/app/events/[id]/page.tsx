@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { Calendar, MapPin, ArrowLeft, FileText, Loader2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import Image from "next/image";
 
 interface Event {
   id: string;
@@ -173,11 +174,13 @@ export default function EventDetailPage() {
 
           {event.imageUrl ? (
             <div className="relative w-full h-[400px]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={event.imageUrl}
                 alt={event.title}
+                fill
+                priority
                 className="w-full h-full object-cover"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 to-transparent" />
             </div>

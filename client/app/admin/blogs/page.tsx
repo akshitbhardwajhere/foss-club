@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { BookOpen, Edit3, Plus } from "lucide-react";
 import api from "@/lib/axios";
@@ -24,7 +25,11 @@ import ImageUpload from "@/components/ImageUpload";
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
 import AdminFormWrapper from "@/components/admin/AdminFormWrapper";
 import ConfirmDeleteDialog from "@/components/admin/ConfirmDeleteDialog";
-import RichTextEditor from "@/components/RichTextEditor";
+
+const RichTextEditor = dynamic(() => import("@/components/RichTextEditor"), {
+  ssr: false,
+  loading: () => <div className="h-[400px] w-full bg-[#0d1a12] animate-pulse rounded-lg border border-[#1b3123]" />,
+});
 import { toast } from "sonner";
 
 interface BlogItem {
