@@ -333,6 +333,12 @@ export const approveCommunityRequest = async (
                 Welcome to the team! Our core members will be reaching out soon with information regarding your onboarding schedule, access to our internal collaboration tools, and next steps. We are excited to see what we can build together.
               </p>
               
+              <div style="text-align:center;margin-top:20px;margin-bottom:30px;">
+                <a href="https://chat.whatsapp.com/HmPTOeQMjEn6PTLS3bdt8w" target="_blank" style="background-color:#25D366;color:#ffffff;padding:12px 24px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:15px;display:inline-block;letter-spacing:0.5px;">
+                  Join WhatsApp Community
+                </a>
+              </div>
+              
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #182A20;padding-top:20px;">
                 <tr>
                   <td>
