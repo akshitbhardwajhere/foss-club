@@ -250,8 +250,15 @@ export default function EventsPage() {
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <Link href={`/events/${evt.id}`} className="block">
-                          <h3 className="font-bold text-white text-lg group-hover:text-[#08B74F] transition-colors truncate">{evt.title}</h3>
+                        <Link href={`/events/${evt.id}`} className="flex flex-col items-start gap-1.5 mt-0.5 mb-1">
+                          <h3 className="font-bold text-white text-lg group-hover:text-[#08B74F] transition-colors truncate max-w-full">{evt.title}</h3>
+                          {isLive ? (
+                            <span className="text-[10px] uppercase tracking-wide font-bold px-2 py-0.5 rounded-md bg-red-500/10 text-red-400 border border-red-500/20">Live</span>
+                          ) : isActuallyPast ? (
+                            <span className="text-[10px] uppercase tracking-wide font-bold px-2 py-0.5 rounded-md bg-zinc-800 text-zinc-400 border border-zinc-700">Completed</span>
+                          ) : (
+                            <span className="text-[10px] uppercase tracking-wide font-bold px-2 py-0.5 rounded-md bg-[#08B74F]/10 text-[#08B74F] border border-[#08B74F]/20">Upcoming</span>
+                          )}
                         </Link>
                         
                         {/* Mobile only location & date */}
