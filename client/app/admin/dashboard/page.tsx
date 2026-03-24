@@ -12,6 +12,7 @@ import {
   LogOut,
   LayoutDashboard,
   AlertCircle,
+  Terminal,
 } from "lucide-react";
 import api from "@/lib/axios";
 import AdminStatCard from "@/components/admin/AdminStatCard";
@@ -53,6 +54,7 @@ export default function AdminDashboardPage() {
     events: { total: 0, upcoming: 0, past: 0 },
     team: { total: 0 },
     blogs: { total: 0 },
+    queries: { total: 0 },
   });
   const [loadingStats, setLoadingStats] = useState(true);
   const [statsError, setStatsError] = useState<string | null>(null);
@@ -266,6 +268,33 @@ export default function AdminDashboardPage() {
                       label: "Published",
                       value: stats.blogs.total,
                       valueColor: "text-orange-400",
+                    },
+                  ]
+            }
+          />
+
+          {/* FOSS Community Card */}
+          <AdminStatCard
+            title="FOSS Community"
+            description="Manage community queries and view submitted forms."
+            icon={Terminal}
+            href="/admin/queries"
+            colorTheme="blue"
+            itemVariants={itemVariants}
+            stats={
+              loadingStats
+                ? [
+                    {
+                      label: "Pending",
+                      value: <Skeleton className="h-6 w-12 bg-zinc-800" />,
+                      valueColor: "text-[#08B74F]",
+                    },
+                  ]
+                : [
+                    {
+                      label: "Total Apps",
+                      value: stats.queries.total,
+                      valueColor: "text-[#08B74F]",
                     },
                   ]
             }

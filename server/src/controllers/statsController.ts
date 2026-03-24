@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
 import prisma from "../config/prisma";
+import { sheets } from "../config/google";
+
+const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 
 export const getDashboardStats = async (
   req: Request,
@@ -28,6 +31,20 @@ export const getDashboardStats = async (
 
     const totalBlogs = await prisma.blog.count();
 
+    let totalQueries = 0;
+    if (SHEET_ID) {
+      try {
+        const sheetResponse = await sheets.spreadsheets.values.get({
+          spreadsheetId: SHEET_ID,
+          range: "Sheet1!A:G",
+        });
+        const rows = sheetResponse.data.values || [];
+        totalQueries = rows.filter((r: any[]) => r[0] && String(r[0]).toLowerCase() !== "date").length;
+      } catch (e) {
+        console.error("Could not fetch sheet queries:", e);
+      }
+    }
+
     res.json({
       events: {
         total: totalEvents,
@@ -39,6 +56,9 @@ export const getDashboardStats = async (
       },
       blogs: {
         total: totalBlogs,
+      },
+      queries: {
+        total: totalQueries,
       },
     });
   } catch (error) {

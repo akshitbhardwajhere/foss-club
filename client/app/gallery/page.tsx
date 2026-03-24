@@ -5,7 +5,7 @@ import api from "@/lib/axios";
 import Link from "next/link";
 import BackgroundBlur from "@/components/shared/BackgroundBlur";
 import PageHeader from "@/components/shared/PageHeader";
-import { Loader2, Image as ImageIcon, Calendar } from "lucide-react";
+import { Loader2, Image as ImageIcon, Calendar, Images } from "lucide-react";
 import Image from "next/image";
 
 interface Event {
@@ -62,39 +62,45 @@ export default function GalleryPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {events.map((evt) => (
               <Link key={evt.id} href={`/gallery/${evt.id}`}>
-                <div className="bg-zinc-900/40 backdrop-blur-sm border border-zinc-800/50 rounded-3xl overflow-hidden hover:border-[#08B74F]/40 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(8,183,79,0.1)] transition-all duration-500 group h-full flex flex-col">
-                  {evt.imageUrl ? (
-                    <div className="w-full h-48 md:h-56 bg-zinc-800 relative z-0 transition-transform duration-700 ease-out group-hover:scale-105 overflow-hidden">
+                <div className="bg-zinc-900/30 backdrop-blur-md border border-zinc-800/50 rounded-3xl overflow-hidden hover:border-[#08B74F]/40 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(8,183,79,0.15)] transition-all duration-500 group h-full flex flex-col p-3">
+                  {/* Image Container with photo album feel */}
+                  <div className="relative w-full h-56 md:h-64 rounded-2xl overflow-hidden bg-zinc-800/50 mb-4 shadow-md overflow-hidden">
+                    {evt.imageUrl ? (
                       <Image
                         src={evt.imageUrl}
                         alt={evt.title}
                         fill
                         sizes="(max-width: 768px) 100vw, 33vw"
-                        className="object-cover relative z-10"
+                        className="object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#050B08] via-transparent to-transparent opacity-80 z-20 pointer-events-none" />
+                    ) : (
+                      <div className="absolute inset-0 bg-zinc-900 flex flex-col items-center justify-center">
+                        <ImageIcon className="w-12 h-12 text-zinc-700 mb-4" />
+                      </div>
+                    )}
+                    {/* Glassy Overlay Icon */}
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
+                      <div className="bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full p-4 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 shadow-2xl">
+                         <Images className="w-6 h-6" />
+                      </div>
                     </div>
-                  ) : (
-                    <div className="w-full h-56 bg-zinc-800/50 flex flex-col items-center justify-center relative">
-                      <ImageIcon className="w-12 h-12 text-zinc-600 mb-2" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/90 to-transparent" />
-                    </div>
-                  )}
+                  </div>
 
-                  <div className="p-6 flex flex-col flex-grow -mt-12 relative z-10">
-                    <h2 className="text-2xl font-bold mb-3 group-hover:text-[#08B74F] transition-colors drop-shadow-md">
-                      {evt.title}
-                    </h2>
-                    
-                    <div className="mt-auto flex items-center gap-2 text-zinc-400 text-sm font-medium">
-                      <Calendar className="w-4 h-4 text-[#08B74F]" />
+                  {/* Content Area */}
+                  <div className="px-4 pb-4 flex flex-col flex-grow">
+                    <div className="flex items-center gap-2 text-[#08B74F] text-xs font-bold mb-3 tracking-wider uppercase">
+                      <Calendar className="w-3.5 h-3.5" />
                       <span>
-                        {new Date(evt.date).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                        {new Date(evt.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                       </span>
                     </div>
-                    
-                    <div className="mt-6 flex items-center text-[#08B74F] font-bold text-sm tracking-wide gap-2 group-hover:gap-4 transition-all">
-                      VIEW GALLERY <span className="text-lg">→</span>
+
+                    <h2 className="text-xl font-bold text-white mb-2 group-hover:text-[#08B74F] transition-colors line-clamp-2">
+                       {evt.title}
+                    </h2>
+
+                    <div className="mt-auto pt-4 flex items-center text-zinc-400 font-medium text-sm transition-colors group-hover:text-white">
+                       Enter Gallery <span className="ml-2 transition-transform duration-300 group-hover:translate-x-2 text-[#08B74F]">→</span>
                     </div>
                   </div>
                 </div>
