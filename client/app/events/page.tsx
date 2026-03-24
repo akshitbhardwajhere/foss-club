@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { ArrowUpDown, Search, ChevronLeft, ChevronRight, Calendar, MapPin } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import api from "@/lib/axios";
 import BackgroundBlur from "@/components/shared/BackgroundBlur";
 import PageHeader from "@/components/shared/PageHeader";
@@ -246,7 +247,7 @@ export default function EventsPage() {
                     <div className="col-span-1 lg:col-span-5 flex items-start gap-4">
                       {evt.imageUrl && (
                         <div className="w-14 h-14 bg-zinc-800 rounded-lg overflow-hidden flex-shrink-0 relative hidden md:block border border-zinc-700/50">
-                          <img src={evt.imageUrl} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                          <Image src={evt.imageUrl} alt="" fill sizes="56px" className="object-cover group-hover:scale-110 transition-transform duration-500" />
                         </div>
                       )}
                       <div className="flex-1 min-w-0">

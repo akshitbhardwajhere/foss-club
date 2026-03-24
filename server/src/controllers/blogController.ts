@@ -8,11 +8,11 @@ export const getBlogs = async (req: Request, res: Response) => {
       select: {
         id: true,
         title: true,
-        content: true,
         author: true,
         tags: true,
         imageUrl: true,
         createdAt: true,
+        updatedAt: true
       },
       orderBy: { createdAt: "desc" },
     });

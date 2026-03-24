@@ -3,6 +3,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { Users, Edit3, GripVertical, Github, Linkedin, Twitter } from 'lucide-react';
 import ConfirmDeleteDialog from '@/components/admin/ConfirmDeleteDialog';
 import { ensureUrl } from '@/lib/utils';
+import Image from 'next/image';
 
 interface TeamMember {
     id: string;
@@ -80,7 +81,7 @@ export function SortableTeamCard({ member, onEdit, onDelete }: SortableTeamCardP
             <div className={`w-32 h-32 rounded-full bg-zinc-800 border-4 border-zinc-900 mb-4 overflow-hidden relative shadow-xl ring-1 ring-zinc-700/50 ${isDragging ? 'ring-2 ring-[#08B74F] ring-offset-2 ring-offset-zinc-900' : ''}`}>
                 {member.imageUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={member.imageUrl} alt={member.name} className="w-full h-full object-cover pointer-events-none group-hover:scale-110 transition-transform duration-500" />
+                    <Image src={member.imageUrl} alt={member.name} fill sizes="250px" className="object-cover pointer-events-none group-hover:scale-110 transition-transform duration-500" />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-zinc-600 bg-zinc-800/50">
                         <Users className="w-10 h-10" />

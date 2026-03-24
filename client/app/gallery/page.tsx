@@ -6,6 +6,7 @@ import Link from "next/link";
 import BackgroundBlur from "@/components/shared/BackgroundBlur";
 import PageHeader from "@/components/shared/PageHeader";
 import { Loader2, Image as ImageIcon, Calendar } from "lucide-react";
+import Image from "next/image";
 
 interface Event {
   id: string;
@@ -63,13 +64,15 @@ export default function GalleryPage() {
               <Link key={evt.id} href={`/gallery/${evt.id}`}>
                 <div className="bg-zinc-900/40 backdrop-blur-sm border border-zinc-800/50 rounded-3xl overflow-hidden hover:border-[#08B74F]/40 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(8,183,79,0.1)] transition-all duration-500 group h-full flex flex-col">
                   {evt.imageUrl ? (
-                    <div className="relative h-56 w-full overflow-hidden">
-                      <img
+                    <div className="w-full h-48 md:h-56 bg-zinc-800 relative z-0 transition-transform duration-700 ease-out group-hover:scale-105 overflow-hidden">
+                      <Image
                         src={evt.imageUrl}
                         alt={evt.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="object-cover relative z-10"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/90 to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#050B08] via-transparent to-transparent opacity-80 z-20 pointer-events-none" />
                     </div>
                   ) : (
                     <div className="w-full h-56 bg-zinc-800/50 flex flex-col items-center justify-center relative">

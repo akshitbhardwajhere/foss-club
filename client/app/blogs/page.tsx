@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Search, ChevronLeft, ChevronRight, User, Calendar, ArrowUpDown } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import api from "@/lib/axios";
 import BackgroundBlur from "@/components/shared/BackgroundBlur";
 import PageHeader from "@/components/shared/PageHeader";
@@ -176,13 +177,12 @@ export default function BlogsPage() {
                   <div className="hidden lg:block col-span-1 text-zinc-500 font-medium text-sm">
                     {(currentPage - 1) * itemsPerPage + i + 1}
                   </div>
-                  
-                  <div className="col-span-1 lg:col-span-5 flex items-start gap-4">
-                    {blog.imageUrl && (
-                      <div className="w-14 h-14 bg-zinc-800 rounded-lg overflow-hidden flex-shrink-0 relative hidden md:block border border-zinc-700/50">
-                        <img src={blog.imageUrl} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                      </div>
-                    )}
+                    <div className="col-span-1 lg:col-span-5 flex items-start gap-5">
+                      {blog.imageUrl && (
+                        <div className="w-20 h-20 bg-zinc-800 rounded-xl overflow-hidden flex-shrink-0 relative hidden md:block border border-zinc-700/50">
+                          <Image src={blog.imageUrl} alt="" fill sizes="80px" className="object-cover group-hover:scale-110 transition-transform duration-500" />
+                        </div>
+                      )}
                     <div className="flex-1 min-w-0">
                       <Link href={`/blogs/${blog.id}`} className="block">
                         <h3 className="font-bold text-white text-lg group-hover:text-[#08B74F] transition-colors truncate">{blog.title}</h3>

@@ -1,11 +1,12 @@
 'use client';
-import { UploadCloud, X, Crop as CropIcon, Image as ImageIcon, Loader2 } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { Upload, X, Crop as CropIcon, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { useState, useRef, useCallback } from 'react';
 import ReactCrop, { type Crop, centerCrop, makeAspectCrop, PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { toast } from 'sonner';
 import api from '@/lib/axios';
 import { getCroppedImg } from '@/lib/cropImage';
+import Image from 'next/image';
 
 interface ImageUploadProps {
     onChange: (url: string) => void;
@@ -21,20 +22,22 @@ export default function ImageUpload({ onChange, value }: ImageUploadProps) {
     const [dynamicAspect, setDynamicAspect] = useState<number | undefined>(1);
     const imgRef = useRef<HTMLImageElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [previewUrl, setPreviewUrl] = useState('');
 
-    function onSelectFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const onSelectFile = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             setCrop(undefined); // Makes crop preview update between images.
             setCompletedCrop(null);
             const reader = new FileReader();
-            reader.addEventListener('load', () =>
-                setImgSrc(reader.result?.toString() || ''),
-            );
+            reader.addEventListener('load', () => {
+                setImgSrc(reader.result?.toString() || '');
+                setPreviewUrl(reader.result?.toString() || ''); // Set preview URL for next/image
+            });
             reader.readAsDataURL(e.target.files[0]);
         }
-    }
+    }, []);
 
-    function onImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {
+    const onImageLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
         const { width, height } = e.currentTarget;
         const crop = centerCrop(
             makeAspectCrop(
@@ -50,7 +53,7 @@ export default function ImageUpload({ onChange, value }: ImageUploadProps) {
             height
         );
         setCrop(crop);
-    }
+    }, []);
 
     // Determine if user is dragging a corner or a side handle
     const handleDragStart = (e: React.PointerEvent<HTMLDivElement> | Event) => {
@@ -115,6 +118,7 @@ export default function ImageUpload({ onChange, value }: ImageUploadProps) {
             const data = await res.json();
             onChange(data.secure_url);
             setImgSrc('');
+            setPreviewUrl('');
             toast.success("Image cropped and uploaded successfully.");
         } catch (error: any) {
             console.error("Upload error:", error);
@@ -159,8 +163,9 @@ export default function ImageUpload({ onChange, value }: ImageUploadProps) {
                     >
                         {isRemoving ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}
                     </button>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={value} alt="Current upload" className="object-cover w-full h-full" />
+                    <div className="relative w-full h-full">
+                        <Image src={value} alt="Current upload" fill sizes="300px" className="object-cover" />
+                    </div>
                 </div>
             ) : null}
 
@@ -209,10 +214,20 @@ export default function ImageUpload({ onChange, value }: ImageUploadProps) {
                         </ReactCrop>
                     </div>
 
+                    <div className="rounded-xl overflow-hidden shadow-2xl relative w-full h-[400px]">
+                        <Image
+                            src={previewUrl}
+                            alt="Crop preview"
+                            fill
+                            sizes="500px"
+                            className="object-cover"
+                        />
+                    </div>
+
                     <div className="flex items-center gap-3 w-full">
                         <button
                             type="button"
-                            onClick={() => { setImgSrc(''); setCrop(undefined); }}
+                            onClick={() => { setImgSrc(''); setCrop(undefined); setPreviewUrl(''); }}
                             className="px-4 py-2 bg-zinc-900 text-zinc-300 hover:text-white rounded-lg flex-1 font-medium transition-colors"
                         >
                             Cancel

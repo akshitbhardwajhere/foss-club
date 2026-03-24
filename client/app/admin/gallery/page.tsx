@@ -5,6 +5,7 @@ import api from "@/lib/axios";
 import { toast } from "sonner";
 import { Loader2, ChevronLeft, Calendar, PlusCircle, Images, Trash2 } from "lucide-react";
 import ImageUpload from "@/components/ImageUpload";
+import Image from "next/image";
 
 interface Event {
     id: string;
@@ -261,7 +262,7 @@ export default function AdminGalleryPage() {
                             {galleryImages.map((img) => (
                                 <div key={img.id} className="bg-zinc-900/60 backdrop-blur border border-zinc-800 rounded-3xl p-5 flex flex-col group hover:bg-zinc-800/60 hover:border-zinc-700 transition-all duration-300 shadow-lg">
                                     <div className="w-full h-48 bg-zinc-950 rounded-2xl overflow-hidden mb-5 relative shadow-inner">
-                                        <img src={img.url} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                                        <Image src={img.url} alt="" fill sizes="300px" className="object-cover group-hover:scale-105 transition-transform duration-700" />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                                         <button 
                                             onClick={() => handleDeleteImage(img.id)}

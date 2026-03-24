@@ -6,6 +6,7 @@ import BackgroundBlur from "@/components/shared/BackgroundBlur";
 import PageHeader from "@/components/shared/PageHeader";
 import { Loader2, ChevronLeft, Calendar } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound, useParams } from "next/navigation";
 
 interface Event {
@@ -101,13 +102,15 @@ export default function EventGalleryDetails() {
                   }`}
                 >
                   <div className="w-full md:w-1/2 group">
-                    <div className="relative rounded-3xl overflow-hidden border border-zinc-800/50 shadow-2xl transition-transform duration-500 group-hover:scale-[1.02] group-hover:border-[#08B74F]/30">
-                      <img 
+                    <div className="w-full h-[300px] md:h-[450px] bg-zinc-800 relative overflow-hidden group rounded-3xl border border-zinc-800/50 shadow-2xl">
+                      <Image 
                         src={img.url} 
-                        alt="Event Moment" 
-                        className="w-full h-auto object-cover max-h-[500px]"
+                        alt={img.description || "Event Moment"} 
+                        fill
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 pointer-events-none" />
                     </div>
                   </div>
                   
