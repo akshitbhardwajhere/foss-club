@@ -2,13 +2,23 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, CalendarDays, Edit3, Trash2 } from "lucide-react";
+import { MessageSquare, CalendarDays, Edit3, Trash2, CheckCircle } from "lucide-react";
 import api from "@/lib/axios";
 import { formatDate } from "@/lib/utils";
 import { toast } from "sonner";
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
 import ConfirmDeleteDialog from "@/components/admin/ConfirmDeleteDialog";
 import AdminTableSkeleton from "@/components/admin/AdminTableSkeleton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 // The columns fetched from Sheet1!A:G
 // 0: Date, 1: Name, 2: Email, 3: Phone, 4: Institute, 5: Enrollment, 6: Expertise
@@ -32,6 +42,18 @@ export default function QueriesAdminPage() {
         name: "", email: "", phone: "", institute: "", enrollment: "", expertise: ""
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Approval Dialog State
+    const [approveDialogData, setApproveDialogData] = useState<QueryRow | null>(null);
+    const [approveBasis, setApproveBasis] = useState<string>("Outstanding GitHub Profile");
+    const [isApproving, setIsApproving] = useState(false);
+
+    const APPROVAL_BASIS_OPTIONS = [
+        "Outstanding GitHub Profile",
+        "Expertise",
+        "Strong Portfolio of Projects",
+        "Demonstrated Passion for FOSS",
+    ];
 
     const fetchQueries = async () => {
         try {
@@ -107,6 +129,25 @@ export default function QueriesAdminPage() {
             toast.error("Failed to update query");
         } finally {
             setIsSubmitting(false);
+        }
+    };
+
+    const handleApproveSubmit = async () => {
+        if (!approveDialogData || !approveBasis) return;
+        setIsApproving(true);
+        try {
+            await api.post("/api/contact/approve", {
+                email: approveDialogData.email,
+                name: approveDialogData.name,
+                basis: approveBasis
+            });
+            toast.success(`Approval email sent to ${approveDialogData.name}`);
+            setApproveDialogData(null);
+            setApproveBasis("Outstanding GitHub Profile"); // reset
+        } catch (error) {
+            toast.error("Failed to route approval email. Check configurations.");
+        } finally {
+            setIsApproving(false);
         }
     };
 
@@ -256,8 +297,16 @@ export default function QueriesAdminPage() {
                                             <td className="px-6 py-4 text-right">
                                                 <div className="flex items-center justify-end gap-2">
                                                     <button
+                                                        onClick={() => setApproveDialogData(q)}
+                                                        className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#08B74F]/10 text-[#08B74F] hover:bg-[#08B74F]/20 transition-colors hover:scale-105"
+                                                        title="Approve & Send Email"
+                                                    >
+                                                        <CheckCircle className="w-4 h-4" />
+                                                    </button>
+                                                    <button
                                                         onClick={() => handleEditClick(q)}
                                                         className="flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700 transition-colors"
+                                                        title="Edit Details"
                                                     >
                                                         <Edit3 className="w-4 h-4" />
                                                     </button>
@@ -282,6 +331,49 @@ export default function QueriesAdminPage() {
                     )}
                 </div>
             </motion.div>
+
+            {/* Approval Email Dialog */}
+            <AlertDialog open={!!approveDialogData} onOpenChange={(isOpen) => !isOpen && setApproveDialogData(null)}>
+                <AlertDialogContent className="bg-[#050B08] border border-zinc-800 text-white rounded-2xl max-w-md shadow-2xl">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="text-2xl font-bold flex items-center gap-3">
+                            <CheckCircle className="w-6 h-6 text-[#08B74F]" /> Dispatch Approval
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-zinc-400 mt-2">
+                            You are highly recommending <strong>{approveDialogData?.name}</strong> to join the FOSS Community. This will dispatch a styled automated email to <span className="text-zinc-300 font-medium">{approveDialogData?.email}</span>.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <div className="py-4">
+                        <label className="block text-sm font-semibold text-zinc-300 mb-2">On which basis are you approving this request?</label>
+                        <select
+                            value={approveBasis}
+                            onChange={(e) => setApproveBasis(e.target.value)}
+                            className="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#08B74F]/50 transition-shadow transition-colors appearance-none cursor-pointer"
+                        >
+                            {APPROVAL_BASIS_OPTIONS.map((opt) => (
+                                <option key={opt} value={opt}>{opt}</option>
+                            ))}
+                        </select>
+                        <p className="text-xs text-zinc-500 mt-2 italic">This criteria constraint will be explicitly listed in the approval email.</p>
+                    </div>
+
+                    <AlertDialogFooter className="mt-2">
+                        <AlertDialogCancel disabled={isApproving} className="bg-zinc-900 text-white border-zinc-700 hover:bg-zinc-800 hover:text-white rounded-xl">
+                            Cancel
+                        </AlertDialogCancel>
+                        <button
+                            onClick={handleApproveSubmit}
+                            disabled={isApproving}
+                            className={`inline-flex h-10 items-center justify-center rounded-xl font-bold px-4 py-2 transition-colors ${
+                                isApproving ? 'bg-[#08B74F]/50 text-zinc-300 cursor-not-allowed' : 'bg-[#08B74F] text-black hover:bg-[#08B74F]/90'
+                            }`}
+                        >
+                            {isApproving ? "Dispatching..." : "Send Approval →"}
+                        </button>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

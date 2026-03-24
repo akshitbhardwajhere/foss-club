@@ -266,3 +266,117 @@ export const submitContactForm = async (
     });
   }
 };
+
+export const approveCommunityRequest = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const { email, name, basis } = req.body;
+
+    if (!email || !name || !basis) {
+      res.status(400).json({ message: "Email, name, and approval basis are required." });
+      return;
+    }
+
+    if (
+      !process.env.MAILJET_API_KEY ||
+      !process.env.MAILJET_API_SECRET ||
+      !process.env.MAILJET_FROM_EMAIL
+    ) {
+      res.status(500).json({
+        message: "Email service is not properly configured. Please try again later.",
+      });
+      return;
+    }
+
+    const mailjet = new Client({
+      apiKey: process.env.MAILJET_API_KEY,
+      apiSecret: process.env.MAILJET_API_SECRET,
+    });
+
+    const approvalHtml = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Application Approved - FOSS Community</title>
+</head>
+<body style="margin:0;padding:0;background-color:#050B08;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#050B08;width:100% !important;min-width:100%;table-layout:fixed;">
+    <tr>
+      <td align="center" style="padding:40px 20px;">
+        <table role="presentation" width="100%" max-width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;margin:0 auto;background-color:#08100C;border:1px solid #182A20;border-radius:12px;overflow:hidden;">
+          <tr>
+            <td style="padding:40px 40px 30px 40px;border-bottom:1px solid #182A20;text-align:center;">
+              <h1 style="margin:0;font-size:28px;font-weight:700;color:#08B74F;letter-spacing:-0.5px;">Congratulations! 🎉</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:40px;">
+              <h2 style="margin:0 0 20px 0;font-size:18px;color:#ffffff;font-weight:500;">Dear ${name},</h2>
+              
+              <p style="margin:0 0 24px 0;font-size:15px;color:#D4D4D8;line-height:1.6;">
+                We are absolutely thrilled to inform you that your application to join the Free and Open Source Software (FOSS) Community at NIT Srinagar has been <strong>approved</strong>!
+              </p>
+              
+              <div style="background-color:#0A1610;border-left:4px solid #08B74F;padding:20px;margin-bottom:28px;border-radius:0 8px 8px 0;">
+                <p style="margin:0 0 8px 0;font-size:14px;color:#A1A1AA;text-transform:uppercase;letter-spacing:1px;font-weight:600;">
+                  Selection Criteria
+                </p>
+                <p style="margin:0;font-size:18px;color:#ffffff;line-height:1.4;font-weight:500;">
+                  You were selected based on your <span style="color:#08B74F;font-weight:bold;">${basis}</span>.
+                </p>
+              </div>
+              
+              <p style="margin:0 0 30px 0;font-size:15px;color:#D4D4D8;line-height:1.6;">
+                Welcome to the team! Our core members will be reaching out soon with information regarding your onboarding schedule, access to our internal collaboration tools, and next steps. We are excited to see what we can build together.
+              </p>
+              
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #182A20;padding-top:20px;">
+                <tr>
+                  <td>
+                    <p style="margin:0;font-size:14px;color:#E4E4E7;line-height:1.5;">
+                      <strong style="color:#ffffff;">Welcome aboard,</strong><br/>
+                      The FOSS Core Team<br/>
+                      NIT Srinagar
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+    await mailjet
+      .post("send", { version: "v3.1" })
+      .request({
+        Messages: [
+          {
+            From: {
+              Email: process.env.MAILJET_FROM_EMAIL,
+              Name: "FOSS Club NIT Srinagar",
+            },
+            To: [
+              {
+                Email: email,
+                Name: name,
+              },
+            ],
+            Subject: "Application Approved! Welcome to the FOSS Community 🎉",
+            HTMLPart: approvalHtml,
+          },
+        ],
+      });
+
+    res.status(200).json({ message: "Approval email sent successfully." });
+  } catch (error: any) {
+    console.error("Error sending approval email:", error);
+    res.status(500).json({ message: "Failed to send approval email.", error: error.message });
+  }
+};
