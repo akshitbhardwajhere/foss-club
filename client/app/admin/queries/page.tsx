@@ -30,6 +30,7 @@ interface QueryRow {
     institute: string;
     enrollment: string;
     expertise: string;
+    status: string;
     originalRowIndex: number; // to send back to the backend
 }
 
@@ -70,6 +71,7 @@ export default function QueriesAdminPage() {
                     institute: col[4] || "",
                     enrollment: col[5] || "",
                     expertise: col[6] || "",
+                    status: col[7] || "Pending",
                     originalRowIndex: idx + 1, // Google Sheets 1-indexed (row 1 is first row). The API returns an array (0-indexed). 
                 }));
 
@@ -139,7 +141,8 @@ export default function QueriesAdminPage() {
             await api.post("/api/contact/approve", {
                 email: approveDialogData.email,
                 name: approveDialogData.name,
-                basis: approveBasis
+                basis: approveBasis,
+                rowIndex: approveDialogData.originalRowIndex
             });
             toast.success(`Approval email sent to ${approveDialogData.name}`);
             setApproveDialogData(null);
@@ -271,10 +274,17 @@ export default function QueriesAdminPage() {
                                                     <p className="font-bold text-white text-sm md:text-base">
                                                         {q.name}
                                                     </p>
-                                                    <a href={`mailto:${q.email}`} className="text-xs text-[#08B74F] hover:underline">
+                                                    <a href={`mailto:${q.email}`} className="text-xs text-[#08B74F] hover:underline block mb-1">
                                                         {q.email}
                                                     </a>
                                                     <p className="text-xs text-zinc-400 mt-1">{q.phone}</p>
+                                                    <div className="mt-2 text-left inline-block">
+                                                        {q.status === "Approved" ? (
+                                                            <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-[#08B74F]/20 text-[#08B74F] rounded-full">Approved</span>
+                                                        ) : (
+                                                            <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-orange-500/10 text-orange-400 border border-orange-500/20 rounded-full">Pending</span>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 max-w-xs md:max-w-md">

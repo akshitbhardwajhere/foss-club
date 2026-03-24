@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { sheets } from "../config/google";
+import { Client } from "node-mailjet";
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 
@@ -8,7 +9,7 @@ export const getEntries = async (req: Request, res: Response) => {
   try {
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
-      range: "Sheet1!A:G", // Date, Name, Email, Phone, Institute, Enrollment, Expertise
+      range: "Sheet1!A:H", // Date, Name, Email, Phone, Institute, Enrollment, Expertise, Status
     });
 
     res.json(response.data.values || []);
@@ -25,7 +26,7 @@ export const addEntry = async (req: Request, res: Response) => {
   try {
     await sheets.spreadsheets.values.append({
       spreadsheetId: SHEET_ID,
-      range: "Sheet1!A:G",
+      range: "Sheet1!A:H",
       valueInputOption: "USER_ENTERED",
       requestBody: {
         values: [
@@ -89,6 +90,27 @@ export const deleteEntry = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Invalid row index" });
     }
 
+    let emailToNotify = "";
+    let nameToNotify = "";
+    let isApproved = false;
+
+    try {
+      const rowRes = await sheets.spreadsheets.values.get({
+        spreadsheetId: SHEET_ID,
+        range: `Sheet1!A${rowIdx}:H${rowIdx}`,
+      });
+      const rowData = rowRes.data.values?.[0];
+      if (rowData && rowData.length >= 3) {
+         nameToNotify = rowData[1];
+         emailToNotify = rowData[2];
+         if (rowData[7] && rowData[7].toString().trim() === "Approved") {
+            isApproved = true;
+         }
+      }
+    } catch (e) {
+      console.error("Could not fetch row before deletion", e);
+    }
+
     // Google Sheets API requires deleteDimension for deleting a row entirely
     await sheets.spreadsheets.batchUpdate({
       spreadsheetId: SHEET_ID,
@@ -108,6 +130,82 @@ export const deleteEntry = async (req: Request, res: Response) => {
       },
     });
 
+    if (emailToNotify && process.env.MAILJET_API_KEY && process.env.MAILJET_API_SECRET) {
+      try {
+        const mailjet = new Client({
+          apiKey: process.env.MAILJET_API_KEY,
+          apiSecret: process.env.MAILJET_API_SECRET,
+        });
+
+        const subjectTag = isApproved 
+          ? "Update Regarding Your FOSS Community Membership" 
+          : "Update on Your FOSS Community Application";
+
+        const paragraph1 = isApproved
+          ? "This email is to inform you that your membership in the <strong>FOSS Community</strong> at NIT Srinagar has been revoked, and your access has been removed by the core team."
+          : "Thank you for applying to the <strong>FOSS Community</strong> at NIT Srinagar. After careful review of your application, we regret to inform you that we will not be moving forward with your request at this time.";
+
+        const paragraph2 = isApproved
+          ? "We appreciate the time you spent with the community. If you believe this was an error or wish to discuss this decision, please reach out to the core admin team directly."
+          : "We received many strong applications this cycle and had to make some very difficult decisions. We truly appreciate your passion for Free and Open Source Software. Please continue contributing and feel free to apply again in the future!";
+
+        const notifyHtml = `
+<!DOCTYPE html>
+<html lang="en">
+<body style="margin:0;padding:0;background-color:#050B08;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#050B08;width:100% !important;min-width:100%;table-layout:fixed;">
+    <tr>
+      <td align="center" style="padding:40px 20px;">
+        <table role="presentation" width="100%" max-width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;margin:0 auto;background-color:#08100C;border:1px solid #182A20;border-radius:12px;overflow:hidden;">
+          <tr>
+            <td style="padding:40px 40px 30px 40px;border-bottom:1px solid #182A20;">
+              <h1 style="margin:0;font-size:24px;color:#ffffff;">${subjectTag}</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:40px;">
+              <h2 style="margin:0 0 20px 0;font-size:16px;color:#ffffff;font-weight:500;">Dear ${nameToNotify},</h2>
+              <p style="margin:0 0 24px 0;font-size:15px;color:#D4D4D8;line-height:1.6;">
+                ${paragraph1}
+              </p>
+              <p style="margin:0 0 30px 0;font-size:15px;color:#D4D4D8;line-height:1.6;">
+                ${paragraph2}
+              </p>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #182A20;padding-top:20px;">
+                <tr>
+                  <td>
+                    <p style="margin:0;font-size:14px;color:#E4E4E7;line-height:1.5;">
+                      <strong style="color:#ffffff;">Best regards,</strong><br/>
+                      The FOSS Core Team<br/>
+                      NIT Srinagar
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+        await mailjet.post("send", { version: "v3.1" }).request({
+          Messages: [
+            {
+              From: { Email: process.env.MAILJET_FROM_EMAIL!, Name: "FOSS Club NIT Srinagar" },
+              To: [{ Email: emailToNotify, Name: nameToNotify }],
+              Subject: subjectTag,
+              HTMLPart: notifyHtml,
+            }
+          ]
+        });
+      } catch (err) {
+        console.error("Failed to send rejection email", err);
+      }
+    }
+
     res.json({ success: true });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -120,7 +218,7 @@ export const initSheet = async (req: Request, res: Response) => {
     // 1. Add headers
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEET_ID,
-      range: "Sheet1!A1:G1",
+      range: "Sheet1!A1:H1",
       valueInputOption: "USER_ENTERED",
       requestBody: {
         values: [
@@ -132,6 +230,7 @@ export const initSheet = async (req: Request, res: Response) => {
             "Institute",
             "Enrollment",
             "Expertise",
+            "Status",
           ],
         ],
       },
@@ -149,7 +248,7 @@ export const initSheet = async (req: Request, res: Response) => {
                 startRowIndex: 0,
                 endRowIndex: 1,
                 startColumnIndex: 0,
-                endColumnIndex: 7, // A to G
+                endColumnIndex: 8, // A to H
               },
               cell: {
                 userEnteredFormat: {

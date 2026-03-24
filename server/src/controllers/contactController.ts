@@ -272,7 +272,7 @@ export const approveCommunityRequest = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const { email, name, basis } = req.body;
+    const { email, name, basis, rowIndex } = req.body;
 
     if (!email || !name || !basis) {
       res.status(400).json({ message: "Email, name, and approval basis are required." });
@@ -379,6 +379,20 @@ export const approveCommunityRequest = async (
           },
         ],
       });
+
+    // Mark as Approved in Google Sheet
+    if (rowIndex && SHEET_ID) {
+      try {
+        await sheets.spreadsheets.values.update({
+          spreadsheetId: SHEET_ID,
+          range: `Sheet1!H${rowIndex}`,
+          valueInputOption: "USER_ENTERED",
+          requestBody: { values: [["Approved"]] },
+        });
+      } catch (err) {
+        console.error("Could not set Approved status in sheet", err);
+      }
+    }
 
     res.status(200).json({ message: "Approval email sent successfully." });
   } catch (error: any) {
