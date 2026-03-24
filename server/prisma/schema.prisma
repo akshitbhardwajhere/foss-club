@@ -28,9 +28,24 @@ model Event {
   documentUrl        String?
   isDateTentative    Boolean                  @default(false)
   registrationConfig EventRegistrationConfig?
+  galleryImages      EventGalleryImage[]
 
   @@index([createdAt])
   @@index([date])
+}
+
+model EventGalleryImage {
+  id          String   @id @default(uuid())
+  eventId     String
+  url         String
+  description String
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@index([order])
 }
 
 model Blog {

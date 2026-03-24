@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Terminal, LayoutDashboard, CalendarDays, Users, Rss, X } from 'lucide-react';
+import { Terminal, LayoutDashboard, CalendarDays, Users, Rss, X, Images } from 'lucide-react';
 
 interface AdminSidebarProps {
     isOpen: boolean;
@@ -15,6 +15,7 @@ export default function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
     const navItems = [
         { label: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
         { label: 'Events', href: '/admin/events', icon: CalendarDays },
+        { label: 'Event Gallery', href: '/admin/gallery', icon: Images },
         { label: 'Members', href: '/admin/team', icon: Users },
         { label: 'Blogs', href: '/admin/blogs', icon: Rss },
         { label: 'FOSS Community', href: '/admin/queries', icon: Terminal },
@@ -47,7 +48,7 @@ export default function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
                 </div>
 
                 {/* Navigation */}
-                <nav className="flex-1 px-3 space-y-1">
+                <nav className="flex-1 min-h-0 px-3 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
                     {navItems.map((item) => {
                         const isActive = pathname?.startsWith(item.href) ||
                             (pathname?.startsWith('/admin/events') && item.label === 'Events') ||

@@ -8,6 +8,10 @@ export const navlinks = [
     href: "/events",
   },
   {
+    name: "Gallery",
+    href: "/gallery",
+  },
+  {
     name: "Blogs",
     href: "/blogs",
   },
