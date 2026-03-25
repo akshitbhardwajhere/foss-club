@@ -1,48 +1,59 @@
 # FOSS Club NIT Srinagar - Official Website
 
-This repository contains the official website for the Free and Open Source Society (FOSS) Club at the National Institute of Technology Srinagar. The website serves as a platform to showcase club activities, events, blogs, and team members.
+This repository contains the official website for the Free and Open Source Society (FOSS) Club at the National Institute of Technology Srinagar. The website serves as a platform to showcase club activities, events, blogs, team members, and manage event registrations.
 
 ## 🚀 Features
 
-- **Modern UI**: Built with Next.js and Tailwind CSS for a premium user experience.
-- **Admin Dashboard**: Secure admin panel to manage website content.
+- **Modern UI**: Built with Next.js 14, Tailwind CSS v4, and Framer Motion for a premium, responsive user experience.
+- **Admin Dashboard**: Secure admin panel to manage website content and analytics.
 - **Content Management**:
-  - **Events**: Create and manage event listings (upcoming and past).
-  - **News**: Publish club news and announcements.
-  - **Blogs**: Share articles and insights on open-source.
-  - **Team**: Showcase club members and their roles.
-- **Responsive Design**: Fully optimized for desktop, tablet, and mobile devices.
-- **Dark Mode**: Built-in dark theme for a comfortable viewing experience.
+  - **Events**: Create and manage event listings (upcoming, tentative, and past). Includes countdown timers.
+  - **Event Registration**: Built-in registration system for students (individuals & teams) with automated email notifications (via Mailjet) and real-time syncing to Google Sheets.
+  - **Gallery**: Manage and display event images in an organized gallery.
+  - **News & Blogs**: Publish club news and articles using a seamless Rich Text Editor (Tiptap).
+  - **Team**: Showcase club members with drag-and-drop ordering capabilities.
+- **File Management**: Comprehensive image and PDF upload capabilities directly integrating with Cloudinary.
+- **Responsive & Accessible Design**: Optimized for desktop, tablet, and mobile viewing across different devices, incorporating Radix UI primitives.
+- **Dark Mode**: Built-in dark theme powered by `next-themes` for a comfortable viewing experience.
 
 ## 🛠️ Tech Stack
 
-### Frontend
+### Frontend (Client)
 - **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **State Management**: [Redux Toolkit](https://redux-toolkit.js.org/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **UI Components**: [Radix UI](https://www.radix-ui.com/), Shadcn UI
 - **Animation**: [Framer Motion](https://www.framer.com/motion/)
 - **Icons**: [Lucide React](https://lucide.dev/)
-- **Forms**: React Hook Form + Zod
+- **Editor**: [Tiptap](https://tiptap.dev/)
+- **Forms & Validation**: React Hook Form + Zod
+- **Drag & Drop**: dnd-kit
 
-### Backend
+### Backend (Server)
 - **Framework**: [Express.js](https://expressjs.com/)
 - **Database**: [PostgreSQL](https://www.postgresql.org/)
 - **ORM**: [Prisma](https://prisma.io/)
-- **Authentication**: JWT (JSON Web Tokens)
-- **Validation**: Zod
+- **Storage**: [Cloudinary](https://cloudinary.com/)
+- **Communication**: Node Mailjet (Email Automation)
+- **Integration**: Google APIs (Google Sheets Sync)
+- **Authentication**: JWT & bcryptjs
+- **File Uploads**: Multer
 
 ## 📂 Project Structure
 
-```
+```text
 foss-club/
 ├── client/          # Next.js Frontend Application
-│   ├── app/         # Next.js App Router pages
-│   ├── components/  # Reusable React components
-│   └── lib/         # Utility functions and API clients
+│   ├── app/         # Next.js App Router pages (admin, events, blogs, team, gallery)
+│   ├── components/  # Reusable React components (AdminSidebar, ImageUpload, PdfUpload, etc.)
+│   └── lib/         # Utility functions, Redux store, and API clients
 ├── server/          # Express.js Backend Application
-│   ├── config/      # Database and middleware configuration
-│   ├── controllers/ # Request handlers
-│   ├── routes/      # API route definitions
-│   └── prisma/      # Prisma schema and migrations
+│   ├── src/
+│   │   ├── config/      # DB, Cloudinary, Mailjet configuration
+│   │   ├── controllers/ # Logic for Auth, Events, Blogs, Registration, Sheets, Contact, Stats, Uploads
+│   │   ├── routes/      # API endpoints mapping to controllers
+│   │   └── middleware/  # Auth guards, Error handling
+│   └── prisma/      # Schema (Admin, Event, Blog, TeamMember, RegistrationConfig, etc.)
 └── README.md        # Project documentation
 ```
 
@@ -51,6 +62,9 @@ foss-club/
 ### Prerequisites
 - Node.js (v18 or higher)
 - PostgreSQL (v14 or higher)
+- Cloudinary Account
+- Mailjet Account
+- Google Service Account (for Sheets API)
 
 ### 1. Backend Setup
 
@@ -64,8 +78,12 @@ npm install
 # Create .env file
 cp .env.example .env
 
-# Configure database URL in .env
-# DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
+# Configure environment variables in .env
+# - DATABASE_URL
+# - JWT_SECRET
+# - CLOUDINARY credentials
+# - MAILJET credentials
+# - GOOGLE_SHEETS settings
 
 # Generate Prisma client
 npx prisma generate
@@ -73,11 +91,11 @@ npx prisma generate
 # Apply database migrations
 npx prisma migrate dev --name init
 
-# Start the server
+# Start the development server
 npm run dev
 ```
 
-The backend API will be available at `http://localhost:5000`.
+The backend API will be running at `http://localhost:5000`.
 
 ### 2. Frontend Setup
 
@@ -94,35 +112,28 @@ npm run dev
 
 The frontend application will be available at `http://localhost:3000`.
 
-## 📂 API Endpoints
+## 📂 Key API Endpoints
 
 ### Authentication
 - `POST /api/auth/login` - Admin login
-- `POST /api/auth/refresh` - Refresh token
 
-### Events
+### Events & Registrations
 - `GET /api/events` - Get all events
-- `GET /api/events/:id` - Get event by ID
 - `POST /api/events` - Create event (admin)
-- `PUT /api/events/:id` - Update event (admin)
-- `DELETE /api/events/:id` - Delete event (admin)
+- `POST /api/registrations/:eventId` - Register for an event
+- `GET /api/registrations/config/:eventId` - Get event registration config
 
-### Blogs
+### Content (Blogs & Gallery)
 - `GET /api/blogs` - Get all blogs
-- `GET /api/blogs/:id` - Get blog by ID
-- `POST /api/blogs` - Create blog (admin)
-- `PUT /api/blogs/:id` - Update blog (admin)
-- `DELETE /api/blogs/:id` - Delete blog (admin)
+- `GET /api/gallery` - Get all gallery images
 
-### Team
-- `GET /api/team` - Get all team members
-- `GET /api/team/:id` - Get team member by ID
-- `POST /api/team` - Create team member (admin)
-- `PUT /api/team/:id` - Update team member (admin)
-- `DELETE /api/team/:id` - Delete team member (admin)
+### External Integrations
+- `POST /api/contact` - Submit contact form
+- `GET/POST /api/sheet/*` - Google Sheets synchronizations
+- `POST /api/upload/*` - Handle file uploads (Cloudinary)
 
 ### Dashboard
-- `GET /api/dashboard/stats` - Get statistics
+- `GET /api/stats` - Get summary statistics for the admin dashboard
 
 ## 🤝 Contributing
 
