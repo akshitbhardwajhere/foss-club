@@ -19,6 +19,13 @@ interface TimeLeft {
     seconds: number;
 }
 
+/**
+ * NextEventCountdown Component
+ * 
+ * A sticky floating widget that surfaces the most immediate upcoming event to the user.
+ * Fetches the `/api/events/next` endpoint on mount and orchestrates a local interval to countdown
+ * visually via Framer Motion animations. Also detects if the event naturally starts today ("Live Now").
+ */
 export default function NextEventCountdown() {
     const [event, setEvent] = useState<Event | null>(null);
     const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);

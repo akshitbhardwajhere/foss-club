@@ -2,6 +2,13 @@ import { Request, Response } from "express";
 import prisma from "../config/prisma";
 import { deleteCloudinaryImage } from "../utils/cloudinary";
 
+/**
+ * Retrieves a list of all blogs, ordered by newest first.
+ * Does not include full content to keep the payload lightweight.
+ *
+ * @param {Request} req - The express request object.
+ * @param {Response} res - The express response object.
+ */
 export const getBlogs = async (req: Request, res: Response) => {
   try {
     const blogs = await prisma.blog.findMany({
@@ -22,6 +29,13 @@ export const getBlogs = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Retrieves a single blog by its ID, including full content.
+ *
+ * @param {Request} req - The express request object containing the blog ID in params.
+ * @param {Response} res - The express response object.
+ * @returns {Promise<void>}
+ */
 export const getBlogById = async (
   req: Request,
   res: Response,
@@ -39,6 +53,12 @@ export const getBlogById = async (
   }
 };
 
+/**
+ * Creates a new blog post.
+ *
+ * @param {Request} req - The express request object containing blog data in body.
+ * @param {Response} res - The express response object.
+ */
 export const createBlog = async (req: Request, res: Response) => {
   try {
     const { title, content, author, tags, imageUrl } = req.body;
@@ -59,6 +79,14 @@ export const createBlog = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Updates an existing blog post.
+ * If a new image URL is provided, securely deletes the old image from Cloudinary.
+ *
+ * @param {Request} req - The express request object containing updated blog data in body and ID in params.
+ * @param {Response} res - The express response object.
+ * @returns {Promise<void>}
+ */
 export const updateBlog = async (
   req: Request,
   res: Response,
@@ -97,6 +125,14 @@ export const updateBlog = async (
   }
 };
 
+/**
+ * Deletes a specifically identified blog post.
+ * Also removes any associated images from Cloudinary to prevent orphaned assets.
+ *
+ * @param {Request} req - The express request object containing the blog ID in params.
+ * @param {Response} res - The express response object.
+ * @returns {Promise<void>}
+ */
 export const deleteBlog = async (
   req: Request,
   res: Response,

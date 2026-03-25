@@ -17,6 +17,14 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 
+/**
+ * Header Component
+ * 
+ * The primary public navigation bar. Features scroll-dependent transparency,
+ * advanced layout animations using Framer Motion, and a heavily optimized mobile hamburger menu hook.
+ * Hidden automatically if rendered on an `/admin` route.
+ */
+
 function Header() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);

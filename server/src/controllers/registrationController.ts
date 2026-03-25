@@ -4,7 +4,13 @@ import { sendRegistrationEmail } from "../utils/email";
 
 const prisma = new PrismaClient();
 
-// Create or update registration config for an event (Admin)
+/**
+ * Creates or updates the registration configuration for a specific event.
+ * Only accessible by administrators.
+ *
+ * @param {Request} req - The express request object containing eventId and validUntil.
+ * @param {Response} res - The express response object.
+ */
 export const saveRegistrationConfig = async (req: Request, res: Response) => {
   try {
     const { eventId, validUntil } = req.body;
@@ -33,7 +39,13 @@ export const saveRegistrationConfig = async (req: Request, res: Response) => {
   }
 };
 
-// Get registration config for an event (public)
+/**
+ * Retrieves the currently active registration configuration for an event.
+ * Used publicly by users wanting to register to see if form is active.
+ *
+ * @param {Request} req - The express request object with eventId in params.
+ * @param {Response} res - The express response object.
+ */
 export const getRegistrationConfig = async (req: Request, res: Response) => {
   try {
     const { eventId } = req.params;
@@ -70,7 +82,14 @@ export const getRegistrationConfig = async (req: Request, res: Response) => {
   }
 };
 
-// Submit a registration response (public)
+/**
+ * Submits a new participant registration for an event.
+ * Verifies that the registration window is still open before recording data.
+ * Automates a confirmation email upon successful insertion.
+ *
+ * @param {Request} req - The express request object populated with user demographic data.
+ * @param {Response} res - The express response object.
+ */
 export const submitRegistration = async (req: Request, res: Response) => {
   try {
     const {
@@ -151,7 +170,13 @@ export const submitRegistration = async (req: Request, res: Response) => {
   }
 };
 
-// Admin Route to stop (close early) the registration form for an event
+/**
+ * Stops an active registration window early.
+ * Useful if seats are full or if the admin decides to manually cut off applications.
+ *
+ * @param {Request} req - The express request object containing the eventId.
+ * @param {Response} res - The express response object.
+ */
 export const stopRegistration = async (req: Request, res: Response) => {
   try {
     const { eventId } = req.params;
@@ -184,7 +209,14 @@ export const stopRegistration = async (req: Request, res: Response) => {
   }
 };
 
-// Admin Route to fetch all registrations for a specific event
+/**
+ * Fetches the entire list of registered participants for a given event.
+ * Intended for the admin dashboard.
+ *
+ * @param {Request} req - The express request object.
+ * @param {Response} res - The express response object.
+ * @returns {Promise<void>}
+ */
 export const getEventRegistrations = async (
   req: Request,
   res: Response,

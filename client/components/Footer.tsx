@@ -1,3 +1,8 @@
+/**
+ * Footer Component
+ * 
+ * The global standard footer injected at the bottom of the public-facing application pages.
+ */
 export default function Footer() {
     return (
         <footer className="w-full bg-[#050B08] border-t border-zinc-900/50 py-8 relative z-10">

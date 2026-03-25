@@ -4,6 +4,12 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { ShieldCheck, ArrowRight, Terminal, Lock } from "lucide-react";
 
+/**
+ * AdminHomePage Component
+ * 
+ * The public landing page at `/admin`.
+ * Presents a secure-looking entrance gateway that funnels valid administrators to `/admin/login`.
+ */
 export default function AdminHomePage() {
     return (
         <div className="min-h-screen bg-[#060d08] flex items-center justify-center relative overflow-hidden">

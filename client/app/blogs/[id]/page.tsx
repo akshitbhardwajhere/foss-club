@@ -49,6 +49,13 @@ function estimateReadTime(content: string): number {
   return Math.max(1, Math.ceil(words / 200));
 }
 
+/**
+ * BlogDetailPage Component
+ * 
+ * Renders a full blog article by fetching standard data from `/api/blogs/[id]`.
+ * Features an animated read-progress bar anchored to the top of the viewport,
+ * estimated read time calculation, and raw HTML injection for the rich text payload.
+ */
 export default function BlogDetailPage() {
   const params = useParams();
   const router = useRouter();

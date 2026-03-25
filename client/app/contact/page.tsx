@@ -56,6 +56,13 @@ const formSchema = z
 
 type FormData = z.infer<typeof formSchema>;
 
+/**
+ * ContactPage Component
+ * 
+ * A robust client-side form using `react-hook-form` and `zod` validation that allows 
+ * users to apply to join the community. Captures user metadata depending on whether they are 
+ * from the host university or not. Handles submission explicitly via the backend `/api/contact` API.
+ */
 export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 

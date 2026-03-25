@@ -5,6 +5,13 @@ import {
   deleteCloudinaryResource,
 } from "../utils/cloudinary";
 
+/**
+ * Retrieves all events sorted by creation date in descending order.
+ * Fetches basic details and the registration configuration's validUntil date.
+ *
+ * @param {Request} req - The express request object.
+ * @param {Response} res - The express response object.
+ */
 export const getEvents = async (req: Request, res: Response) => {
   try {
     const events = await prisma.event.findMany({
@@ -31,6 +38,13 @@ export const getEvents = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Retrieves the closest upcoming active event (including events happening today).
+ * Used primarily for the homepage countdown component.
+ *
+ * @param {Request} req - The express request object.
+ * @param {Response} res - The express response object.
+ */
 export const getNextEvent = async (req: Request, res: Response) => {
   try {
     const startOfToday = new Date();
@@ -55,6 +69,14 @@ export const getNextEvent = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Retrieves a specific event by its ID.
+ * Also includes its associated registration configuration if any.
+ *
+ * @param {Request} req - The express request object containing the event ID in params.
+ * @param {Response} res - The express response object.
+ * @returns {Promise<void>}
+ */
 export const getEventById = async (
   req: Request,
   res: Response,
@@ -75,6 +97,12 @@ export const getEventById = async (
   }
 };
 
+/**
+ * Creates a new event entry in the database.
+ * 
+ * @param {Request} req - The express request object containing event payload in body.
+ * @param {Response} res - The express response object.
+ */
 export const createEvent = async (req: Request, res: Response) => {
   try {
     const {
@@ -107,6 +135,14 @@ export const createEvent = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Updates an existing event.
+ * If a new image or document URL is provided, it automatically deletes the old asset from Cloudinary.
+ *
+ * @param {Request} req - The express request object containing the updated fields in body and event ID in params.
+ * @param {Response} res - The express response object.
+ * @returns {Promise<void>}
+ */
 export const updateEvent = async (
   req: Request,
   res: Response,
@@ -167,6 +203,14 @@ export const updateEvent = async (
   }
 };
 
+/**
+ * Deletes an event by its ID.
+ * Gracefully removes associated images and documents from Cloudinary before deleting the database record.
+ *
+ * @param {Request} req - The express request object containing the event ID in params.
+ * @param {Response} res - The express response object.
+ * @returns {Promise<void>}
+ */
 export const deleteEvent = async (
   req: Request,
   res: Response,
@@ -193,6 +237,14 @@ export const deleteEvent = async (
   }
 };
 
+/**
+ * Streams the associated PDF document of an event to the client.
+ * Fetches the document from Cloudinary server-side to avoid CORS issues.
+ *
+ * @param {Request} req - The express request object containing the event ID.
+ * @param {Response} res - The express response object used to stream the PDF file.
+ * @returns {Promise<void>}
+ */
 export const downloadEventDocument = async (
   req: Request,
   res: Response,

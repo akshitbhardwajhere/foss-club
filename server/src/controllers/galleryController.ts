@@ -1,6 +1,12 @@
 import { Request, Response } from "express";
 import prisma from "../config/prisma";
 
+/**
+ * Retrieves all gallery images associated with a specific event.
+ *
+ * @param {Request} req - The express request object capturing `eventId` in params.
+ * @param {Response} res - The express response object.
+ */
 export const getEventGallery = async (req: Request, res: Response) => {
   try {
     const eventId = req.params.eventId as string;
@@ -15,6 +21,13 @@ export const getEventGallery = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Uploads a record for a new gallery image attached to an event.
+ * Enforces a strict limit of 10 gallery photos per event.
+ *
+ * @param {Request} req - The express request object capturing the URL and description.
+ * @param {Response} res - The express response object.
+ */
 export const addGalleryImage = async (req: Request, res: Response) => {
   try {
     const eventId = req.params.eventId as string;
@@ -51,6 +64,13 @@ export const addGalleryImage = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Deletes an existing gallery image database record by its exact ID.
+ * Note: Cloudinary image deletion logic operates separately or via cleanup jobs.
+ *
+ * @param {Request} req - The express request object including the image ID.
+ * @param {Response} res - The express response object.
+ */
 export const deleteGalleryImage = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;

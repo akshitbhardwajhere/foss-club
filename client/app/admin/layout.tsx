@@ -11,6 +11,16 @@ import { Terminal, Menu } from "lucide-react";
 
 import AdminSidebar from "@/components/AdminSidebar";
 
+/**
+ * AdminLayout Component
+ * 
+ * Central authorization gatekeeper for the entire Next.js `/admin` route tree.
+ * Intercepts mounting to dispatch `checkAuth` against the secure backend cookie.
+ * Protects nested admin pages and natively redirects unauthenticated users back to `/admin` 
+ * or authenticated users explicitly visiting `/admin/login` to the `/admin/dashboard`.
+ *
+ * @param {Object} props - React children comprising nested admin pages.
+ */
 export default function AdminLayout({
   children,
 }: {

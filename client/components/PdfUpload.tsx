@@ -9,6 +9,14 @@ interface PdfUploadProps {
     value: string;
 }
 
+/**
+ * PdfUpload Component
+ * 
+ * Specifically handles the uploading of `.pdf` documents via the backend's multer pipeline.
+ * Unlike image uploads, PDFs must be uploaded server-side to guarantee `access_mode="public"` on Cloudinary.
+ *
+ * @param {PdfUploadProps} props - Component properties capturing the resulting URL.
+ */
 export default function PdfUpload({ onChange, value }: PdfUploadProps) {
     const [isUploading, setIsUploading] = useState(false);
     const [isRemoving, setIsRemoving] = useState(false);

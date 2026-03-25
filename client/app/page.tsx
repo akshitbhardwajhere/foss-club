@@ -6,6 +6,13 @@ import { ArrowRight, Code2, Terminal, Globe } from 'lucide-react';
 import BackgroundBlur from '@/components/shared/BackgroundBlur';
 import NextEventCountdown from '@/components/NextEventCountdown';
 
+/**
+ * Home Page Component
+ * 
+ * The primary landing page for the FOSS club website (`/`). 
+ * Features a dynamic hero section, a sticky event countdown widget, 
+ * and a "bento box" style grid highlighting the club's core offerings.
+ */
 export default function Home() {
   const containerVariants = {
     hidden: { opacity: 0 },

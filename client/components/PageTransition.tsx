@@ -10,6 +10,12 @@ const variants = {
   exit: { opacity: 0, y: -20 },
 };
 
+/**
+ * PageTransition Component
+ * 
+ * A global wrapper responsible for smoothly fading and sliding new routes into view.
+ * Utilizes Framer Motion's `<AnimatePresence>` logic wrapped around `next/navigation`.
+ */
 export default function PageTransition({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 

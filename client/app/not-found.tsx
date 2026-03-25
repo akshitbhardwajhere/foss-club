@@ -1,6 +1,12 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
+/**
+ * NotFound Component
+ * 
+ * The default 404 fallback page displayed automatically by Next.js when a requested route does not exist.
+ * Provides a simple call-to-action to return to the homepage.
+ */
 export default function NotFound() {
   return (
     <div className="bg-black text-white flex flex-col items-center justify-center min-h-screen px-4 text-center">

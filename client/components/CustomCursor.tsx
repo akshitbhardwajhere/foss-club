@@ -5,6 +5,14 @@ import { motion, useSpring } from 'framer-motion';
 import { useSelector } from 'react-redux';
 import { RootState } from '../lib/store';
 
+/**
+ * CustomCursor Component
+ * 
+ * Renders a stylized custom cursor element that follows the user's mouse pointer using Framer Motion springs.
+ * It intelligently enlarges or changes style when hovering over clickable elements or based on global Redux state.
+ * Is completely hidden from touch devices to preserve mobile UX.
+ */
+
 export default function CustomCursor() {
     const [isHovering, setIsHovering] = useState(false);
     // Optional: Read cursor variant from Redux if you have global hover states

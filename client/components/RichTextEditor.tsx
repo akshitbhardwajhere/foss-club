@@ -66,6 +66,15 @@ function Divider() {
     return <div className="w-px h-6 bg-zinc-700/60 mx-1" />;
 }
 
+/**
+ * RichTextEditor Component
+ * 
+ * A fully-featured WYSIWYG editor built on top of Tiptap.
+ * Provides extensive formatting capabilities including headings, lists, highlights, colors, and links.
+ * Used primarily in the admin dashboard for creating rich blog posts.
+ *
+ * @param {RichTextEditorProps} props - Component properties for two-way HTML binding.
+ */
 export default function RichTextEditor({ value, onChange, placeholder }: RichTextEditorProps) {
     const editor = useEditor({
         immediatelyRender: false,

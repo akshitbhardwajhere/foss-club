@@ -23,6 +23,12 @@ interface GalleryImage {
   order: number;
 }
 
+/**
+ * EventGalleryDetails Component
+ * 
+ * Dynamically loads and presents all high-resolution photos associated with a specific completed event.
+ * Arranges images in an alternating zigzag pattern (image left, image right) with their respective descriptions.
+ */
 export default function EventGalleryDetails() {
   const params = useParams();
   const [event, setEvent] = useState<Event | null>(null);

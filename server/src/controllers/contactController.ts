@@ -132,6 +132,14 @@ function buildAutoReplyHtml(name: string) {
 </html>`;
 }
 
+/**
+ * Handles incoming contact or community join requests.
+ * Saves data into Google Sheets (if configured) and sends asynchronous emails via Mailjet to both the user and the administrators.
+ *
+ * @param {Request} req - The express request object populated with contact form fields.
+ * @param {Response} res - The express response object.
+ * @returns {Promise<void>}
+ */
 export const submitContactForm = async (
   req: Request,
   res: Response,
@@ -267,6 +275,14 @@ export const submitContactForm = async (
   }
 };
 
+/**
+ * Approves a community join request directly from the admin dashboard.
+ * Triggers an approval email via Mailjet and updates the application's status in Google Sheets.
+ *
+ * @param {Request} req - The express request object containing user email, name, basis for approval, and sheet row index.
+ * @param {Response} res - The express response object.
+ * @returns {Promise<void>}
+ */
 export const approveCommunityRequest = async (
   req: Request,
   res: Response,

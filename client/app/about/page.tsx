@@ -5,6 +5,12 @@ import { Terminal, Target, Users, Rocket } from 'lucide-react';
 import BackgroundBlur from '@/components/shared/BackgroundBlur';
 import PageHeader from '@/components/shared/PageHeader';
 
+/**
+ * AboutPage Component
+ * 
+ * Displays the club's mission statement, core values, and general information.
+ * Uses Framer Motion to stagger the entrance of the information cards.
+ */
 export default function AboutPage() {
     const containerVariants = {
         hidden: { opacity: 0 },

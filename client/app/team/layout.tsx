@@ -27,6 +27,13 @@ export const metadata: Metadata = {
     },
 };
 
+/**
+ * TeamLayout Component
+ * 
+ * Injects route-specific SEO metadata for the `/team` path.
+ *
+ * @param {Object} props - React children node.
+ */
 export default function TeamLayout({
     children,
 }: {

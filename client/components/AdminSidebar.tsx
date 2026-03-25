@@ -9,6 +9,16 @@ interface AdminSidebarProps {
     setIsOpen: (isOpen: boolean) => void;
 }
 
+/**
+ * AdminSidebar Component
+ * 
+ * Renders the sticky/fixed sidebar navigation for the admin dashboard.
+ * On mobile, it acts as an off-canvas menu with a blurred backdrop.
+ * Automatically highlights the active link based on `usePathname`.
+ *
+ * @param {AdminSidebarProps} props - Component properties containing open state and setter.
+ */
+
 export default function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
     const pathname = usePathname();
 

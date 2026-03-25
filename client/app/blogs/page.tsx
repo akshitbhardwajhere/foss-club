@@ -27,6 +27,13 @@ interface Blog {
 
 import { Skeleton } from "@/components/ui/skeleton";
 
+/**
+ * BlogsPage Component
+ * 
+ * The main public-facing blog directory for the FOSS club.
+ * Fetches all published blogs from the backend (`/api/blogs`) and displays them with a paginated, searchable interface.
+ * Allows users to sort chronological posts natively in the client.
+ */
 export default function BlogsPage() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);

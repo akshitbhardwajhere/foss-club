@@ -28,6 +28,13 @@ export const metadata: Metadata = {
     },
 };
 
+/**
+ * EventsLayout Component
+ * 
+ * Injects route-specific SEO metadata for the `/events` path.
+ *
+ * @param {Object} props - React children node.
+ */
 export default function EventsLayout({
     children,
 }: {

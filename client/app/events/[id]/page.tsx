@@ -20,6 +20,13 @@ interface Event {
   isDateTentative?: boolean;
 }
 
+/**
+ * EventDetailPage Component
+ * 
+ * Renders the full details of a single event dynamically based on the URL `[id]` parameter.
+ * Also queries the backend to determine if registrations are currently open or closed,
+ * and handles the native client-side downloading of PDF brochures.
+ */
 export default function EventDetailPage() {
   const params = useParams();
   const router = useRouter();

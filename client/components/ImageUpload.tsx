@@ -13,6 +13,15 @@ interface ImageUploadProps {
     value: string;
 }
 
+/**
+ * ImageUpload Component
+ * 
+ * Provides an interactive UI for users to upload, preview, and natively crop images 
+ * explicitly locked to a 1:1 aspect ratio when using corner handles. 
+ * Uploads the processed blob directly to Cloudinary.
+ *
+ * @param {ImageUploadProps} props - Component properties capturing the resulting URL.
+ */
 export default function ImageUpload({ onChange, value }: ImageUploadProps) {
     const [imgSrc, setImgSrc] = useState('');
     const [crop, setCrop] = useState<Crop>();

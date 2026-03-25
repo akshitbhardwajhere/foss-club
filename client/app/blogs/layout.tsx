@@ -28,6 +28,13 @@ export const metadata: Metadata = {
     },
 };
 
+/**
+ * BlogsLayout Component
+ * 
+ * Injects route-specific SEO metadata for the `/blogs` path.
+ *
+ * @param {Object} props - React children node.
+ */
 export default function BlogsLayout({
     children,
 }: {

@@ -19,6 +19,13 @@ interface TeamMember {
   twitterUrl?: string;
 }
 
+/**
+ * TeamPage Component
+ * 
+ * The public roster displaying all FOSS club core team members.
+ * Fetches data asynchronously from the `/api/team` endpoint and renders them using the `TeamMemberCard` component.
+ * Layout is staggered gracefully using Framer Motion.
+ */
 export default function TeamPage() {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);

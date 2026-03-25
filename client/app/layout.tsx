@@ -32,7 +32,15 @@ export const metadata: Metadata = {
   },
 };
 
-
+/**
+ * RootLayout (Server Component)
+ * 
+ * The absolute root of the Next.js application bridging the `<html>` and `<body>` tags.
+ * Sets up global metadata (SEO/OpenGraph), integrates global CSS, loads local Geist fonts,
+ * and initializes the dark mode theme. Wraps everything in the client-side `ProvidersAndLayout`.
+ *
+ * @param {Object} props - React children node.
+ */
 export default function RootLayout({
   children,
 }: Readonly<{

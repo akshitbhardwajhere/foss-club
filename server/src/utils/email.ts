@@ -1,3 +1,7 @@
+/**
+ * @file email.ts
+ * @description Provides utility functions to dispatch system transactional emails via Mailjet.
+ */
 import Mailjet from "node-mailjet";
 
 const mailjetClient = Mailjet.apiConnect(

@@ -1,3 +1,8 @@
+/**
+ * @file cloudinary.ts
+ * @description Provides wrapper utilities around the official Cloudinary SDK for uploading and deleting media assets.
+ * Uses lazy initialization to ensure environment variables are loaded securely before config.
+ */
 import { v2 as cloudinary } from "cloudinary";
 
 let isConfigured = false;

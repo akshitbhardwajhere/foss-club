@@ -15,6 +15,13 @@ interface Event {
   date: string;
 }
 
+/**
+ * GalleryPage Component
+ * 
+ * The main public-facing photo gallery for the FOSS club.
+ * Exclusively fetches and displays past/completed events that have an associated `imageUrl` or gallery content.
+ * Serves as an atmospheric entry point before users click into specific event photo albums.
+ */
 export default function GalleryPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);

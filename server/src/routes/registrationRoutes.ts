@@ -8,6 +8,12 @@ import {
 } from "../controllers/registrationController";
 import { protect } from "../middleware/authMiddleware";
 
+/**
+ * @file registrationRoutes.ts
+ * @description Express routes for event registrations (`/api/registrations`).
+ * 
+ * Separate public routes (for students to register) and protected routes (for admins to manage configurations and view lists).
+ */
 const router = express.Router();
 
 // Admin Routes

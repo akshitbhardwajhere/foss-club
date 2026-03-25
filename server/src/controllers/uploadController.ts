@@ -5,6 +5,14 @@ import {
   uploadBufferToCloudinary,
 } from "../utils/cloudinary";
 
+/**
+ * Deletes an image resource securely from Cloudinary.
+ * Designed to return a 200 OK even if Cloudinary fails, ensuring the frontend form state can safely reset without being permanently blocked.
+ *
+ * @param {Request} req - The express request object containing `imageUrl`.
+ * @param {Response} res - The express response object.
+ * @returns {Promise<void>}
+ */
 export const removeCloudinaryImage = async (
   req: Request,
   res: Response,
@@ -42,6 +50,14 @@ export const removeCloudinaryImage = async (
       .json({ message: "Image reference cleared (cleanup error logged)" });
   }
 };
+/**
+ * Deletes a raw document resource (like PDF) securely from Cloudinary.
+ * Designed to return a graceful 200 OK even if the document was already deleted.
+ *
+ * @param {Request} req - The express request object containing `documentUrl`.
+ * @param {Response} res - The express response object.
+ * @returns {Promise<void>}
+ */
 export const removeCloudinaryDocument = async (
   req: Request,
   res: Response,

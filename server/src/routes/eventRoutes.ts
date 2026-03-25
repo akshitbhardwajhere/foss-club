@@ -10,6 +10,13 @@ import {
 } from "../controllers/eventController";
 import { protect } from "../middleware/authMiddleware";
 
+/**
+ * @file eventRoutes.ts
+ * @description Express routes for managing club events (`/api/events`).
+ * 
+ * Supports retrieving the next active event, downloading event brochures, 
+ * and standard CRUD operations. Admin privileges required for mutative actions.
+ */
 const router = express.Router();
 
 router.route("/").get(getEvents).post(protect, createEvent);

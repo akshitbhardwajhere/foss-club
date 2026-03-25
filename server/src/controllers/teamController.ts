@@ -2,9 +2,14 @@ import { Request, Response } from "express";
 import prisma from "../config/prisma";
 import { deleteCloudinaryImage } from "../utils/cloudinary";
 
-// @desc    Get all team members
-// @route   GET /api/team
-// @access  Public
+/**
+ * Retrieves all core team members.
+ * Sorts them by their custom order first, then chronologically by creation date.
+ *
+ * @param {Request} req - The express request object.
+ * @param {Response} res - The express response object.
+ * @returns {Promise<void>}
+ */
 export const getTeamMembers = async (
   req: Request,
   res: Response,
@@ -19,9 +24,13 @@ export const getTeamMembers = async (
   }
 };
 
-// @desc    Get single team member
-// @route   GET /api/team/:id
-// @access  Public
+/**
+ * Retrieves a single team member by their unique ID.
+ *
+ * @param {Request} req - The express request object containing the ID in params.
+ * @param {Response} res - The express response object.
+ * @returns {Promise<void>}
+ */
 export const getTeamMemberById = async (
   req: Request,
   res: Response,
@@ -42,9 +51,14 @@ export const getTeamMemberById = async (
   }
 };
 
-// @desc    Create a team member
-// @route   POST /api/team
-// @access  Private/Admin
+/**
+ * Creates a new team member profile.
+ * Only accessible by administrators.
+ *
+ * @param {Request} req - The express request object containing the new member's details.
+ * @param {Response} res - The express response object.
+ * @returns {Promise<void>}
+ */
 export const createTeamMember = async (
   req: Request,
   res: Response,
@@ -73,9 +87,14 @@ export const createTeamMember = async (
   }
 };
 
-// @desc    Update a team member
-// @route   PUT /api/team/:id
-// @access  Private/Admin
+/**
+ * Updates an existing team member's profile.
+ * Automatically handles the deletion of their old image from Cloudinary if a new one is provided.
+ *
+ * @param {Request} req - The express request object containing the updated fields.
+ * @param {Response} res - The express response object.
+ * @returns {Promise<void>}
+ */
 export const updateTeamMember = async (
   req: Request,
   res: Response,
@@ -119,9 +138,14 @@ export const updateTeamMember = async (
   }
 };
 
-// @desc    Delete a team member
-// @route   DELETE /api/team/:id
-// @access  Private/Admin
+/**
+ * Removes a team member completely from the database.
+ * Also cleans up their associated image asset from Cloudinary.
+ *
+ * @param {Request} req - The express request object containing the member ID.
+ * @param {Response} res - The express response object.
+ * @returns {Promise<void>}
+ */
 export const deleteTeamMember = async (
   req: Request,
   res: Response,
@@ -151,9 +175,14 @@ export const deleteTeamMember = async (
   }
 };
 
-// @desc    Reorder team members
-// @route   PUT /api/team/reorder
-// @access  Private/Admin
+/**
+ * Reorders team members dynamically based on drag-and-drop actions in the UI.
+ * Uses a bulk transaction to ensure complete atomicity of the order update.
+ *
+ * @param {Request} req - The express request object containing an array of `{ id, order }`.
+ * @param {Response} res - The express response object.
+ * @returns {Promise<void>}
+ */
 export const reorderTeamMembers = async (
   req: Request,
   res: Response,

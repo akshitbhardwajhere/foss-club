@@ -28,6 +28,14 @@ interface Event {
 
 import { Skeleton } from "@/components/ui/skeleton";
 
+/**
+ * EventsPage Component
+ * 
+ * The primary public-facing events directory for the FOSS club.
+ * Fetches event data asynchronously from the backend (`/api/events`) and renders them in a styled table format.
+ * Includes client-side capabilities for comprehensive filtering (All, Live, Upcoming, Completed), sorting by date,
+ * text-based searching (title/location), and pagination.
+ */
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);

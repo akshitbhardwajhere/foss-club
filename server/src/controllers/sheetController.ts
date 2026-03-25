@@ -4,7 +4,13 @@ import { Client } from "node-mailjet";
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 
-// GET all rows
+/**
+ * Fetches all row entries from the configured Google Sheet.
+ * Maps to columns A through H representing typical contact form submissions.
+ *
+ * @param {Request} req - The express request object.
+ * @param {Response} res - The express response object.
+ */
 export const getEntries = async (req: Request, res: Response) => {
   try {
     const response = await sheets.spreadsheets.values.get({
@@ -18,7 +24,12 @@ export const getEntries = async (req: Request, res: Response) => {
   }
 };
 
-// POST new entry
+/**
+ * Appends a new contact entry into the Google Sheet.
+ *
+ * @param {Request} req - The express request object containing name, email, phone, etc.
+ * @param {Response} res - The express response object.
+ */
 export const addEntry = async (req: Request, res: Response) => {
   // Fields match contact form
   const { name, email, phone, institute, enrollment, expertise } = req.body;
@@ -49,7 +60,13 @@ export const addEntry = async (req: Request, res: Response) => {
   }
 };
 
-// PUT update entry by row index (assumes row index comes from frontend, e.g. 1-indexed in Google Sheets but 0-indexed in array)
+/**
+ * Updates an existing entry directly in the Google Sheet.
+ * Useful when an admin edits the user details from the dashboard UI.
+ *
+ * @param {Request} req - The express request object; receives `rowIndex` via params.
+ * @param {Response} res - The express response object.
+ */
 export const updateEntry = async (req: Request, res: Response) => {
   const { rowIndex } = req.params; // String representing actual sheet row, e.g. "2" for the first data row
   const { name, email, phone, institute, enrollment, expertise } = req.body;
@@ -80,7 +97,12 @@ export const updateEntry = async (req: Request, res: Response) => {
   }
 };
 
-// DELETE entry by row index
+/**
+ * Completely drops a row from the Google Sheet and dispatches an automated rejection/revocation email via Mailjet.
+ *
+ * @param {Request} req - The express request object; identifies the specific sheet `rowIndex` dynamically.
+ * @param {Response} res - The express response object.
+ */
 export const deleteEntry = async (req: Request, res: Response) => {
   const { rowIndex } = req.params; // string representing sheet row e.g. "2"
 
@@ -212,7 +234,13 @@ export const deleteEntry = async (req: Request, res: Response) => {
   }
 };
 
-// POST setup headers with colored background
+/**
+ * Initializes a brand new Google Sheet with perfectly formatted and color-coded column headers.
+ * Usually invoked once when setting up the system initially.
+ *
+ * @param {Request} req - The express request object.
+ * @param {Response} res - The express response object.
+ */
 export const initSheet = async (req: Request, res: Response) => {
   try {
     // 1. Add headers

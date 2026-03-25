@@ -4,6 +4,15 @@ import { sheets } from "../config/google";
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 
+/**
+ * Aggregates various statistics from the database and Google Sheets to display on the admin dashboard.
+ * 
+ * Includes counts for: total events, upcoming events, past events, team members, blogs, and sheet queries.
+ *
+ * @param {Request} req - The express request object.
+ * @param {Response} res - The express response object.
+ * @returns {Promise<void>}
+ */
 export const getDashboardStats = async (
   req: Request,
   res: Response,

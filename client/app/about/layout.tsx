@@ -28,6 +28,13 @@ export const metadata: Metadata = {
     },
 };
 
+/**
+ * AboutLayout Component
+ * 
+ * Injects route-specific SEO metadata for the `/about` path.
+ *
+ * @param {Object} props - React children node.
+ */
 export default function AboutLayout({
     children,
 }: {

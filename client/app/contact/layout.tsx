@@ -28,6 +28,13 @@ export const metadata: Metadata = {
     },
 };
 
+/**
+ * ContactLayout Component
+ * 
+ * Injects route-specific SEO metadata for the `/contact` path.
+ *
+ * @param {Object} props - React children node.
+ */
 export default function ContactLayout({
     children,
 }: {

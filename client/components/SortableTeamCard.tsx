@@ -22,6 +22,15 @@ interface SortableTeamCardProps {
     onDelete: (id: string, name?: string) => void;
 }
 
+/**
+ * SortableTeamCard Component
+ * 
+ * An interactive, draggable Team Member card designed exclusively for the `@dnd-kit/sortable` list context.
+ * Enables live dragging to reorder team members visually before committing to the database.
+ * Also exposes Edit and Delete quick-action buttons.
+ *
+ * @param {SortableTeamCardProps} props - Component properties encapsulating member data and dnd listeners.
+ */
 export function SortableTeamCard({ member, onEdit, onDelete }: SortableTeamCardProps) {
     const {
         attributes,
