@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Calendar, Headset, Info, Menu, Users, BookOpen, House } from "lucide-react";
+import { Calendar, Headset, Info, Menu, Users, BookOpen, House, Image as ImageIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Button } from "./ui/button";
@@ -122,6 +122,13 @@ function Header() {
                       <span className="font-medium">Events</span>
                     </DropdownMenuItem>
                   </Link>
+                  {/* Event Gallery */}
+                  <Link href="/gallery">
+                    <DropdownMenuItem className="text-white focus:bg-zinc-800/60 focus:text-[#08B74F] cursor-pointer rounded-xl p-3 gap-3">
+                      <ImageIcon className="w-5 h-5 text-zinc-400" />
+                      <span className="font-medium">Event Gallery</span>
+                    </DropdownMenuItem>
+                  </Link>
                   {/* Blogs */}
                   <Link href="/blogs">
                     <DropdownMenuItem className="text-white focus:bg-zinc-800/60 focus:text-[#08B74F] cursor-pointer rounded-xl p-3 gap-3">
@@ -129,9 +136,6 @@ function Header() {
                       <span className="font-medium">Blogs</span>
                     </DropdownMenuItem>
                   </Link>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator className="bg-zinc-800 my-1" />
-                <DropdownMenuGroup>
                   {/* Team */}
                   <Link href="/team">
                     <DropdownMenuItem className="text-white focus:bg-zinc-800/60 focus:text-[#08B74F] cursor-pointer rounded-xl p-3 gap-3">
@@ -139,6 +143,9 @@ function Header() {
                       <span className="font-medium">Team</span>
                     </DropdownMenuItem>
                   </Link>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator className="bg-zinc-800 my-1" />
+                <DropdownMenuGroup>
                   {/* About */}
                   <Link href="/about">
                     <DropdownMenuItem className="text-white focus:bg-zinc-800/60 focus:text-[#08B74F] cursor-pointer rounded-xl p-3 gap-3">
