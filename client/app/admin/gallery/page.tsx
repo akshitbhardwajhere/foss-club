@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/axios";
 import { toast } from "sonner";
-import { Loader2, ChevronLeft, Calendar, PlusCircle, Images, Trash2 } from "lucide-react";
+import { Loader2, ChevronLeft, Calendar, PlusCircle, Images, Trash2, Edit2, Check } from "lucide-react";
 import ImageUpload from "@/components/ImageUpload";
 import Image from "next/image";
 
@@ -33,6 +33,11 @@ export default function AdminGalleryPage() {
     const [newImageUrl, setNewImageUrl] = useState("");
     const [newImageDesc, setNewImageDesc] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Edit Image State
+    const [editingImageId, setEditingImageId] = useState<string | null>(null);
+    const [editDescription, setEditDescription] = useState("");
+    const [isUpdating, setIsUpdating] = useState(false);
 
     useEffect(() => {
         fetchEvents();
@@ -112,6 +117,23 @@ export default function AdminGalleryPage() {
             toast.success("Image removed");
         } catch (error) {
             toast.error("Failed to remove image");
+        }
+    };
+
+    const handleUpdateImage = async (imageId: string) => {
+        if (!editDescription.trim()) return toast.error("Description cannot be empty");
+        setIsUpdating(true);
+        try {
+            const res = await api.put(`/api/gallery/${imageId}`, {
+                description: editDescription
+            });
+            setGalleryImages(galleryImages.map(img => img.id === imageId ? { ...img, description: res.data.description } : img));
+            setEditingImageId(null);
+            toast.success("Image description updated!");
+        } catch (error) {
+            toast.error("Failed to update description");
+        } finally {
+            setIsUpdating(false);
         }
     };
 
@@ -271,10 +293,46 @@ export default function AdminGalleryPage() {
                                         >
                                             <Trash2 className="w-4 h-4" />
                                         </button>
+                                        <button 
+                                            onClick={() => {
+                                                setEditingImageId(img.id);
+                                                setEditDescription(img.description);
+                                            }}
+                                            className="absolute top-3 right-15 w-10 h-10 bg-blue-500/90 text-white rounded-full flex items-center justify-center hover:bg-blue-600 hover:scale-110 transition-all shadow-xl backdrop-blur-md opacity-0 group-hover:opacity-100"
+                                            title="Edit description"
+                                        >
+                                            <Edit2 className="w-4 h-4" />
+                                        </button>
                                     </div>
-                                    <div className="flex-1 px-2">
+                                    <div className="flex-1 px-2 overflow-hidden flex flex-col">
                                         <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2 border-b border-zinc-800 pb-2">Description</h4>
-                                        <p className="text-zinc-300 text-sm leading-relaxed">{img.description}</p>
+                                        {editingImageId === img.id ? (
+                                            <div className="flex flex-col gap-2 flex-1">
+                                                <textarea
+                                                    value={editDescription}
+                                                    onChange={(e) => setEditDescription(e.target.value)}
+                                                    rows={3}
+                                                    className="w-full bg-zinc-950/50 border border-zinc-700 text-white rounded-xl p-2 focus:outline-none focus:border-[#08B74F] focus:ring-1 focus:ring-[#08B74F] text-sm resize-none transition-all"
+                                                />
+                                                <div className="flex items-center justify-end gap-2 mt-auto pt-2">
+                                                    <button
+                                                        onClick={() => setEditingImageId(null)}
+                                                        className="px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleUpdateImage(img.id)}
+                                                        disabled={isUpdating}
+                                                        className="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#08B74F] text-black hover:bg-[#09c958] disabled:opacity-50 flex items-center gap-1 transition-colors"
+                                                    >
+                                                        {isUpdating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />} Save
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <p className="text-zinc-300 text-sm leading-relaxed line-clamp-3 hover:line-clamp-none transition-all">{img.description}</p>
+                                        )}
                                     </div>
                                 </div>
                             ))}

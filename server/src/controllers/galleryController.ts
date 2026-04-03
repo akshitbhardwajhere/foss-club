@@ -83,3 +83,30 @@ export const deleteGalleryImage = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Server error deleting image" });
   }
 };
+
+/**
+ * Updates an existing gallery image description.
+ *
+ * @param {Request} req - The express request object including the image ID.
+ * @param {Response} res - The express response object.
+ */
+export const updateGalleryImage = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+    const { description } = req.body;
+    
+    if (description === undefined) {
+      return res.status(400).json({ message: "Description is required for update" });
+    }
+
+    const updatedImage = await prisma.eventGalleryImage.update({
+      where: { id },
+      data: { description },
+    });
+
+    res.json(updatedImage);
+  } catch (error) {
+    console.error("Error updating gallery image:", error);
+    res.status(500).json({ message: "Server error updating image" });
+  }
+};
