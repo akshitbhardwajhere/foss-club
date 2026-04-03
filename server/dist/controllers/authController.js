@@ -32,6 +32,16 @@ const setTokenCookie = (res, token) => {
     };
     res.cookie("jwt", token, cookieOptions);
 };
+/**
+ * Handles the login process for an admin user.
+ *
+ * Verifies the credentials against the database. If successful,
+ * it generates a JWT token and attaches it to an HttpOnly cookie.
+ *
+ * @param {Request} req - The Express request object, expecting `email` and `password` in the body.
+ * @param {Response} res - The Express response object used to set the cookie and return the session info.
+ * @returns {Promise<void>}
+ */
 const loginAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;
@@ -55,6 +65,15 @@ const loginAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.loginAdmin = loginAdmin;
+/**
+ * Handles the logout process for an admin user.
+ *
+ * Clears the JWT HTTP-only cookie by setting its expiration date to the past.
+ *
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object used to clear the cookie.
+ * @returns {Promise<void>}
+ */
 const logoutAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const isProduction = process.env.NODE_ENV === "production";
     res.cookie("jwt", "", {
@@ -67,6 +86,16 @@ const logoutAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     res.status(200).json({ message: "Logged out successfully" });
 });
 exports.logoutAdmin = logoutAdmin;
+/**
+ * Retrieves the currently authenticated admin's profile.
+ *
+ * Assumes that the `protect` middleware has already attached the admin
+ * object to the request.
+ *
+ * @param {Request} req - The Express request object containing the admin data.
+ * @param {Response} res - The Express response object.
+ * @returns {Promise<void>}
+ */
 const getMe = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // admin is attached by the protect middleware
     const admin = req.admin;

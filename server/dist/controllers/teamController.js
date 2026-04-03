@@ -15,9 +15,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.reorderTeamMembers = exports.deleteTeamMember = exports.updateTeamMember = exports.createTeamMember = exports.getTeamMemberById = exports.getTeamMembers = void 0;
 const prisma_1 = __importDefault(require("../config/prisma"));
 const cloudinary_1 = require("../utils/cloudinary");
-// @desc    Get all team members
-// @route   GET /api/team
-// @access  Public
+/**
+ * Retrieves all core team members.
+ * Sorts them by their custom order first, then chronologically by creation date.
+ *
+ * @param {Request} req - The express request object.
+ * @param {Response} res - The express response object.
+ * @returns {Promise<void>}
+ */
 const getTeamMembers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const teamMembers = yield prisma_1.default.teamMember.findMany({
@@ -30,9 +35,13 @@ const getTeamMembers = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.getTeamMembers = getTeamMembers;
-// @desc    Get single team member
-// @route   GET /api/team/:id
-// @access  Public
+/**
+ * Retrieves a single team member by their unique ID.
+ *
+ * @param {Request} req - The express request object containing the ID in params.
+ * @param {Response} res - The express response object.
+ * @returns {Promise<void>}
+ */
 const getTeamMemberById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id = req.params.id;
@@ -51,9 +60,14 @@ const getTeamMemberById = (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.getTeamMemberById = getTeamMemberById;
-// @desc    Create a team member
-// @route   POST /api/team
-// @access  Private/Admin
+/**
+ * Creates a new team member profile.
+ * Only accessible by administrators.
+ *
+ * @param {Request} req - The express request object containing the new member's details.
+ * @param {Response} res - The express response object.
+ * @returns {Promise<void>}
+ */
 const createTeamMember = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { name, role, email, githubUrl, linkedinUrl, imageUrl } = req.body;
@@ -75,9 +89,14 @@ const createTeamMember = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.createTeamMember = createTeamMember;
-// @desc    Update a team member
-// @route   PUT /api/team/:id
-// @access  Private/Admin
+/**
+ * Updates an existing team member's profile.
+ * Automatically handles the deletion of their old image from Cloudinary if a new one is provided.
+ *
+ * @param {Request} req - The express request object containing the updated fields.
+ * @param {Response} res - The express response object.
+ * @returns {Promise<void>}
+ */
 const updateTeamMember = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { name, role, email, githubUrl, linkedinUrl, imageUrl } = req.body;
@@ -112,9 +131,14 @@ const updateTeamMember = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.updateTeamMember = updateTeamMember;
-// @desc    Delete a team member
-// @route   DELETE /api/team/:id
-// @access  Private/Admin
+/**
+ * Removes a team member completely from the database.
+ * Also cleans up their associated image asset from Cloudinary.
+ *
+ * @param {Request} req - The express request object containing the member ID.
+ * @param {Response} res - The express response object.
+ * @returns {Promise<void>}
+ */
 const deleteTeamMember = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id = req.params.id;
@@ -138,9 +162,14 @@ const deleteTeamMember = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.deleteTeamMember = deleteTeamMember;
-// @desc    Reorder team members
-// @route   PUT /api/team/reorder
-// @access  Private/Admin
+/**
+ * Reorders team members dynamically based on drag-and-drop actions in the UI.
+ * Uses a bulk transaction to ensure complete atomicity of the order update.
+ *
+ * @param {Request} req - The express request object containing an array of `{ id, order }`.
+ * @param {Response} res - The express response object.
+ * @returns {Promise<void>}
+ */
 const reorderTeamMembers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { items } = req.body;

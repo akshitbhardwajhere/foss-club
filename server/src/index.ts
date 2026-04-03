@@ -2,6 +2,7 @@ import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import compression from "compression";
 
 // Routes
 import authRoutes from "./routes/authRoutes";
@@ -60,6 +61,7 @@ app.use(
     credentials: true,
   }),
 );
+app.use(compression());
 app.use(express.json());
 app.use(cookieParser());
 

@@ -9,6 +9,7 @@ import {
   downloadEventDocument,
 } from "../controllers/eventController";
 import { protect } from "../middleware/authMiddleware";
+import { cachePublic } from "../middleware/cacheMiddleware";
 
 /**
  * @file eventRoutes.ts
@@ -19,13 +20,13 @@ import { protect } from "../middleware/authMiddleware";
  */
 const router = express.Router();
 
-router.route("/").get(getEvents).post(protect, createEvent);
-router.route("/next").get(getNextEvent);
-router.route("/:id/document").get(downloadEventDocument);
+router.route("/").get(cachePublic("5 minutes"), getEvents).post(protect, createEvent);
+router.route("/next").get(cachePublic("5 minutes"), getNextEvent);
+router.route("/:id/document").get(cachePublic("1 day"), downloadEventDocument);
 
 router
   .route("/:id")
-  .get(getEventById)
+  .get(cachePublic("5 minutes"), getEventById)
   .put(protect, updateEvent)
   .delete(protect, deleteEvent);
 

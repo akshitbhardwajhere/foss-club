@@ -8,6 +8,7 @@ import {
   reorderTeamMembers,
 } from "../controllers/teamController";
 import { protect } from "../middleware/authMiddleware";
+import { cachePublic } from "../middleware/cacheMiddleware";
 
 /**
  * @file teamRoutes.ts
@@ -18,10 +19,10 @@ import { protect } from "../middleware/authMiddleware";
 const router = express.Router();
 
 router.route("/reorder").put(protect, reorderTeamMembers);
-router.route("/").get(getTeamMembers).post(protect, createTeamMember);
+router.route("/").get(cachePublic("5 minutes"), getTeamMembers).post(protect, createTeamMember);
 router
   .route("/:id")
-  .get(getTeamMemberById)
+  .get(cachePublic("5 minutes"), getTeamMemberById)
   .put(protect, updateTeamMember)
   .delete(protect, deleteTeamMember);
 

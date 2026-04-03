@@ -5,6 +5,7 @@ import {
   deleteGalleryImage,
 } from "../controllers/galleryController";
 import { protect } from "../middleware/authMiddleware";
+import { cachePublic } from "../middleware/cacheMiddleware";
 
 /**
  * @file galleryRoutes.ts
@@ -15,7 +16,7 @@ import { protect } from "../middleware/authMiddleware";
 const router = express.Router();
 
 router.route("/:eventId")
-  .get(getEventGallery)
+  .get(cachePublic("5 minutes"), getEventGallery)
   .post(protect, addGalleryImage);
 
 router.route("/:id")

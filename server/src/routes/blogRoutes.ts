@@ -7,6 +7,7 @@ import {
   deleteBlog,
 } from "../controllers/blogController";
 import { protect } from "../middleware/authMiddleware";
+import { cachePublic } from "../middleware/cacheMiddleware";
 
 /**
  * @file blogRoutes.ts
@@ -17,11 +18,11 @@ import { protect } from "../middleware/authMiddleware";
  */
 const router = express.Router();
 
-router.route("/").get(getBlogs).post(protect, createBlog);
+router.route("/").get(cachePublic("5 minutes"), getBlogs).post(protect, createBlog);
 
 router
   .route("/:id")
-  .get(getBlogById)
+  .get(cachePublic("5 minutes"), getBlogById)
   .put(protect, updateBlog)
   .delete(protect, deleteBlog);
 
