@@ -108,13 +108,13 @@ export default function EventGalleryDetails() {
                   }`}
                 >
                   <div className="w-full md:w-1/2 group">
-                    <div className="w-full h-[300px] md:h-[450px] bg-zinc-800 relative overflow-hidden group rounded-3xl border border-zinc-800/50 shadow-2xl">
+                    <div className="w-full aspect-square md:aspect-video bg-zinc-900/40 relative overflow-hidden group rounded-3xl border border-zinc-800/50 shadow-2xl flex items-center justify-center">
                       <Image 
                         src={img.url} 
                         alt={img.description || "Event Moment"} 
                         fill
                         sizes="(max-width: 768px) 100vw, 50vw"
-                        className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
+                        className="object-contain group-hover:scale-105 transition-transform duration-700 ease-out p-1" 
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 pointer-events-none" />
                     </div>

@@ -80,10 +80,8 @@ export default function EventDetailPage() {
             const configRes = await api.get(
               `/api/registration/config/${params.id}`,
             );
-            console.log("Config Result Data:", configRes.data);
             const isValid = new Date(configRes.data.validUntil) > new Date();
             const isPast = new Date(res.data.date) < new Date();
-            console.log("Is valid limit?", isValid, "Is past?", isPast);
 
             if (configRes.data && isValid && !isPast) {
               setIsRegistrationOpen(true);

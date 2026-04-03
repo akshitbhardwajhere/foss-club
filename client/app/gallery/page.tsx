@@ -71,7 +71,7 @@ export default function GalleryPage() {
               <Link key={evt.id} href={`/gallery/${evt.id}`}>
                 <div className="bg-zinc-900/30 backdrop-blur-md border border-zinc-800/50 rounded-3xl overflow-hidden hover:border-[#08B74F]/40 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(8,183,79,0.15)] transition-all duration-500 group h-full flex flex-col p-3">
                   {/* Image Container with photo album feel */}
-                  <div className="relative w-full h-56 md:h-64 rounded-2xl overflow-hidden bg-zinc-800/50 mb-4 shadow-md overflow-hidden">
+                  <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-zinc-800/50 mb-4 shadow-md flex items-center justify-center">
                     {evt.imageUrl ? (
                       <Image
                         src={evt.imageUrl}
