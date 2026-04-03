@@ -42,8 +42,8 @@ export default function EventsPage() {
   const [filter, setFilter] = useState<
     "all" | "live" | "upcoming" | "completed"
   >("all");
-  const [monthSort, setMonthSort] = useState<"default" | "asc" | "desc">(
-    "default",
+  const [monthSort, setMonthSort] = useState<"asc" | "desc">(
+    "asc",
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -87,14 +87,11 @@ export default function EventsPage() {
   });
 
   const sortedFilteredEvents = [...filteredEvents].sort((a, b) => {
-    if (monthSort === "default") return 0;
 
-    const dateA = new Date(a.date);
-    const dateB = new Date(b.date);
-    const monthKeyA = dateA.getFullYear() * 12 + dateA.getMonth();
-    const monthKeyB = dateB.getFullYear() * 12 + dateB.getMonth();
+    const dateA = new Date(a.date).getTime();
+    const dateB = new Date(b.date).getTime();
 
-    return monthSort === "asc" ? monthKeyA - monthKeyB : monthKeyB - monthKeyA;
+    return monthSort === "asc" ? dateA - dateB : dateB - dateA;
   });
 
   const totalPages = Math.ceil(sortedFilteredEvents.length / itemsPerPage);
@@ -178,12 +175,9 @@ export default function EventsPage() {
                 <DropdownMenuRadioGroup
                   value={monthSort}
                   onValueChange={(value) =>
-                    setMonthSort(value as "default" | "asc" | "desc")
+                    setMonthSort(value as "asc" | "desc")
                   }
                 >
-                  <DropdownMenuRadioItem value="default">
-                    Default Sort
-                  </DropdownMenuRadioItem>
                   <DropdownMenuRadioItem value="asc">
                     Date: Oldest First
                   </DropdownMenuRadioItem>
