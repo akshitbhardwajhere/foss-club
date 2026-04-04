@@ -7,11 +7,13 @@ This repository contains the official website for the Free and Open Source Socie
 - **Modern UI**: Built with Next.js 14, Tailwind CSS v4, and Framer Motion for a premium, responsive user experience.
 - **Admin Dashboard**: Secure admin panel to manage website content and analytics.
 - **Content Management**:
-  - **Events**: Create and manage event listings (upcoming, tentative, and past). Includes countdown timers.
+  - **Events**: Create and manage event listings (upcoming, tentative, and past). Includes countdown timers and live event tags.
   - **Event Registration**: Built-in registration system for students (individuals & teams) with automated email notifications (via Mailjet) and real-time syncing to Google Sheets.
-  - **Gallery**: Manage and display event images in an organized gallery.
+  - **Gallery**: Manage and display event images in an organized gallery with editable descriptions.
   - **News & Blogs**: Publish club news and articles using a seamless Rich Text Editor (Tiptap).
   - **Team**: Showcase club members with drag-and-drop ordering capabilities.
+- **Performance Optimized**: Implemented API response compression, static asset caching, and dynamic imports for improved load times and efficiency.
+- **Well-Documented**: Extensive JSDoc comments integrated across both client and server codebases.
 - **File Management**: Comprehensive image and PDF upload capabilities directly integrating with Cloudinary.
 - **Responsive & Accessible Design**: Optimized for desktop, tablet, and mobile viewing across different devices, incorporating Radix UI primitives.
 - **Dark Mode**: Built-in dark theme powered by `next-themes` for a comfortable viewing experience.
@@ -125,7 +127,10 @@ The frontend application will be available at `http://localhost:3000`.
 
 ### Content (Blogs & Gallery)
 - `GET /api/blogs` - Get all blogs
-- `GET /api/gallery` - Get all gallery images
+- `GET /api/gallery/:eventId` - Get gallery images for a specific event
+- `POST /api/gallery/:eventId` - Add an image to an event's gallery
+- `PUT /api/gallery/:id` - Update a gallery image description
+- `DELETE /api/gallery/:id` - Delete a gallery image
 
 ### External Integrations
 - `POST /api/contact` - Submit contact form
