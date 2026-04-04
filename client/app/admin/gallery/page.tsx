@@ -288,7 +288,7 @@ export default function AdminGalleryPage() {
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                                         <button 
                                             onClick={() => handleDeleteImage(img.id)}
-                                            className="absolute top-3 right-3 w-10 h-10 bg-red-500/90 text-white rounded-full flex items-center justify-center hover:bg-red-600 hover:scale-110 transition-all shadow-xl backdrop-blur-md opacity-0 group-hover:opacity-100"
+                                            className="absolute top-3 right-3 w-10 h-10 bg-red-500/90 text-white rounded-full flex items-center justify-center hover:bg-red-600 hover:scale-110 transition-all shadow-xl backdrop-blur-md opacity-100 md:opacity-0 group-hover:opacity-100"
                                             title="Delete permanently"
                                         >
                                             <Trash2 className="w-4 h-4" />
@@ -298,7 +298,7 @@ export default function AdminGalleryPage() {
                                                 setEditingImageId(img.id);
                                                 setEditDescription(img.description);
                                             }}
-                                            className="absolute top-3 right-15 w-10 h-10 bg-blue-500/90 text-white rounded-full flex items-center justify-center hover:bg-blue-600 hover:scale-110 transition-all shadow-xl backdrop-blur-md opacity-0 group-hover:opacity-100"
+                                            className="absolute top-3 right-16 w-10 h-10 bg-blue-500/90 text-white rounded-full flex items-center justify-center hover:bg-blue-600 hover:scale-110 transition-all shadow-xl backdrop-blur-md opacity-100 md:opacity-0 group-hover:opacity-100"
                                             title="Edit description"
                                         >
                                             <Edit2 className="w-4 h-4" />
