@@ -48,11 +48,6 @@ export default function TeamMemberCard({ member, itemVariants, priority }: TeamM
             <div className={`hidden sm:flex w-full bg-zinc-900/40 backdrop-blur-sm border border-zinc-800/50 rounded-[2rem] p-8 flex-col items-center group hover:border-${colorTheme}/40 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_${shadowTheme}] transition-all duration-500 overflow-hidden relative`}>
                 <div className={`absolute inset-0 bg-gradient-to-b from-${colorTheme}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
                 <div className="w-44 h-44 rounded-full bg-zinc-800 p-2 mb-6 relative z-10 group-hover:scale-105 transition-transform duration-300">
-                    {member.role === 'Team Lead' && (
-                        <div className="absolute -top-6 -left-6 w-16 h-16 bg-yellow-500 rounded-full border-4 border-zinc-900 flex items-center justify-center z-20 -rotate-45 shadow-2xl">
-                            <Crown className="w-8 h-8 text-zinc-950 fill-zinc-950" />
-                        </div>
-                    )}
                     <Image
                         src={member.imageUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${member.name}`}
                         alt={member.name}
@@ -126,11 +121,6 @@ export default function TeamMemberCard({ member, itemVariants, priority }: TeamM
                         <DialogHeader className="hidden"><DialogTitle>{member.name}</DialogTitle></DialogHeader>
                         
                         <div className={`w-32 h-32 rounded-full bg-zinc-800 p-2 mb-4 relative z-10`}>
-                            {member.role === 'Team Lead' && (
-                                <div className="absolute -top-5 -left-5 w-12 h-12 bg-yellow-500 rounded-full border-4 border-zinc-900 flex items-center justify-center z-20 -rotate-45 shadow-2xl">
-                                    <Crown className="w-6 h-6 text-zinc-950 fill-zinc-950" />
-                                </div>
-                            )}
                             <Image
                                 src={member.imageUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${member.name}`}
                                 alt={member.name}
