@@ -7,7 +7,7 @@ import api from "@/lib/axios";
 import BackgroundBlur from "@/components/shared/BackgroundBlur";
 import PageHeader from "@/components/shared/PageHeader";
 import TeamMemberCard from "@/components/cards/TeamMemberCard";
-import { Skeleton } from "@/components/ui/skeleton";
+import TeamPageSkeleton from "@/components/skeletons/TeamPageSkeleton";
 
 interface TeamMember {
   id: string;
@@ -21,7 +21,7 @@ interface TeamMember {
 
 /**
  * TeamPage Component
- * 
+ *
  * The public roster displaying all FOSS club core team members.
  * Fetches data asynchronously from the `/api/team` endpoint and renders them using the `TeamMemberCard` component.
  * Layout is staggered gracefully using Framer Motion.
@@ -88,7 +88,7 @@ export default function TeamPage() {
           title={
             <>
               Meet the{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#08B74F] to-emerald-400">
+              <span className="text-transparent bg-clip-text bg-linear-to-r from-[#08B74F] to-emerald-400">
                 Innovators
               </span>
             </>
@@ -105,25 +105,7 @@ export default function TeamPage() {
         </motion.p>
 
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div
-                key={i}
-                className="flex flex-col items-center gap-4 bg-zinc-900/40 p-8 rounded-3xl border border-zinc-800"
-              >
-                <Skeleton className="w-44 h-44 rounded-full bg-zinc-800" />
-                <div className="space-y-3 w-full flex flex-col items-center">
-                  <Skeleton className="h-6 w-3/4 bg-zinc-800" />
-                  <Skeleton className="h-4 w-1/2 bg-zinc-800 text-center" />
-                  <div className="flex gap-4 mt-4 pt-4">
-                    <Skeleton className="w-8 h-8 rounded-full bg-zinc-800" />
-                    <Skeleton className="w-8 h-8 rounded-full bg-zinc-800" />
-                    <Skeleton className="w-8 h-8 rounded-full bg-zinc-800" />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <TeamPageSkeleton />
         ) : teamMembers.length === 0 ? (
           <div className="flex items-center justify-center p-20 text-zinc-500 font-medium border border-zinc-800/50 rounded-2xl w-full bg-zinc-900/20">
             No team members found. Check back later!
