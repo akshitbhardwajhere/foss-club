@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Terminal, LayoutDashboard, CalendarDays, Users, Rss, X, Images } from 'lucide-react';
+import { Terminal, LayoutDashboard, CalendarDays, Users, Rss, X, Images, GraduationCap } from 'lucide-react';
 
 interface AdminSidebarProps {
     isOpen: boolean;
@@ -27,6 +27,7 @@ export default function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
         { label: 'Events', href: '/admin/events', icon: CalendarDays },
         { label: 'Event Gallery', href: '/admin/gallery', icon: Images },
         { label: 'Members', href: '/admin/team', icon: Users },
+        { label: 'Alumni', href: '/admin/alumni', icon: GraduationCap },
         { label: 'Blogs', href: '/admin/blogs', icon: Rss },
         { label: 'FOSS Community', href: '/admin/queries', icon: Terminal },
     ];

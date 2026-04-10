@@ -16,6 +16,7 @@ export const getTeamMembers = async (
 ): Promise<void> => {
   try {
     const teamMembers = await prisma.teamMember.findMany({
+      where: { isAlumni: false },
       orderBy: [{ order: "asc" }, { createdAt: "desc" }],
     });
     res.json(teamMembers);

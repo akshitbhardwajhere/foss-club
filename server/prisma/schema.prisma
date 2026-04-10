@@ -72,6 +72,8 @@ model TeamMember {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   order       Int      @default(0)
+  isAlumni    Boolean  @default(false)
+  company     String?
 
   @@index([order])
 }

@@ -9,6 +9,7 @@ interface TeamMember {
     id: string;
     name: string;
     role: string;
+    company?: string;
     imageUrl?: string;
     githubUrl?: string;
     linkedinUrl?: string;
@@ -42,8 +43,11 @@ export default function TeamMemberCard({ member, itemVariants }: TeamMemberCardP
                 />
             </div>
 
-            <h3 className="text-xl font-bold mb-1 relative z-10">{member.name}</h3>
-            <p className="text-[#08B74F] font-medium mb-6 relative z-10">{member.role}</p>
+            <h3 className="text-xl font-bold mb-1 relative z-10 text-center">{member.name}</h3>
+            <p className={`text-[#08B74F] font-medium relative z-10 text-center ${member.company ? 'mb-1' : 'mb-6'}`}>{member.role}</p>
+            {member.company && (
+                <p className="text-zinc-400 text-sm mb-6 relative z-10 text-center">@ {member.company}</p>
+            )}
 
             <div className="flex gap-4 relative z-10">
                 {member.githubUrl && (

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Calendar, Headset, Info, Menu, Users, BookOpen, House, Image as ImageIcon } from "lucide-react";
+import { Calendar, Headset, Info, Menu, Users, BookOpen, House, Image as ImageIcon, GraduationCap } from "lucide-react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Button } from "./ui/button";
@@ -149,6 +149,13 @@ function Header() {
                     <DropdownMenuItem className="text-white focus:bg-zinc-800/60 focus:text-[#08B74F] cursor-pointer rounded-xl p-3 gap-3">
                       <Users className="w-5 h-5 text-zinc-400" />
                       <span className="font-medium">Team</span>
+                    </DropdownMenuItem>
+                  </Link>
+                  {/* Alumni */}
+                  <Link href="/alumni">
+                    <DropdownMenuItem className="text-white focus:bg-zinc-800/60 focus:text-yellow-500 cursor-pointer rounded-xl p-3 gap-3">
+                      <GraduationCap className="w-5 h-5 text-zinc-400" />
+                      <span className="font-medium">Alumni</span>
                     </DropdownMenuItem>
                   </Link>
                 </DropdownMenuGroup>
