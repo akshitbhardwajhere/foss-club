@@ -6,7 +6,7 @@ const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 
 /**
  * Aggregates various statistics from the database and Google Sheets to display on the admin dashboard.
- * 
+ *
  * Includes counts for: total events, upcoming events, past events, team members, blogs, and sheet queries.
  *
  * @param {Request} req - The express request object.
@@ -18,41 +18,53 @@ export const getDashboardStats = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const totalEvents = await prisma.event.count();
+    const now = new Date();
 
-    const upcomingEvents = await prisma.event.count({
-      where: {
-        date: {
-          gt: new Date(),
-        },
-      },
-    });
+    const totalQueriesPromise = (async (): Promise<number> => {
+      if (!SHEET_ID) return 0;
 
-    const pastEvents = await prisma.event.count({
-      where: {
-        date: {
-          lte: new Date(),
-        },
-      },
-    });
-
-    const totalTeamMembers = await prisma.teamMember.count();
-
-    const totalBlogs = await prisma.blog.count();
-
-    let totalQueries = 0;
-    if (SHEET_ID) {
       try {
         const sheetResponse = await sheets.spreadsheets.values.get({
           spreadsheetId: SHEET_ID,
           range: "Sheet1!A:G",
         });
         const rows = sheetResponse.data.values || [];
-        totalQueries = rows.filter((r: any[]) => r[0] && String(r[0]).toLowerCase() !== "date").length;
+        return rows.filter(
+          (r: any[]) => r[0] && String(r[0]).toLowerCase() !== "date",
+        ).length;
       } catch (e) {
         console.error("Could not fetch sheet queries:", e);
+        return 0;
       }
-    }
+    })();
+
+    const [
+      totalEvents,
+      upcomingEvents,
+      pastEvents,
+      totalTeamMembers,
+      totalBlogs,
+      totalQueries,
+    ] = await Promise.all([
+      prisma.event.count(),
+      prisma.event.count({
+        where: {
+          date: {
+            gt: now,
+          },
+        },
+      }),
+      prisma.event.count({
+        where: {
+          date: {
+            lte: now,
+          },
+        },
+      }),
+      prisma.teamMember.count(),
+      prisma.blog.count(),
+      totalQueriesPromise,
+    ]);
 
     res.json({
       events: {

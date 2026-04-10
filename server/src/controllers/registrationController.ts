@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
 import { sendRegistrationEmail } from "../utils/email";
-
-const prisma = new PrismaClient();
+import prisma from "../config/prisma";
 
 /**
  * Creates or updates the registration configuration for a specific event.
@@ -120,7 +118,11 @@ export const submitRegistration = async (req: Request, res: Response) => {
     const config = await prisma.eventRegistrationConfig.findUnique({
       where: { eventId },
       include: {
-        event: true,
+        event: {
+          select: {
+            title: true,
+          },
+        },
       },
     });
 

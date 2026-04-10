@@ -1,7 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Search, ChevronLeft, ChevronRight, User, Calendar, ArrowUpDown } from "lucide-react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import {
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  User,
+  Calendar,
+  ArrowUpDown,
+} from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import api from "@/lib/axios";
@@ -29,7 +36,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 /**
  * BlogsPage Component
- * 
+ *
  * The main public-facing blog directory for the FOSS club.
  * Fetches all published blogs from the backend (`/api/blogs`) and displays them with a paginated, searchable interface.
  * Allows users to sort chronological posts natively in the client.
@@ -38,7 +45,10 @@ export default function BlogsPage() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [dateSort, setDateSort] = useState<"default" | "desc" | "asc">("default");
+  const deferredSearchQuery = useDeferredValue(searchQuery);
+  const [dateSort, setDateSort] = useState<"default" | "desc" | "asc">(
+    "default",
+  );
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
@@ -60,26 +70,40 @@ export default function BlogsPage() {
     fetchBlogs();
   }, []);
 
-  const filteredBlogs = blogs.filter((blog) => {
-    const matchesSearch =
-      blog.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      blog.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      blog.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-    
-    return matchesSearch;
-  });
+  const normalizedSearch = deferredSearchQuery.trim().toLowerCase();
 
-  const sortedFilteredBlogs = [...filteredBlogs].sort((a, b) => {
-    if (dateSort === "default") return 0;
-    const dateA = new Date(a.createdAt).getTime();
-    const dateB = new Date(b.createdAt).getTime();
-    return dateSort === "desc" ? dateB - dateA : dateA - dateB;
-  });
+  const sortedFilteredBlogs = useMemo(() => {
+    const filteredBlogs = blogs.filter((blog) => {
+      if (!normalizedSearch) return true;
 
-  const totalPages = Math.ceil(sortedFilteredBlogs.length / itemsPerPage);
-  const paginatedBlogs = sortedFilteredBlogs.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+      return (
+        blog.title.toLowerCase().includes(normalizedSearch) ||
+        blog.author.toLowerCase().includes(normalizedSearch) ||
+        blog.tags.some((tag) => tag.toLowerCase().includes(normalizedSearch))
+      );
+    });
+
+    return filteredBlogs.sort((a, b) => {
+      if (dateSort === "default") return 0;
+
+      const dateA = new Date(a.createdAt).getTime();
+      const dateB = new Date(b.createdAt).getTime();
+      return dateSort === "desc" ? dateB - dateA : dateA - dateB;
+    });
+  }, [blogs, dateSort, normalizedSearch]);
+
+  const totalPages = useMemo(
+    () => Math.ceil(sortedFilteredBlogs.length / itemsPerPage),
+    [sortedFilteredBlogs.length],
+  );
+
+  const paginatedBlogs = useMemo(
+    () =>
+      sortedFilteredBlogs.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage,
+      ),
+    [sortedFilteredBlogs, currentPage],
   );
 
   return (
@@ -180,40 +204,63 @@ export default function BlogsPage() {
             {/* Table Body */}
             <div className="divide-y divide-zinc-800/50">
               {paginatedBlogs.map((blog, i) => (
-                <div key={blog.id} className="grid grid-cols-1 lg:grid-cols-12 gap-4 px-6 lg:px-8 py-5 items-center hover:bg-zinc-800/30 transition-colors group">
+                <div
+                  key={blog.id}
+                  className="grid grid-cols-1 lg:grid-cols-12 gap-4 px-6 lg:px-8 py-5 items-center hover:bg-zinc-800/30 transition-colors group"
+                >
                   <div className="hidden lg:block col-span-1 text-zinc-500 font-medium text-sm">
                     {(currentPage - 1) * itemsPerPage + i + 1}
                   </div>
-                    <div className="col-span-1 lg:col-span-5 flex items-start gap-5">
-                      {blog.imageUrl && (
-                        <div className="w-20 h-20 bg-zinc-800 rounded-xl overflow-hidden flex-shrink-0 relative hidden md:block border border-zinc-700/50">
-                          <Image src={blog.imageUrl} alt="" fill sizes="80px" className="object-cover group-hover:scale-110 transition-transform duration-500" />
-                        </div>
-                      )}
+                  <div className="col-span-1 lg:col-span-5 flex items-start gap-5">
+                    {blog.imageUrl && (
+                      <div className="w-20 h-20 bg-zinc-800 rounded-xl overflow-hidden shrink-0 relative hidden md:block border border-zinc-700/50">
+                        <Image
+                          src={blog.imageUrl}
+                          alt=""
+                          fill
+                          sizes="80px"
+                          className="object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                      </div>
+                    )}
                     <div className="flex-1 min-w-0">
                       <Link href={`/blogs/${blog.id}`} className="block">
-                        <h3 className="font-bold text-white text-lg group-hover:text-[#08B74F] transition-colors truncate">{blog.title}</h3>
+                        <h3 className="font-bold text-white text-lg group-hover:text-[#08B74F] transition-colors truncate">
+                          {blog.title}
+                        </h3>
                       </Link>
-                      
+
                       {/* Mobile only details */}
                       <div className="flex flex-wrap items-center gap-3 mt-2 lg:hidden">
                         <div className="flex items-center gap-1.5 text-xs text-zinc-400">
                           <User className="w-3.5 h-3.5 text-[#08B74F]" />
-                          <span className="truncate max-w-[150px]">{blog.author}</span>
+                          <span className="truncate max-w-37.5">
+                            {blog.author}
+                          </span>
                         </div>
                         <div className="flex items-center gap-1.5 text-xs text-zinc-400">
                           <Calendar className="w-3.5 h-3.5 text-[#08B74F]" />
                           <span>
-                            {new Date(blog.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                            {new Date(blog.createdAt).toLocaleDateString(
+                              "en-GB",
+                              {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              },
+                            )}
                           </span>
                         </div>
                       </div>
-                      
+
                       {/* Tags */}
                       {blog.tags && blog.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mt-2 hidden lg:flex">
+                        <div className="hidden lg:mt-2 lg:flex lg:flex-wrap lg:gap-2">
                           {blog.tags.slice(0, 2).map((tag, idx) => (
-                            <span key={idx} className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700">
+                            <span
+                              key={idx}
+                              className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700"
+                            >
                               {tag}
                             </span>
                           ))}
@@ -221,31 +268,51 @@ export default function BlogsPage() {
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="hidden lg:flex col-span-2 text-sm text-zinc-400 items-center gap-2">
-                     <User className="w-4 h-4 text-zinc-600 flex-shrink-0" />
-                     <span className="truncate">{blog.author}</span>
+                    <User className="w-4 h-4 text-zinc-600 shrink-0" />
+                    <span className="truncate">{blog.author}</span>
                   </div>
-                  
+
                   <div className="hidden lg:flex col-span-2 text-sm items-center text-zinc-300 gap-2">
-                     <Calendar className="w-4 h-4 text-zinc-600 flex-shrink-0" />
-                     <span className="font-medium">
-                       {new Date(blog.createdAt).getDate().toString().padStart(2, "0")} {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][new Date(blog.createdAt).getMonth()]} {new Date(blog.createdAt).getFullYear()}
-                     </span>
+                    <Calendar className="w-4 h-4 text-zinc-600 shrink-0" />
+                    <span className="font-medium">
+                      {new Date(blog.createdAt)
+                        .getDate()
+                        .toString()
+                        .padStart(2, "0")}{" "}
+                      {
+                        [
+                          "Jan",
+                          "Feb",
+                          "Mar",
+                          "Apr",
+                          "May",
+                          "Jun",
+                          "Jul",
+                          "Aug",
+                          "Sep",
+                          "Oct",
+                          "Nov",
+                          "Dec",
+                        ][new Date(blog.createdAt).getMonth()]
+                      }{" "}
+                      {new Date(blog.createdAt).getFullYear()}
+                    </span>
                   </div>
-                  
+
                   <div className="col-span-1 lg:col-span-2 flex justify-start lg:justify-end mt-4 lg:mt-0">
-                     <Link
-                       href={`/blogs/${blog.id}`}
-                       className="px-6 py-2.5 rounded-full font-bold text-xs tracking-wider transition-all duration-300 w-full lg:w-auto text-center border bg-zinc-800 text-zinc-300 border-zinc-700 hover:bg-white hover:text-black hover:border-white shadow-[0_0_15px_transparent] hover:shadow-[0_0_15px_rgba(255,255,255,0.3)]"
-                     >
-                       READ MORE
-                     </Link>
+                    <Link
+                      href={`/blogs/${blog.id}`}
+                      className="px-6 py-2.5 rounded-full font-bold text-xs tracking-wider transition-all duration-300 w-full lg:w-auto text-center border bg-zinc-800 text-zinc-300 border-zinc-700 hover:bg-white hover:text-black hover:border-white shadow-[0_0_15px_transparent] hover:shadow-[0_0_15px_rgba(255,255,255,0.3)]"
+                    >
+                      READ MORE
+                    </Link>
                   </div>
                 </div>
               ))}
             </div>
-            
+
             {/* Pagination Controls */}
             {totalPages > 1 && (
               <div className="flex items-center justify-center gap-2 p-6 border-t border-zinc-800/50 bg-zinc-900/20">
@@ -273,7 +340,9 @@ export default function BlogsPage() {
                   ))}
                 </div>
                 <button
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  onClick={() =>
+                    setCurrentPage((p) => Math.min(totalPages, p + 1))
+                  }
                   disabled={currentPage === totalPages}
                   className="w-9 h-9 rounded-full flex items-center justify-center border border-zinc-700 bg-zinc-800/50 text-zinc-400 hover:text-white hover:bg-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                   aria-label="Next page"
