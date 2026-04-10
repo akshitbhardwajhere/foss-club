@@ -20,6 +20,33 @@ import galleryRoutes from "./routes/galleryRoutes";
 // Load env vars
 dotenv.config();
 
+// Validate critical environment variables
+const requiredEnvVars = ["JWT_SECRET"];
+const optionalButImportantEnvVars = ["GOOGLE_SHEET_ID"];
+
+const missingRequired = requiredEnvVars.filter(
+  (envVar) => !process.env[envVar],
+);
+const missingOptional = optionalButImportantEnvVars.filter(
+  (envVar) => !process.env[envVar],
+);
+
+if (missingRequired.length > 0) {
+  console.error(
+    "❌ Missing required environment variables:",
+    missingRequired.join(", "),
+  );
+  process.exit(1);
+}
+
+if (missingOptional.length > 0 && process.env.NODE_ENV !== "production") {
+  console.warn(
+    "⚠️  Missing optional environment variables:",
+    missingOptional.join(", "),
+  );
+  console.warn("   App will continue but some features may not work properly");
+}
+
 // Connect to database securely
 import connectDB from "./config/db";
 import prisma from "./config/prisma";
@@ -107,6 +134,20 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   if (process.env.NODE_ENV !== "production") {
-    console.log(`=== FOSS Club Server Started ===`);
+    console.log(`
+╔════════════════════════════════════════╗
+║   FOSS Club Server Started             ║
+╚════════════════════════════════════════╝
+
+📌 Environment: ${process.env.NODE_ENV || "development"}
+🔌 Port: ${PORT}
+🛡️  CORS Origins: ${allowedOrigins.join(", ")}
+📊 Google Sheets: ${process.env.GOOGLE_SHEET_ID ? "✓ Configured" : "✗ Not configured"}
+🔐 Auth: JWT configured
+
+Server is ready to accept requests.
+    `);
+  } else {
+    console.log(`FOSS Club API Server started on port ${PORT}`);
   }
 });
