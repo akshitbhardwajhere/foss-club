@@ -385,3 +385,84 @@ button *,
 .blog-content em {
   color: #d4d4d8;
 }
+
+/* Distinct skeleton shimmer identities for Team and Alumni pages */
+.team-skeleton-glow,
+.alumni-skeleton-glow {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.team-skeleton-glow::after,
+.alumni-skeleton-glow::after {
+  content: "";
+  position: absolute;
+  inset: -120% -35%;
+  pointer-events: none;
+}
+
+.team-skeleton-glow::after {
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgba(8, 183, 79, 0.08) 48%,
+    rgba(52, 211, 153, 0.14) 52%,
+    rgba(8, 183, 79, 0.08) 56%,
+    transparent 68%
+  );
+  animation: team-skeleton-shimmer 3.2s linear infinite;
+}
+
+.alumni-skeleton-glow::after {
+  background: linear-gradient(
+    120deg,
+    transparent 40%,
+    rgba(245, 158, 11, 0.09) 50%,
+    rgba(251, 191, 36, 0.15) 54%,
+    transparent 66%
+  );
+  transform: rotate(-8deg);
+  animation: alumni-skeleton-shimmer 4.2s ease-in-out infinite;
+}
+
+@keyframes team-skeleton-shimmer {
+  0% {
+    transform: translateX(-130%);
+    opacity: 0;
+  }
+  16% {
+    opacity: 1;
+  }
+  58% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(130%);
+    opacity: 0;
+  }
+}
+
+@keyframes alumni-skeleton-shimmer {
+  0% {
+    transform: translateX(-120%) rotate(-8deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  65% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(120%) rotate(-8deg);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .team-skeleton-glow::after,
+  .alumni-skeleton-glow::after {
+    animation: none;
+  }
+}

@@ -11,8 +11,11 @@ export default function TeamPageSkeleton({
     <div className="w-full">
       <div className="grid grid-cols-4 min-[420px]:grid-cols-5 gap-3 w-full px-1 sm:hidden">
         {Array.from({ length: count }).map((_, i) => (
-          <div key={i} className="flex flex-col items-center gap-2 w-full">
-            <Skeleton className="w-full aspect-square rounded-[12px] bg-zinc-800/80" />
+          <div
+            key={i}
+            className="team-skeleton-glow flex flex-col items-center gap-2 w-full"
+          >
+            <Skeleton className="w-full aspect-square rounded-2xl bg-zinc-800/80" />
             <Skeleton className="h-3 w-4/5 rounded bg-zinc-800/70" />
           </div>
         ))}
@@ -22,7 +25,7 @@ export default function TeamPageSkeleton({
         {Array.from({ length: 6 }).map((_, i) => (
           <div
             key={i}
-            className="flex flex-col items-center gap-4 bg-zinc-900/40 p-8 rounded-3xl border border-zinc-800"
+            className="team-skeleton-glow flex flex-col items-center gap-4 bg-zinc-900/40 p-8 rounded-3xl border border-zinc-800"
           >
             <Skeleton className="w-44 h-44 rounded-full bg-zinc-800" />
             <div className="space-y-3 w-full flex flex-col items-center">

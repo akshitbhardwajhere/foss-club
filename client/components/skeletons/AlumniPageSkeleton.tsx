@@ -11,7 +11,10 @@ export default function AlumniPageSkeleton({
     <div className="w-full">
       <div className="grid grid-cols-4 min-[420px]:grid-cols-5 gap-3 w-full px-1 sm:hidden">
         {Array.from({ length: count }).map((_, i) => (
-          <div key={i} className="flex flex-col items-center gap-2 w-full">
+          <div
+            key={i}
+            className="alumni-skeleton-glow flex flex-col items-center gap-2 w-full"
+          >
             <div className="relative w-full">
               <Skeleton className="w-full aspect-square rounded-2xl bg-zinc-800/80" />
               <Skeleton className="absolute bottom-1.5 right-1.5 w-4 h-4 rounded-full bg-yellow-500/60" />
@@ -25,7 +28,7 @@ export default function AlumniPageSkeleton({
         {Array.from({ length: 3 }).map((_, i) => (
           <div
             key={i}
-            className="flex flex-col items-center gap-4 bg-zinc-900/40 p-8 rounded-3xl border border-zinc-800"
+            className="alumni-skeleton-glow flex flex-col items-center gap-4 bg-zinc-900/40 p-8 rounded-3xl border border-zinc-800"
           >
             <Skeleton className="w-44 h-44 rounded-full bg-zinc-800" />
             <div className="space-y-3 w-full flex flex-col items-center">
