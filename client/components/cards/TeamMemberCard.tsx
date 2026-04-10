@@ -19,9 +19,10 @@ interface TeamMember {
 interface TeamMemberCardProps {
     member: TeamMember;
     itemVariants: any; // We receive inherited motion variants from the parent layout
+    priority?: boolean;
 }
 
-export default function TeamMemberCard({ member, itemVariants }: TeamMemberCardProps) {
+export default function TeamMemberCard({ member, itemVariants, priority }: TeamMemberCardProps) {
     return (
         <motion.div
             variants={itemVariants}
@@ -40,6 +41,7 @@ export default function TeamMemberCard({ member, itemVariants }: TeamMemberCardP
                     height={352}
                     className="w-full h-full rounded-full object-cover bg-zinc-950"
                     style={{ imageRendering: 'auto' }}
+                    priority={priority}
                 />
             </div>
 

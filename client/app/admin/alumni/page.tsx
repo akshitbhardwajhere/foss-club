@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { GraduationCap, Plus } from "lucide-react";
 import api from "@/lib/axios";
@@ -180,6 +180,8 @@ export default function AlumniAdminPage() {
     form.reset();
   };
 
+  const sortableItems = useMemo(() => alumni.map((m) => m.id), [alumni]);
+
   return (
     <div className="min-h-screen bg-zinc-950 text-white p-4 md:p-8 pt-6 md:pt-12 overflow-x-hidden w-full max-w-8xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
@@ -335,7 +337,7 @@ export default function AlumniAdminPage() {
               onDragEnd={handleDragEnd}
             >
               <SortableContext
-                items={alumni.map((m) => m.id)}
+                items={sortableItems}
                 strategy={rectSortingStrategy}
               >
                 <motion.div

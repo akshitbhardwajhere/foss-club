@@ -76,6 +76,7 @@ model TeamMember {
   company     String?
 
   @@index([order])
+  @@index([isAlumni, order])
 }
 
 model EventRegistrationConfig {

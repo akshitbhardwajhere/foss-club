@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Users, Plus } from "lucide-react";
 import api from "@/lib/axios";
@@ -212,6 +212,8 @@ export default function TeamAdminPage() {
     setEditingId(null);
     form.reset();
   };
+
+  const sortableItems = useMemo(() => team.map((m) => m.id), [team]);
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white p-4 md:p-8 pt-6 md:pt-12 overflow-x-hidden w-full max-w-8xl mx-auto">
@@ -481,7 +483,7 @@ export default function TeamAdminPage() {
               onDragEnd={handleDragEnd}
             >
               <SortableContext
-                items={team.map((m) => m.id)}
+                items={sortableItems}
                 strategy={rectSortingStrategy}
               >
                 <motion.div

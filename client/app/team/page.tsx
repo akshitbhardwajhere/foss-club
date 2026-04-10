@@ -135,6 +135,7 @@ export default function TeamPage() {
                 key={member.id || i}
                 member={member}
                 itemVariants={itemVariants}
+                priority={i < 3}
               />
             ))}
           </div>
