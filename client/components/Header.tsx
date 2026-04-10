@@ -134,7 +134,7 @@ function Header() {
                   <Link href="/gallery">
                     <DropdownMenuItem className="text-white focus:bg-zinc-800/60 focus:text-[#08B74F] cursor-pointer rounded-xl p-3 gap-3">
                       <ImageIcon className="w-5 h-5 text-zinc-400" />
-                      <span className="font-medium">Event Gallery</span>
+                      <span className="font-medium">Gallery</span>
                     </DropdownMenuItem>
                   </Link>
                   {/* Blogs */}
