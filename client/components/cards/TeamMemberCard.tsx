@@ -91,13 +91,13 @@ export default function TeamMemberCard({ member, itemVariants, priority }: TeamM
                 <Dialog>
                     <DialogTrigger asChild>
                         <div className="flex flex-col items-center gap-2 cursor-pointer w-full group">
-                            <div className={`w-full aspect-square rounded-[24px] bg-zinc-800 p-[3px] relative group-hover:ring-2 ring-0 transition-all overflow-hidden ${isAlumni ? 'hover:ring-yellow-500' : 'hover:ring-[#08B74F]'}`}>
+                            <div className={`w-full aspect-square rounded-[8px] bg-zinc-800 p-[3px] relative group-hover:ring-2 ring-0 transition-all overflow-hidden ${isAlumni ? 'hover:ring-yellow-500' : 'hover:ring-[#08B74F]'}`}>
                                 <Image
                                     src={member.imageUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${member.name}`}
                                     alt={member.name}
                                     fill
                                     sizes="25vw"
-                                    className="rounded-[20px] object-cover bg-zinc-950"
+                                    className="rounded-[10px] object-cover bg-zinc-950"
                                     style={{ imageRendering: 'auto' }}
                                     priority={priority}
                                 />
