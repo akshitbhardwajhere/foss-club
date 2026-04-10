@@ -128,7 +128,7 @@ export default function AlumniPage() {
             No alumni records found yet.
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+          <div className="grid grid-cols-4 min-[420px]:grid-cols-5 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-8 w-full px-1 sm:px-0">
             {alumni.map((member, i) => (
               <TeamMemberCard
                 key={member.id || i}
