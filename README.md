@@ -1,155 +1,372 @@
 # FOSS Club NIT Srinagar - Official Website
 
-This repository contains the official website for the Free and Open Source Society (FOSS) Club at the National Institute of Technology Srinagar. The website serves as a platform to showcase club activities, events, blogs, team members, and manage event registrations.
+Official monorepo for the FOSS Club NIT Srinagar platform.
 
-## 🚀 Features
+This codebase contains:
 
-- **Modern UI**: Built with Next.js 14, Tailwind CSS v4, and Framer Motion for a premium, responsive user experience.
-- **Admin Dashboard**: Secure admin panel to manage website content and analytics.
-- **Content Management**:
-  - **Events**: Create and manage event listings (upcoming, tentative, and past). Includes countdown timers and live event tags.
-  - **Event Registration**: Built-in registration system for students (individuals & teams) with automated email notifications (via Mailjet) and real-time syncing to Google Sheets.
-  - **Gallery**: Manage and display event images in an organized gallery with editable descriptions.
-  - **News & Blogs**: Publish club news and articles using a seamless Rich Text Editor (Tiptap).
-  - **Team**: Showcase club members with drag-and-drop ordering capabilities.
-- **Performance Optimized**: Implemented API response compression, static asset caching, and dynamic imports for improved load times and efficiency.
-- **Well-Documented**: Extensive JSDoc comments integrated across both client and server codebases.
-- **File Management**: Comprehensive image and PDF upload capabilities directly integrating with Cloudinary.
-- **Responsive & Accessible Design**: Optimized for desktop, tablet, and mobile viewing across different devices, incorporating Radix UI primitives.
-- **Dark Mode**: Built-in dark theme powered by `next-themes` for a comfortable viewing experience.
+- A Next.js frontend for the public website and admin UI.
+- An Express + Prisma backend API for content management, authentication, registrations, and integrations.
 
-## 🛠️ Tech Stack
+## What This App Includes
 
-### Frontend (Client)
-- **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
-- **State Management**: [Redux Toolkit](https://redux-toolkit.js.org/)
-- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
-- **UI Components**: [Radix UI](https://www.radix-ui.com/), Shadcn UI
-- **Animation**: [Framer Motion](https://www.framer.com/motion/)
-- **Icons**: [Lucide React](https://lucide.dev/)
-- **Editor**: [Tiptap](https://tiptap.dev/)
-- **Forms & Validation**: React Hook Form + Zod
-- **Drag & Drop**: dnd-kit
+### Public experience
 
-### Backend (Server)
-- **Framework**: [Express.js](https://expressjs.com/)
-- **Database**: [PostgreSQL](https://www.postgresql.org/)
-- **ORM**: [Prisma](https://prisma.io/)
-- **Storage**: [Cloudinary](https://cloudinary.com/)
-- **Communication**: Node Mailjet (Email Automation)
-- **Integration**: Google APIs (Google Sheets Sync)
-- **Authentication**: JWT & bcryptjs
-- **File Uploads**: Multer
+- Home page with dynamic next-event countdown.
+- Events listing and event detail pages.
+- Event registration flow.
+- Blogs listing and detail pages.
+- Team and alumni pages.
+- Gallery listing and event-wise gallery detail pages.
+- About and contact/community request pages.
 
-## 📂 Project Structure
+### Admin experience
+
+- Admin authentication (JWT cookie-based session).
+- Dashboard statistics.
+- Event CRUD and registration management.
+- Blog CRUD.
+- Team CRUD + drag-and-drop reordering.
+- Alumni status updates.
+- Gallery image management.
+- Query/community request moderation.
+
+### Integrations
+
+- PostgreSQL via Prisma.
+- Cloudinary for media/document storage.
+- Mailjet/Nodemailer for outgoing emails.
+- Google Sheets API for community/registration workflows.
+
+## Current Tech Stack
+
+### Frontend (`client`)
+
+- Next.js 16 (App Router)
+- React 19
+- TypeScript
+- Tailwind CSS v4
+- Framer Motion
+- Redux Toolkit + React Redux
+- React Hook Form + Zod
+- dnd-kit
+- Radix UI primitives + shadcn-style components
+- Tiptap editor
+
+### Backend (`server`)
+
+- Express 5
+- TypeScript
+- Prisma ORM
+- PostgreSQL
+- JWT + bcryptjs authentication
+- Multer for document upload handling
+- apicache response caching middleware
+
+## Architecture
+
+The repository uses a two-app monorepo architecture:
+
+1. `client/` serves UI pages and calls backend APIs.
+2. `server/` exposes REST endpoints and handles all data/integration workflows.
+
+### High-level request flow
+
+1. Browser renders route in the Next.js app.
+2. Client calls backend via Axios (`NEXT_PUBLIC_API_URL`).
+3. Express routes dispatch to domain controllers.
+4. Controllers use Prisma and external integrations.
+5. Response is sent as JSON (public routes are cache-aware; admin routes are protected).
+
+### Backend layers
+
+- `server/src/index.ts`: app bootstrap, CORS, compression, route mounts, health endpoint.
+- `server/src/routes`: endpoint grouping by domain.
+- `server/src/controllers`: business logic and response handling.
+- `server/src/middleware`: auth guard and cache policies.
+- `server/src/config`: Prisma, DB connection, Google auth setup.
+- `server/src/utils`: Cloudinary and mail helpers.
+- `server/prisma/schema.prisma`: authoritative data model.
+
+### Frontend layers
+
+- `client/app`: App Router pages/layouts.
+- `client/components`: shared/admin/ui/cards/skeleton components.
+- `client/lib`: Axios client, Redux store/slices, validators/helpers.
+- `client/data`: app data (navigation and constants).
+
+## Repository Structure
 
 ```text
 foss-club/
-├── client/          # Next.js Frontend Application
-│   ├── app/         # Next.js App Router pages (admin, events, blogs, team, gallery)
-│   ├── components/  # Reusable React components (AdminSidebar, ImageUpload, PdfUpload, etc.)
-│   └── lib/         # Utility functions, Redux store, and API clients
-├── server/          # Express.js Backend Application
-│   ├── src/
-│   │   ├── config/      # DB, Cloudinary, Mailjet configuration
-│   │   ├── controllers/ # Logic for Auth, Events, Blogs, Registration, Sheets, Contact, Stats, Uploads
-│   │   ├── routes/      # API endpoints mapping to controllers
-│   │   └── middleware/  # Auth guards, Error handling
-│   └── prisma/      # Schema (Admin, Event, Blog, TeamMember, RegistrationConfig, etc.)
-└── README.md        # Project documentation
+├── client/
+│   ├── app/
+│   │   ├── admin/                  # Admin route tree
+│   │   ├── events/                 # Events + registration pages
+│   │   ├── blogs/                  # Blog listing + detail pages
+│   │   ├── gallery/                # Gallery listing + event gallery pages
+│   │   ├── team/ about/ contact/ alumni/
+│   │   └── layout.tsx              # Root app layout
+│   ├── components/
+│   │   ├── admin/
+│   │   ├── cards/
+│   │   ├── shared/
+│   │   ├── skeletons/
+│   │   └── ui/
+│   ├── lib/
+│   │   ├── axios.ts
+│   │   ├── store.ts
+│   │   └── features/
+│   └── public/
+├── server/
+│   ├── prisma/
+│   │   ├── schema.prisma
+│   │   └── migrations/
+│   └── src/
+│       ├── config/
+│       ├── controllers/
+│       ├── middleware/
+│       ├── routes/
+│       ├── utils/
+│       └── index.ts
+├── CONTRIBUTION.md
+└── README.md
 ```
 
-## 🚀 Getting Started
+## Frontend Route Map
 
-### Prerequisites
-- Node.js (v18 or higher)
-- PostgreSQL (v14 or higher)
-- Cloudinary Account
-- Mailjet Account
-- Google Service Account (for Sheets API)
+### Public routes
 
-### 1. Backend Setup
+- `/`
+- `/about`
+- `/events`
+- `/events/[id]`
+- `/events/registration/[eventName]`
+- `/blogs`
+- `/blogs/[id]`
+- `/gallery`
+- `/gallery/[id]`
+- `/team`
+- `/alumni`
+- `/contact`
+
+### Admin routes
+
+- `/admin`
+- `/admin/login`
+- `/admin/dashboard`
+- `/admin/events`
+- `/admin/events/registrations/[eventId]`
+- `/admin/blogs`
+- `/admin/team`
+- `/admin/alumni`
+- `/admin/gallery`
+- `/admin/queries`
+
+## API Surface
+
+All routes are mounted in `server/src/index.ts`.
+
+### Health and root
+
+- `GET /health` - Server + database health check.
+- `GET /` - Basic API service status text.
+
+### Admin auth (`/api/admin`)
+
+- `POST /api/admin/login`
+- `POST /api/admin/logout` (protected)
+- `GET /api/admin/me` (protected)
+
+### Dashboard stats (`/api/admin/stats`)
+
+- `GET /api/admin/stats/` (protected)
+
+### Events (`/api/events`)
+
+- `GET /api/events/`
+- `POST /api/events/` (protected)
+- `GET /api/events/next`
+- `GET /api/events/:id`
+- `PUT /api/events/:id` (protected)
+- `DELETE /api/events/:id` (protected)
+- `GET /api/events/:id/document`
+
+### Blogs (`/api/blogs`)
+
+- `GET /api/blogs/`
+- `POST /api/blogs/` (protected)
+- `GET /api/blogs/:id`
+- `PUT /api/blogs/:id` (protected)
+- `DELETE /api/blogs/:id` (protected)
+
+### Team (`/api/team`)
+
+- `GET /api/team/`
+- `POST /api/team/` (protected)
+- `PUT /api/team/reorder` (protected)
+- `GET /api/team/:id`
+- `PUT /api/team/:id` (protected)
+- `DELETE /api/team/:id` (protected)
+
+### Alumni (`/api/alumni`)
+
+- `GET /api/alumni/`
+- `PUT /api/alumni/:id/status` (protected)
+
+### Registration (`/api/registration`)
+
+- `POST /api/registration/config` (protected)
+- `GET /api/registration/list/:eventId` (protected)
+- `PATCH /api/registration/stop/:eventId` (protected)
+- `GET /api/registration/config/:eventId`
+- `POST /api/registration/submit`
+
+### Contact/community (`/api/contact`)
+
+- `POST /api/contact/`
+- `POST /api/contact/approve` (protected)
+
+### Google Sheets sync (`/api/sheet`)
+
+- `GET /api/sheet/`
+- `POST /api/sheet/`
+- `POST /api/sheet/init`
+- `PUT /api/sheet/:rowIndex`
+- `DELETE /api/sheet/:rowIndex`
+
+### Gallery (`/api/gallery`)
+
+- `GET /api/gallery/:eventId`
+- `POST /api/gallery/:eventId` (protected)
+- `PUT /api/gallery/:id` (protected)
+- `DELETE /api/gallery/:id` (protected)
+
+### Uploads (`/api/upload`)
+
+- `POST /api/upload/document` (protected, PDF upload)
+- `DELETE /api/upload/remove` (protected)
+- `DELETE /api/upload/remove-document` (protected)
+
+## Data Model (Prisma)
+
+Core models defined in `server/prisma/schema.prisma`:
+
+- `Admin`
+- `Event`
+- `EventGalleryImage`
+- `Blog`
+- `TeamMember`
+- `EventRegistrationConfig`
+- `EventRegistration`
+
+## Environment Variables
+
+No committed `.env.example` files were found in this repository. Create these manually.
+
+### Server env (`server/.env`)
+
+Required/expected variables:
+
+- `DATABASE_URL` (used by Prisma/PostgreSQL)
+- `JWT_SECRET` (required at startup)
+- `PORT` (optional, default `5000`)
+- `NODE_ENV` (`development` or `production`)
+- `CLIENT_URL` (CORS allowlist + email links)
+- `FRONTEND_URL` (additional CORS allowlist origin)
+- `CLOUDINARY_CLOUD_NAME`
+- `CLOUDINARY_API_KEY`
+- `CLOUDINARY_API_SECRET`
+- `MAILJET_API_KEY`
+- `MAILJET_API_SECRET`
+- `MAILJET_FROM_EMAIL`
+- `ADMIN_EMAIL` (fallback exists but should be set)
+- `GOOGLE_SHEET_ID`
+- `GOOGLE_CLIENT_EMAIL`
+- `GOOGLE_PRIVATE_KEY` (supports escaped newline format)
+
+### Client env (`client/.env.local`)
+
+- `NEXT_PUBLIC_API_URL` (default fallback is mostly `http://localhost:5000`; metadata layouts currently fallback to `http://localhost:5001` if unset)
+- `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET`
+- `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`
+
+## Local Development Setup
+
+### 1. Clone
 
 ```bash
-# Navigate to server directory
+git clone <your-fork-or-repo-url>
+cd foss-club
+```
+
+### 2. Backend setup
+
+```bash
 cd server
-
-# Install dependencies
 npm install
-
-# Create .env file
-cp .env.example .env
-
-# Configure environment variables in .env
-# - DATABASE_URL
-# - JWT_SECRET
-# - CLOUDINARY credentials
-# - MAILJET credentials
-# - GOOGLE_SHEETS settings
-
-# Generate Prisma client
-npx prisma generate
-
-# Apply database migrations
-npx prisma migrate dev --name init
-
-# Start the development server
-npm run dev
 ```
 
-The backend API will be running at `http://localhost:5000`.
+Create `server/.env` and set all required variables listed above.
 
-### 2. Frontend Setup
+Then run:
 
 ```bash
-# Navigate to client directory
-cd client
-
-# Install dependencies
-npm install
-
-# Start the development server
+npx prisma generate
+npx prisma migrate dev
 npm run dev
 ```
 
-The frontend application will be available at `http://localhost:3000`.
+Backend runs on `http://localhost:5000` by default.
 
-## 📂 Key API Endpoints
+### 3. Frontend setup
 
-### Authentication
-- `POST /api/auth/login` - Admin login
+```bash
+cd ../client
+npm install
+```
 
-### Events & Registrations
-- `GET /api/events` - Get all events
-- `POST /api/events` - Create event (admin)
-- `POST /api/registrations/:eventId` - Register for an event
-- `GET /api/registrations/config/:eventId` - Get event registration config
+Create `client/.env.local` and set:
 
-### Content (Blogs & Gallery)
-- `GET /api/blogs` - Get all blogs
-- `GET /api/gallery/:eventId` - Get gallery images for a specific event
-- `POST /api/gallery/:eventId` - Add an image to an event's gallery
-- `PUT /api/gallery/:id` - Update a gallery image description
-- `DELETE /api/gallery/:id` - Delete a gallery image
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:5000
+NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=...
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=...
+```
 
-### External Integrations
-- `POST /api/contact` - Submit contact form
-- `GET/POST /api/sheet/*` - Google Sheets synchronizations
-- `POST /api/upload/*` - Handle file uploads (Cloudinary)
+Then run:
 
-### Dashboard
-- `GET /api/stats` - Get summary statistics for the admin dashboard
+```bash
+npm run dev
+```
 
-## 🤝 Contributing
+Frontend runs on `http://localhost:3000`.
 
-Contributions are welcome! Please follow these steps:
+## Available Scripts
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+### Client (`client/package.json`)
 
-## 📞 Support
+- `npm run dev`
+- `npm run build`
+- `npm run start`
+- `npm run lint`
 
-For support or questions, please open an issue or contact the development team.
+### Server (`server/package.json`)
+
+- `npm run dev` (nodemon + tsx)
+- `npm run build` (installs deps, generates Prisma client, compiles TS)
+- `npm run start` (runs compiled output)
+
+## Deployment/Operations Notes
+
+- API CORS allowlist includes local origins and production domains configured in server bootstrap.
+- Public GET endpoints use cache middleware where applicable.
+- Admin authentication uses HttpOnly cookie `jwt`.
+- Workflow `.github/workflows/cron.yml` pings the deployed Render backend on a schedule.
+
+## Contributing
+
+See `CONTRIBUTION.md` for contribution workflow and coding conventions.
+
+## License
+
+This project is licensed under the terms in `LICENSE`.
