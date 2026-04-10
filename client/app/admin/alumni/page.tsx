@@ -2,8 +2,26 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { GraduationCap, Plus, Trash2, Edit2 } from "lucide-react";
+import { GraduationCap, Plus } from "lucide-react";
 import api from "@/lib/axios";
+
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  rectSortingStrategy,
+} from "@dnd-kit/sortable";
+import { SortableAlumniCard } from "@/components/SortableAlumniCard";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -86,17 +104,52 @@ export default function AlumniAdminPage() {
     setIsCreating(true);
   };
 
-  const handleRemove = async (id: string, name: string) => {
+  const handleRemove = async (id: string, name?: string) => {
     try {
       await api.put(`/api/alumni/${id}/status`, {
         isAlumni: false,
         company: null,
         role: alumni.find(a => a.id === id)?.role || "",
       });
-      toast.success(`${name} removed from Alumni`);
+      toast.success(`${name || 'Member'} removed from Alumni`);
       fetchData();
     } catch (error) {
       toast.error("Failed to remove from Alumni");
+    }
+  };
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = alumni.findIndex((i) => i.id === active.id);
+      const newIndex = alumni.findIndex((i) => i.id === over.id);
+      const reorderedAlumni = arrayMove(alumni, oldIndex, newIndex);
+      setAlumni(reorderedAlumni);
+
+      const payload = reorderedAlumni.map((member: TeamMember, idx: number) => ({
+        id: member.id,
+        order: idx,
+      }));
+      try {
+        await api.put("/api/team/reorder", { items: payload });
+        toast.success("Alumni order updated");
+      } catch (error) {
+        toast.error("Failed to save new team order");
+        fetchData();
+      }
     }
   };
 
@@ -276,51 +329,31 @@ export default function AlumniAdminPage() {
               </button>
             </div>
           ) : (
-            <motion.div
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
             >
-              {alumni.map((member) => (
-                <div key={member.id} className="bg-zinc-900/40 p-6 rounded-2xl border border-zinc-800 flex flex-col gap-4 relative group">
-                  <div className="flex gap-4 items-center">
-                    <div className="w-16 h-16 rounded-full bg-zinc-800 overflow-hidden relative">
-                      <Image
-                        src={member.imageUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${member.name}`}
-                        alt={member.name}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-white leading-tight">{member.name}</h3>
-                      <p className="text-yellow-500 text-sm font-medium">{member.role}</p>
-                      {member.company && (
-                        <p className="text-zinc-400 text-xs mt-1 bg-zinc-800/50 inline-block px-2 py-0.5 rounded-full">
-                          @ {member.company}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
-                      onClick={() => handleEdit(member)}
-                      className="p-2 rounded-lg bg-zinc-800/80 text-zinc-400 hover:text-white"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleRemove(member.id, member.name)}
-                      className="p-2 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white"
-                      title="Remove from Alumni"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </motion.div>
+              <SortableContext
+                items={alumni.map((m) => m.id)}
+                strategy={rectSortingStrategy}
+              >
+                <motion.div
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  {alumni.map((member) => (
+                    <SortableAlumniCard
+                      key={member.id}
+                      member={member}
+                      onEdit={handleEdit}
+                      onRemove={handleRemove}
+                    />
+                  ))}
+                </motion.div>
+              </SortableContext>
+            </DndContext>
           )}
         </div>
       )}

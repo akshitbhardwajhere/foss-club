@@ -20,12 +20,18 @@ interface ConfirmDeleteDialogProps {
     itemName: string;
     /** Called when the user confirms deletion */
     onConfirm: () => void;
+    /** Optional custom title text */
+    title?: string;
+    /** Optional custom description text */
+    description?: string;
 }
 
 export default function ConfirmDeleteDialog({
     trigger,
     itemName,
     onConfirm,
+    title,
+    description,
 }: ConfirmDeleteDialogProps) {
     return (
         <AlertDialog>
@@ -34,9 +40,9 @@ export default function ConfirmDeleteDialog({
             </AlertDialogTrigger>
             <AlertDialogContent className="bg-zinc-950 border border-zinc-800 text-white">
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogTitle>{title || "Are you absolutely sure?"}</AlertDialogTitle>
                     <AlertDialogDescription className="text-zinc-400">
-                        This action cannot be undone. This will permanently delete &quot;{itemName}&quot;.
+                        {description || `This action cannot be undone. This will permanently delete "${itemName}".`}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
