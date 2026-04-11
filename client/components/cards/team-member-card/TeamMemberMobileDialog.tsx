@@ -200,27 +200,13 @@ export default function TeamMemberMobileDialog({
           </div>
 
           <div className="mt-4 grid grid-cols-3 gap-2">
-            {["compile", "sync", "ship"].map((label, index) => (
-              <motion.div
+            {["compile", "sync", "ship"].map((label) => (
+              <div
                 key={label}
                 className={`rounded-full border px-3 py-2 text-center text-[10px] uppercase tracking-[0.24em] ${isAlumni ? "border-yellow-500/20 bg-yellow-500/10 text-yellow-400" : "border-[#08B74F]/20 bg-[#08B74F]/10 text-[#08B74F]"}`}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, delay: 0.1 * index }}
               >
-                <motion.span
-                  className="inline-block"
-                  animate={{ scale: [1, 1.08, 1] }}
-                  transition={{
-                    duration: 1.8,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: index * 0.2,
-                  }}
-                >
-                  {label}
-                </motion.span>
-              </motion.div>
+                {label}
+              </div>
             ))}
           </div>
 
