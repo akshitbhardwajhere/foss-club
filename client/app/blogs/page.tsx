@@ -1,14 +1,7 @@
 "use client";
 
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
-import {
-  Search,
-  ChevronLeft,
-  ChevronRight,
-  User,
-  Calendar,
-  ArrowUpDown,
-} from "lucide-react";
+import { User, Calendar, ArrowUpDown } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import api from "@/lib/axios";
@@ -21,6 +14,8 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import SearchInput from "@/components/shared/SearchInput";
+import PaginationControls from "@/components/shared/PaginationControls";
 
 interface Blog {
   id: string;
@@ -115,16 +110,12 @@ export default function BlogsPage() {
         <PageHeader title="Our Blog" />
 
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
-          <div className="relative w-full md:w-96">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
-            <input
-              type="text"
-              placeholder="Search by blog title/author"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-zinc-900/50 border border-zinc-700 text-white rounded-full py-3 pl-12 pr-4 focus:outline-none focus:border-[#08B74F] focus:ring-1 focus:ring-[#08B74F] transition-all placeholder:text-zinc-500"
-            />
-          </div>
+          <SearchInput
+            className="w-full md:w-96"
+            placeholder="Search by blog title/author"
+            value={searchQuery}
+            onChange={setSearchQuery}
+          />
 
           <div className="flex items-center gap-2 w-full md:w-auto ml-auto">
             <DropdownMenu>
@@ -313,44 +304,11 @@ export default function BlogsPage() {
               ))}
             </div>
 
-            {/* Pagination Controls */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 p-6 border-t border-zinc-800/50 bg-zinc-900/20">
-                <button
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className="w-9 h-9 rounded-full flex items-center justify-center border border-zinc-700 bg-zinc-800/50 text-zinc-400 hover:text-white hover:bg-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                  aria-label="Previous page"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <div className="flex gap-1 mx-2">
-                  {Array.from({ length: totalPages }).map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setCurrentPage(i + 1)}
-                      className={`w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold transition-all duration-300 ${
-                        currentPage === i + 1
-                          ? "bg-white text-black shadow-[0_0_10px_rgba(255,255,255,0.2)]"
-                          : "bg-transparent text-zinc-400 hover:bg-zinc-800 hover:text-white border border-transparent hover:border-zinc-700"
-                      }`}
-                    >
-                      {i + 1}
-                    </button>
-                  ))}
-                </div>
-                <button
-                  onClick={() =>
-                    setCurrentPage((p) => Math.min(totalPages, p + 1))
-                  }
-                  disabled={currentPage === totalPages}
-                  className="w-9 h-9 rounded-full flex items-center justify-center border border-zinc-700 bg-zinc-800/50 text-zinc-400 hover:text-white hover:bg-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                  aria-label="Next page"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            )}
+            <PaginationControls
+              totalPages={totalPages}
+              currentPage={currentPage}
+              onPageChange={setCurrentPage}
+            />
           </div>
         )}
       </div>

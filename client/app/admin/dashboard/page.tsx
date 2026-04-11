@@ -1,34 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import { useAppDispatch, useAppSelector } from "@/lib/store";
 import { logoutAdmin } from "@/lib/features/authSlice";
 import { useRouter } from "next/navigation";
-import {
-  Users,
-  Calendar,
-  BookOpen,
-  LogOut,
-  LayoutDashboard,
-  AlertCircle,
-  Terminal,
-} from "lucide-react";
+import { LayoutDashboard, AlertCircle } from "lucide-react";
 import api from "@/lib/axios";
-import AdminStatCard from "@/components/admin/AdminStatCard";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import SignOutDialog from "@/components/admin/dashboard/SignOutDialog";
+import DashboardStatGrid from "@/components/admin/dashboard/DashboardStatGrid";
+import type { AdminDashboardStats } from "@/components/admin/dashboard/types";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 
 export default function AdminDashboardPage() {
@@ -50,7 +31,7 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const [stats, setStats] = useState({
+  const [stats, setStats] = useState<AdminDashboardStats>({
     events: { total: 0, upcoming: 0, past: 0 },
     team: { total: 0 },
     blogs: { total: 0 },
@@ -122,35 +103,7 @@ export default function AdminDashboardPage() {
             </div>
           </div>
 
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-all font-semibold hover:-translate-y-0.5">
-                <LogOut className="w-5 h-5" /> Sign Out
-              </button>
-            </AlertDialogTrigger>
-            <AlertDialogContent className="bg-zinc-950 border-zinc-800 text-white shadow-2xl rounded-2xl">
-              <AlertDialogHeader>
-                <AlertDialogTitle className="text-2xl font-bold">
-                  Sign Out
-                </AlertDialogTitle>
-                <AlertDialogDescription className="text-zinc-400">
-                  Are you sure you want to sign out of the command center? You
-                  will need to authenticate again.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter className="mt-4">
-                <AlertDialogCancel className="bg-zinc-900 text-white border-zinc-700 hover:bg-zinc-800 hover:text-white rounded-xl">
-                  Cancel
-                </AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleLogout}
-                  className="bg-red-500 text-white hover:bg-red-600 rounded-xl font-bold"
-                >
-                  Sign Out
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <SignOutDialog onConfirm={handleLogout} />
         </div>
 
         {/* Error Alert */}
@@ -163,143 +116,12 @@ export default function AdminDashboardPage() {
           </Alert>
         )}
 
-        {/* Bento Grid */}
-        <motion.div
-          className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 flex-1 lg:min-h-0 lg:grid-rows-2 pb-8 lg:pb-0 lg:overflow-hidden auto-rows-[minmax(250px,auto)] lg:auto-rows-auto"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          {/* Events Card */}
-          <AdminStatCard
-            title="Events"
-            description="Schedule and manage upcoming hackathons, workshops, and meetups."
-            icon={Calendar}
-            href="/admin/events"
-            colorTheme="blue"
-            colSpan="lg:col-span-2"
-            itemVariants={itemVariants}
-            stats={
-              loadingStats
-                ? [
-                    {
-                      label: "Total",
-                      value: <Skeleton className="h-6 w-12 bg-zinc-800" />,
-                      valueColor: "text-blue-400",
-                    },
-                    {
-                      label: "Past",
-                      value: <Skeleton className="h-6 w-12 bg-zinc-800" />,
-                      valueColor: "text-zinc-400",
-                    },
-                    {
-                      label: "Upcoming",
-                      value: <Skeleton className="h-6 w-12 bg-zinc-800" />,
-                      valueColor: "text-[#08B74F]",
-                    },
-                  ]
-                : [
-                    {
-                      label: "Total",
-                      value: stats.events.total,
-                      valueColor: "text-blue-400",
-                    },
-                    {
-                      label: "Past",
-                      value: stats.events.past,
-                      valueColor: "text-zinc-400",
-                    },
-                    {
-                      label: "Upcoming",
-                      value: stats.events.upcoming,
-                      valueColor: "text-[#08B74F]",
-                    },
-                  ]
-            }
-          />
-
-          {/* Team Card */}
-          <AdminStatCard
-            title="Team Members"
-            description="Manage core club members and roles."
-            icon={Users}
-            href="/admin/team"
-            colorTheme="green"
-            itemVariants={itemVariants}
-            stats={
-              loadingStats
-                ? [
-                    {
-                      label: "Active",
-                      value: <Skeleton className="h-6 w-12 bg-zinc-800" />,
-                      valueColor: "text-[#08B74F]",
-                    },
-                  ]
-                : [
-                    {
-                      label: "Active",
-                      value: stats.team.total,
-                      valueColor: "text-[#08B74F]",
-                    },
-                  ]
-            }
-          />
-
-          {/* Blogs Card */}
-          <AdminStatCard
-            title="Technical Blogs"
-            description="Review, edit, and publish student-authored tech articles and guides."
-            icon={BookOpen}
-            href="/admin/blogs"
-            colorTheme="orange"
-            colSpan="lg:col-span-2"
-            itemVariants={itemVariants}
-            stats={
-              loadingStats
-                ? [
-                    {
-                      label: "Published",
-                      value: <Skeleton className="h-6 w-12 bg-zinc-800" />,
-                      valueColor: "text-orange-400",
-                    },
-                  ]
-                : [
-                    {
-                      label: "Published",
-                      value: stats.blogs.total,
-                      valueColor: "text-orange-400",
-                    },
-                  ]
-            }
-          />
-
-          {/* FOSS Community Card */}
-          <AdminStatCard
-            title="FOSS Community"
-            description="Manage community queries and view submitted forms."
-            icon={Terminal}
-            href="/admin/queries"
-            colorTheme="blue"
-            itemVariants={itemVariants}
-            stats={
-              loadingStats
-                ? [
-                    {
-                      label: "Pending",
-                      value: <Skeleton className="h-6 w-12 bg-zinc-800" />,
-                      valueColor: "text-[#08B74F]",
-                    },
-                  ]
-                : [
-                    {
-                      label: "Total Apps",
-                      value: stats.queries.total,
-                      valueColor: "text-[#08B74F]",
-                    },
-                  ]
-            }
-          />
-        </motion.div>
+        <DashboardStatGrid
+          loadingStats={loadingStats}
+          stats={stats}
+          containerVariants={containerVariants}
+          itemVariants={itemVariants}
+        />
       </div>
     </div>
   );

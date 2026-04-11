@@ -6,52 +6,17 @@ import api from "@/lib/axios";
 import { motion } from "framer-motion";
 import { BookOpen, Tag, ArrowLeft, Clock, User, ChevronUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { stripHtml } from "@/lib/utils";
 import Image from "next/image";
-
-interface Blog {
-  id: string;
-  title: string;
-  content: string;
-  author: string;
-  tags: string[];
-  imageUrl?: string;
-  createdAt: string;
-}
-
-function ReadingProgress() {
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    const updateProgress = () => {
-      const scrollTop = window.scrollY;
-      const docHeight =
-        document.documentElement.scrollHeight - window.innerHeight;
-      setProgress(docHeight > 0 ? (scrollTop / docHeight) * 100 : 0);
-    };
-    window.addEventListener("scroll", updateProgress);
-    return () => window.removeEventListener("scroll", updateProgress);
-  }, []);
-
-  return (
-    <div className="fixed top-0 left-0 w-full h-[3px] z-50">
-      <div
-        className="h-full bg-gradient-to-r from-[#08B74F] via-[#0ED966] to-[#08B74F] transition-all duration-150 ease-out shadow-[0_0_10px_rgba(8,183,79,0.5)]"
-        style={{ width: `${progress}%` }}
-      />
-    </div>
-  );
-}
-
-function estimateReadTime(content: string): number {
-  const plainText = stripHtml(content);
-  const words = plainText.trim().split(/\s+/).length;
-  return Math.max(1, Math.ceil(words / 200));
-}
+import ReadingProgress from "@/components/blogs/detail/ReadingProgress";
+import {
+  estimateReadTime,
+  formatBlogDate,
+} from "@/components/blogs/detail/helpers";
+import type { BlogDetail } from "@/components/blogs/detail/types";
 
 /**
  * BlogDetailPage Component
- * 
+ *
  * Renders a full blog article by fetching standard data from `/api/blogs/[id]`.
  * Features an animated read-progress bar anchored to the top of the viewport,
  * estimated read time calculation, and raw HTML injection for the rich text payload.
@@ -59,7 +24,7 @@ function estimateReadTime(content: string): number {
 export default function BlogDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const [blog, setBlog] = useState<Blog | null>(null);
+  const [blog, setBlog] = useState<BlogDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
@@ -90,7 +55,7 @@ export default function BlogDetailPage() {
       <div className="bg-[#050B08] text-white flex flex-col items-center relative w-full pt-32 pb-20 px-4 font-sans">
         <div className="max-w-4xl mx-auto w-full z-10 mt-12">
           <div className="bg-zinc-900/40 backdrop-blur-sm border border-zinc-800/50 rounded-3xl overflow-hidden shadow-2xl relative">
-            <Skeleton className="w-full h-[300px] md:h-[450px] bg-zinc-800/60" />
+            <Skeleton className="w-full h-75 md:h-112.5 bg-zinc-800/60" />
             <div className="p-8 md:p-12 relative -mt-32 flex flex-col items-center">
               <div className="flex flex-wrap justify-center gap-2 mb-6 z-10">
                 <Skeleton className="h-6 w-20 rounded-full bg-zinc-800" />
@@ -146,12 +111,7 @@ export default function BlogDetailPage() {
   }
 
   const readTime = estimateReadTime(blog.content);
-  const publishDate = new Date(blog.createdAt);
-  const formattedDate = publishDate.toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+  const formattedDate = formatBlogDate(blog.createdAt);
 
   return (
     <div className="bg-[#050B08] text-white flex flex-col items-center relative w-full pt-28 pb-24 px-4 font-sans selection:bg-[#08B74F]/30 selection:text-white overflow-hidden">
@@ -182,7 +142,7 @@ export default function BlogDetailPage() {
         >
           {/* Hero image */}
           {blog.imageUrl ? (
-            <div className="relative w-full h-[280px] md:h-[420px] overflow-hidden">
+            <div className="relative w-full h-70 md:h-105 overflow-hidden">
               <Image
                 src={blog.imageUrl}
                 alt={blog.title}
@@ -193,14 +153,14 @@ export default function BlogDetailPage() {
               />
             </div>
           ) : (
-            <div className="w-full h-[200px] md:h-[280px] bg-gradient-to-br from-zinc-800/40 via-zinc-900/60 to-zinc-950 flex items-center justify-center relative overflow-hidden">
+            <div className="w-full h-50 md:h-70 bg-linear-to-br from-zinc-800/40 via-zinc-900/60 to-zinc-950 flex items-center justify-center relative overflow-hidden">
               <div className="absolute inset-0 opacity-10">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 border border-zinc-700 rounded-full" />
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 border border-zinc-700 rounded-full" />
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border border-zinc-700 rounded-full" />
               </div>
               <BookOpen className="w-16 h-16 text-zinc-700 relative z-10" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f0c] to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-[#0a0f0c] to-transparent" />
             </div>
           )}
 
@@ -245,7 +205,7 @@ export default function BlogDetailPage() {
             >
               {/* Author */}
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#08B74F]/30 to-[#08B74F]/10 border border-[#08B74F]/20 flex items-center justify-center font-bold text-base text-[#08B74F]">
+                <div className="w-10 h-10 rounded-full bg-linear-to-br from-[#08B74F]/30 to-[#08B74F]/10 border border-[#08B74F]/20 flex items-center justify-center font-bold text-base text-[#08B74F]">
                   {blog.author.charAt(0).toUpperCase()}
                 </div>
                 <div className="flex flex-col text-left">

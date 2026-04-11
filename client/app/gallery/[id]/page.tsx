@@ -4,46 +4,37 @@ import { useEffect, useState } from "react";
 import api from "@/lib/axios";
 import BackgroundBlur from "@/components/shared/BackgroundBlur";
 import PageHeader from "@/components/shared/PageHeader";
-import { Loader2, ChevronLeft, Calendar } from "lucide-react";
+import { Loader2, ChevronLeft } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import { notFound, useParams } from "next/navigation";
-
-interface Event {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-}
-
-interface GalleryImage {
-  id: string;
-  url: string;
-  description: string;
-  order: number;
-}
+import GalleryDatePill from "@/components/gallery/detail/GalleryDatePill";
+import GalleryImageRow from "@/components/gallery/detail/GalleryImageRow";
+import type {
+  GalleryEvent,
+  GalleryImageItem,
+} from "@/components/gallery/detail/types";
 
 /**
  * EventGalleryDetails Component
- * 
+ *
  * Dynamically loads and presents all high-resolution photos associated with a specific completed event.
  * Arranges images in an alternating zigzag pattern (image left, image right) with their respective descriptions.
  */
 export default function EventGalleryDetails() {
   const params = useParams();
-  const [event, setEvent] = useState<Event | null>(null);
-  const [images, setImages] = useState<GalleryImage[]>([]);
+  const [event, setEvent] = useState<GalleryEvent | null>(null);
+  const [images, setImages] = useState<GalleryImageItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   useEffect(() => {
     if (!params?.id) return;
-    
+
     const fetchGalleryData = async () => {
       try {
         const [eventRes, galleryRes] = await Promise.all([
           api.get(`/api/events/${params.id}`),
-          api.get(`/api/gallery/${params.id}`)
+          api.get(`/api/gallery/${params.id}`),
         ]);
         setEvent(eventRes.data);
         setImages(galleryRes.data);
@@ -74,62 +65,34 @@ export default function EventGalleryDetails() {
       <BackgroundBlur />
 
       <div className="max-w-6xl mx-auto w-full z-10">
-        <Link href="/gallery" className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors mb-8 font-medium">
+        <Link
+          href="/gallery"
+          className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors mb-8 font-medium"
+        >
           <ChevronLeft className="w-4 h-4" /> Back to Galleries
         </Link>
-        
+
         <PageHeader title={event.title} />
-        
+
         <div className="flex justify-center mb-16">
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900/80 border border-zinc-800 text-zinc-300">
-            <Calendar className="w-4 h-4 text-[#08B74F]" />
-            <span className="text-sm font-medium">
-              {new Date(event.date).toLocaleDateString("en-US", { day: 'numeric', month: "long", year: "numeric" })}
-            </span>
-          </div>
+          <GalleryDatePill date={event.date} />
         </div>
 
         {images.length === 0 ? (
           <div className="text-center py-20 bg-zinc-900/30 border border-zinc-800 rounded-3xl backdrop-blur-sm">
-            <p className="text-zinc-400 text-lg">No photos have been added to this gallery yet.</p>
+            <p className="text-zinc-400 text-lg">
+              No photos have been added to this gallery yet.
+            </p>
           </div>
         ) : (
           <div className="flex flex-col gap-16 md:gap-24">
-            {images.map((img, index) => {
-              // Odd image on left -> index 0, 2, 4 (even logically)
-              // Even image on right -> index 1, 3, 5 (odd logically)
-              const isImageOnRight = index % 2 !== 0;
-
-              return (
-                <div 
-                  key={img.id} 
-                  className={`flex flex-col md:flex-row items-center gap-8 md:gap-14 ${
-                    isImageOnRight ? "md:flex-row-reverse" : ""
-                  }`}
-                >
-                  <div className="w-full md:w-1/2 group">
-                    <div className="w-full aspect-square md:aspect-video bg-zinc-900/40 relative overflow-hidden group rounded-3xl border border-zinc-800/50 shadow-2xl flex items-center justify-center">
-                      <Image 
-                        src={img.url} 
-                        alt={img.description || "Event Moment"} 
-                        fill
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                        className="object-contain group-hover:scale-105 transition-transform duration-700 ease-out p-1" 
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 pointer-events-none" />
-                    </div>
-                  </div>
-                  
-                  <div className="w-full md:w-1/2">
-                    <div className="bg-zinc-900/30 backdrop-blur-md p-8 md:p-10 rounded-3xl border border-zinc-800/60 shadow-xl max-w-lg mx-auto md:mx-0">
-                      <p className="text-lg md:text-xl text-zinc-300 leading-relaxed font-light">
-                        {img.description}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            {images.map((image, index) => (
+              <GalleryImageRow
+                key={image.id}
+                image={image}
+                isImageOnRight={index % 2 !== 0}
+              />
+            ))}
           </div>
         )}
       </div>

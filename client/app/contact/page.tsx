@@ -16,55 +16,31 @@ import {
 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 import { toast } from "sonner";
 import api from "@/lib/axios";
 import BackgroundBlur from "@/components/shared/BackgroundBlur";
 import PageHeader from "@/components/shared/PageHeader";
-
-const formSchema = z
-  .object({
-    name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-    email: z.string().email({ message: "Please enter a valid email address." }),
-    phone: z.string().refine((val) => !val || val.length >= 10, { message: "Please enter a valid phone number." }).optional(),
-    isNitSrinagar: z.string().min(1, { message: "Please select if you are from NIT Srinagar." }),
-    institute: z.string().optional(),
-    enrollment: z.string().optional(),
-    expertise: z
-      .string()
-      .min(2, { message: "Expertise must be at least 2 characters." }),
-  })
-  .superRefine((data, ctx) => {
-    if (data.isNitSrinagar === "yes") {
-      if (!data.enrollment || data.enrollment.trim().length < 2) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Enrollment number is required.",
-          path: ["enrollment"],
-        });
-      }
-    } else if (data.isNitSrinagar === "no") {
-      if (!data.institute || data.institute.trim().length < 2) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Institute name must be at least 2 characters.",
-          path: ["institute"],
-        });
-      }
-    }
-  });
-
-type FormData = z.infer<typeof formSchema>;
+import { getStaggeredMotionPresets } from "@/lib/motion";
+import {
+  contactFormSchema,
+  type ContactFormValues,
+} from "@/components/contact/formSchema";
 
 /**
  * ContactPage Component
- * 
- * A robust client-side form using `react-hook-form` and `zod` validation that allows 
- * users to apply to join the community. Captures user metadata depending on whether they are 
+ *
+ * A robust client-side form using `react-hook-form` and `zod` validation that allows
+ * users to apply to join the community. Captures user metadata depending on whether they are
  * from the host university or not. Handles submission explicitly via the backend `/api/contact` API.
  */
 export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { containerVariants, itemVariants } = getStaggeredMotionPresets({
+    childStagger: 0.1,
+    childDelay: 0.1,
+    itemOffsetY: 20,
+    itemDuration: 0.5,
+  });
 
   const {
     register,
@@ -72,8 +48,8 @@ export default function ContactPage() {
     reset,
     watch,
     formState: { errors },
-  } = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+  } = useForm<ContactFormValues>({
+    resolver: zodResolver(contactFormSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -87,7 +63,7 @@ export default function ContactPage() {
 
   const isNitSrinagarValue = watch("isNitSrinagar");
 
-  async function onSubmit(values: FormData) {
+  async function onSubmit(values: ContactFormValues) {
     setIsSubmitting(true);
     try {
       // Map conditionally rendered fields so backend receives appropriate defaults
@@ -118,23 +94,6 @@ export default function ContactPage() {
     }
   }
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1, delayChildren: 0.1 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5, ease: "easeOut" as const },
-    },
-  };
-
   const inputBaseClass =
     "w-full bg-zinc-900/50 border border-zinc-800 rounded-xl px-4 py-3 text-white placeholder:text-zinc-600 text-sm outline-none transition-all duration-300 focus:border-[#08B74F]/60 focus:ring-2 focus:ring-[#08B74F]/10 focus:bg-zinc-900";
 
@@ -163,7 +122,7 @@ export default function ContactPage() {
             title={
               <>
                 Get in{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#08B74F] to-emerald-400">
+                <span className="text-transparent bg-clip-text bg-linear-to-r from-[#08B74F] to-emerald-400">
                   Touch
                 </span>
               </>
@@ -177,9 +136,13 @@ export default function ContactPage() {
             Have a question, want to collaborate, or just want to say hi?
             We&apos;d love to hear from you.
             <div className="mt-6 p-4 rounded-xl bg-[#08B74F]/10 border border-[#08B74F]/20 text-sm">
-              <p className="font-semibold text-[#A7F3D0] mb-1">Building the FOSS Community</p>
+              <p className="font-semibold text-[#A7F3D0] mb-1">
+                Building the FOSS Community
+              </p>
               <p className="text-zinc-400 leading-relaxed">
-                Please note that our upcoming events and workshops will be exclusively available to registered FOSS Community members. Fill out the form below to join us!
+                Please note that our upcoming events and workshops will be
+                exclusively available to registered FOSS Community members. Fill
+                out the form below to join us!
               </p>
             </div>
             <p className="text-zinc-500 mt-6 text-sm max-w-[90%]">
@@ -218,7 +181,7 @@ export default function ContactPage() {
 
         {/* Right — Join Us Form */}
         <motion.div variants={itemVariants} className="relative">
-          <div className="absolute -inset-px rounded-2xl bg-gradient-to-b from-[#08B74F]/20 via-transparent to-[#08B74F]/5 pointer-events-none" />
+          <div className="absolute -inset-px rounded-2xl bg-linear-to-b from-[#08B74F]/20 via-transparent to-[#08B74F]/5 pointer-events-none" />
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="relative bg-zinc-950/60 backdrop-blur-md border border-zinc-800/80 rounded-2xl p-8 space-y-6"
@@ -284,7 +247,10 @@ export default function ContactPage() {
                 htmlFor="contact-phone"
                 className="text-sm font-medium text-zinc-300 mb-1.5 flex items-center gap-1.5"
               >
-                <Phone className="w-3.5 h-3.5 text-[#08B74F]" /> Phone Number <span className="text-zinc-500 font-normal ml-1">(Optional)</span>
+                <Phone className="w-3.5 h-3.5 text-[#08B74F]" /> Phone Number{" "}
+                <span className="text-zinc-500 font-normal ml-1">
+                  (Optional)
+                </span>
               </label>
               <input
                 id="contact-phone"
@@ -306,14 +272,17 @@ export default function ContactPage() {
                 htmlFor="contact-isnitsrinagar"
                 className="text-sm font-medium text-zinc-300 mb-1.5 flex items-center gap-1.5"
               >
-                <MapPin className="w-3.5 h-3.5 text-[#08B74F]" /> Are you from NIT Srinagar?
+                <MapPin className="w-3.5 h-3.5 text-[#08B74F]" /> Are you from
+                NIT Srinagar?
               </label>
               <select
                 id="contact-isnitsrinagar"
                 className={`${inputBaseClass} appearance-none cursor-pointer`}
                 {...register("isNitSrinagar")}
               >
-                <option value="" disabled>Select an option</option>
+                <option value="" disabled>
+                  Select an option
+                </option>
                 <option value="yes">Yes</option>
                 <option value="no">No</option>
               </select>
@@ -337,7 +306,8 @@ export default function ContactPage() {
                   htmlFor="contact-institute"
                   className="text-sm font-medium text-zinc-300 mb-1.5 flex items-center gap-1.5"
                 >
-                  <MapPin className="w-3.5 h-3.5 text-[#08B74F]" /> Institute Name
+                  <MapPin className="w-3.5 h-3.5 text-[#08B74F]" /> Institute
+                  Name
                 </label>
                 <input
                   id="contact-institute"
@@ -367,7 +337,8 @@ export default function ContactPage() {
                   htmlFor="contact-enrollment"
                   className="text-sm font-medium text-zinc-300 mb-1.5 flex items-center gap-1.5"
                 >
-                  <FileText className="w-3.5 h-3.5 text-[#08B74F]" /> Enrollment Number
+                  <FileText className="w-3.5 h-3.5 text-[#08B74F]" /> Enrollment
+                  Number
                 </label>
                 <input
                   id="contact-enrollment"
@@ -411,7 +382,7 @@ export default function ContactPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#08B74F] to-emerald-500 hover:from-[#07a346] hover:to-emerald-400 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-[#08B74F]/15 hover:shadow-[#08B74F]/25"
+              className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-[#08B74F] to-emerald-500 hover:from-[#07a346] hover:to-emerald-400 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-[#08B74F]/15 hover:shadow-[#08B74F]/25"
             >
               {isSubmitting ? (
                 <>
@@ -427,7 +398,7 @@ export default function ContactPage() {
             </button>
           </form>
         </motion.div>
-      </motion.div >
-    </div >
+      </motion.div>
+    </div>
   );
 }
