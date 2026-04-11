@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Github, Linkedin, GraduationCap, X, Crown } from "lucide-react";
 import { ensureUrl } from "@/lib/utils";
 import Image from "next/image";
+import type { ReactNode } from "react";
 import {
   Dialog,
   DialogClose,
@@ -35,12 +36,15 @@ export default function TeamMemberCard({
   itemVariants,
   priority,
 }: TeamMemberCardProps) {
+  const avatarSrc =
+    member.imageUrl ||
+    `https://api.dicebear.com/9.x/pixel-art/svg?seed=${member.name}`;
+  const firstName = member.name.split(" ")[0];
   const isAlumni =
     !!member.company ||
     member.role.toLowerCase().includes("alumni") ||
     member.role.toLowerCase().includes("former");
   const colorTheme = isAlumni ? "yellow-500" : "[#08B74F]";
-  const bgTheme = isAlumni ? "bg-yellow-500" : "bg-[#08B74F]";
   const textTheme = isAlumni ? "text-yellow-500" : "text-[#08B74F]";
   const shadowTheme = isAlumni ? "rgba(234,179,8,0.1)" : "rgba(8,183,79,0.1)";
   const codeLines = [
@@ -51,6 +55,59 @@ export default function TeamMemberCard({
       : 'const mode = "build";',
     isAlumni ? "git checkout legacy && yarn story" : "npm run innovate",
   ];
+  const socialLinks = [
+    member.githubUrl && {
+      href: ensureUrl(member.githubUrl),
+      title: "GitHub profile",
+      className: "text-zinc-400 hover:text-white hover:bg-zinc-800",
+      icon: <Github className="w-5 h-5" />,
+    },
+    member.linkedinUrl && {
+      href: ensureUrl(member.linkedinUrl),
+      title: "LinkedIn profile",
+      className: "text-zinc-400 hover:text-[#0A66C2] hover:bg-zinc-800",
+      icon: <Linkedin className="w-5 h-5" />,
+    },
+    member.twitterUrl && {
+      href: ensureUrl(member.twitterUrl),
+      title: "X profile",
+      className: "text-zinc-400 hover:text-sky-500 hover:bg-zinc-800",
+      icon: (
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M18.244 2.25H21.552L14.325 10.51L22.827 21.75H16.17L10.956 14.933L4.99 21.75H1.68L9.41 12.915L1.254 2.25H8.08L12.793 8.481L18.244 2.25ZM17.083 19.774H18.916L7.084 4.126H5.117L17.083 19.774Z"
+            fill="currentColor"
+          />
+        </svg>
+      ),
+    },
+  ].filter(Boolean) as Array<{
+    href: string;
+    title: string;
+    className: string;
+    icon: ReactNode;
+  }>;
+
+  const renderSocialLinks = (buttonClassName: string) =>
+    socialLinks.map((social) => (
+      <a
+        key={social.title}
+        href={social.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={social.title}
+        title={social.title}
+        className={`${buttonClassName} ${social.className}`}
+      >
+        {social.icon}
+      </a>
+    ));
 
   return (
     <motion.div
@@ -69,10 +126,7 @@ export default function TeamMemberCard({
         />
         <div className="w-44 h-44 rounded-full bg-zinc-800 p-2 mb-6 relative z-10 group-hover:scale-105 transition-transform duration-300">
           <Image
-            src={
-              member.imageUrl ||
-              `https://api.dicebear.com/7.x/avataaars/svg?seed=${member.name}`
-            }
+            src={avatarSrc}
             alt={member.name}
             width={352}
             height={352}
@@ -95,46 +149,8 @@ export default function TeamMemberCard({
           </p>
         )}
         <div className="flex gap-4 relative z-10">
-          {member.githubUrl && (
-            <a
-              href={ensureUrl(member.githubUrl)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-10 h-10 rounded-full bg-zinc-950 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
-            >
-              <Github className="w-5 h-5" />
-            </a>
-          )}
-          {member.linkedinUrl && (
-            <a
-              href={ensureUrl(member.linkedinUrl)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-10 h-10 rounded-full bg-zinc-950 flex items-center justify-center text-zinc-400 hover:text-[#0A66C2] hover:bg-zinc-800 transition-colors"
-            >
-              <Linkedin className="w-5 h-5" />
-            </a>
-          )}
-          {member.twitterUrl && (
-            <a
-              href={ensureUrl(member.twitterUrl)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-10 h-10 rounded-full bg-zinc-950 flex items-center justify-center text-zinc-400 hover:text-sky-500 hover:bg-zinc-800 transition-colors"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M18.244 2.25H21.552L14.325 10.51L22.827 21.75H16.17L10.956 14.933L4.99 21.75H1.68L9.41 12.915L1.254 2.25H8.08L12.793 8.481L18.244 2.25ZM17.083 19.774H18.916L7.084 4.126H5.117L17.083 19.774Z"
-                  fill="currentColor"
-                />
-              </svg>
-            </a>
+          {renderSocialLinks(
+            "w-10 h-10 rounded-full bg-zinc-950 flex items-center justify-center transition-colors",
           )}
         </div>
       </div>
@@ -144,19 +160,14 @@ export default function TeamMemberCard({
         <Dialog>
           <DialogTrigger asChild>
             <div className="flex flex-col items-center gap-2 cursor-pointer w-full group relative">
-              <div
-                className={`w-full aspect-square rounded-2xl bg-zinc-800 p-0.75 relative  ring-0 transition-all `}
-              >
+              <div className="w-full aspect-square rounded-2xl bg-zinc-800 p-0.75 relative ring-0 transition-all">
                 {member.role === "Team Lead" && (
                   <div className="absolute -top-4 -left-4 w-10 h-10 bg-yellow-500 rounded-full border-[3px] border-zinc-950 flex items-center justify-center z-30 -rotate-45 shadow-lg">
                     <Crown className="w-5 h-5 text-zinc-950 fill-zinc-950" />
                   </div>
                 )}
                 <Image
-                  src={
-                    member.imageUrl ||
-                    `https://api.dicebear.com/7.x/avataaars/svg?seed=${member.name}`
-                  }
+                  src={avatarSrc}
                   alt={member.name}
                   fill
                   sizes="25vw"
@@ -171,7 +182,7 @@ export default function TeamMemberCard({
                 )}
               </div>
               <p className="text-zinc-200 text-xs sm:text-sm font-semibold text-center truncate w-full group-hover:text-white transition-colors">
-                {member.name.split(" ")[0]}
+                {firstName}
               </p>
             </div>
           </DialogTrigger>
@@ -268,10 +279,7 @@ export default function TeamMemberCard({
                   />
                   <div className="relative h-28 w-28 overflow-hidden rounded-full border border-white/10 bg-zinc-950 shadow-[0_0_45px_rgba(0,0,0,0.45)]">
                     <Image
-                      src={
-                        member.imageUrl ||
-                        `https://api.dicebear.com/7.x/avataaars/svg?seed=${member.name}`
-                      }
+                      src={avatarSrc}
                       alt={member.name}
                       width={256}
                       height={256}
@@ -380,46 +388,8 @@ export default function TeamMemberCard({
                 </div>
 
                 <div className="mt-5 flex items-center justify-center gap-4">
-                  {member.githubUrl && (
-                    <a
-                      href={ensureUrl(member.githubUrl)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-12 h-12 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
-                    >
-                      <Github className="w-6 h-6" />
-                    </a>
-                  )}
-                  {member.linkedinUrl && (
-                    <a
-                      href={ensureUrl(member.linkedinUrl)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-12 h-12 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-400 hover:text-[#0A66C2] hover:bg-zinc-800 transition-colors"
-                    >
-                      <Linkedin className="w-6 h-6" />
-                    </a>
-                  )}
-                  {member.twitterUrl && (
-                    <a
-                      href={ensureUrl(member.twitterUrl)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-12 h-12 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-400 hover:text-sky-500 hover:bg-zinc-800 transition-colors"
-                    >
-                      <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M18.244 2.25H21.552L14.325 10.51L22.827 21.75H16.17L10.956 14.933L4.99 21.75H1.68L9.41 12.915L1.254 2.25H8.08L12.793 8.481L18.244 2.25ZM17.083 19.774H18.916L7.084 4.126H5.117L17.083 19.774Z"
-                          fill="currentColor"
-                        />
-                      </svg>
-                    </a>
+                  {renderSocialLinks(
+                    "w-12 h-12 rounded-full bg-zinc-900 flex items-center justify-center transition-colors",
                   )}
                 </div>
               </div>
