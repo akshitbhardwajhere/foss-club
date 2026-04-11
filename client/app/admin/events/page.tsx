@@ -73,7 +73,12 @@ export default function EventsAdminPage() {
   const fetchEvents = async () => {
     try {
       const res = await api.get("/api/events");
-      setEvents(res.data);
+      const sortedEvents = [...res.data].sort(
+        (firstEvent, secondEvent) =>
+          new Date(firstEvent.date).getTime() -
+          new Date(secondEvent.date).getTime(),
+      );
+      setEvents(sortedEvents);
     } catch (error) {
       // Error handled silently
     } finally {

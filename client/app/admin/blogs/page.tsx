@@ -32,7 +32,12 @@ export default function BlogsAdminPage() {
   const fetchBlogs = async () => {
     try {
       const res = await api.get("/api/blogs");
-      setBlogs(res.data);
+      const sortedBlogs = [...res.data].sort(
+        (firstBlog, secondBlog) =>
+          new Date(firstBlog.createdAt).getTime() -
+          new Date(secondBlog.createdAt).getTime(),
+      );
+      setBlogs(sortedBlogs);
     } catch (error) {
       // Error handled silently
       toast.error("Failed to fetch blogs from server");
