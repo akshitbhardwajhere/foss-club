@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { toast } from "sonner";
 import api from "@/lib/axios";
 import RegistrationsHeader from "@/components/admin/events/registrations/RegistrationsHeader";
 import RegistrationsTable from "@/components/admin/events/registrations/RegistrationsTable";
@@ -38,14 +39,17 @@ export default function RegistrationsDashboard() {
     exportRegistrationsCsv(eventTitle, registrations);
   };
 
-  const emailAllRegistrants = () => {
-    const recipients = Array.from(
+  const getRecipientEmails = () =>
+    Array.from(
       new Set(
         registrations
           .map((registrant) => registrant.email.trim())
           .filter((email) => email.length > 0),
       ),
     );
+
+  const emailAllRegistrants = () => {
+    const recipients = getRecipientEmails();
 
     if (recipients.length === 0) {
       return;
@@ -66,6 +70,22 @@ export default function RegistrationsDashboard() {
     window.open(gmailComposeUrl.toString(), "_blank", "noopener,noreferrer");
   };
 
+  const copyAllEmails = async () => {
+    const recipients = getRecipientEmails();
+
+    if (recipients.length === 0) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(recipients.join(", "));
+      toast.success("All emails copied to clipboard.");
+    } catch (error) {
+      console.error("Failed to copy emails", error);
+      toast.error("Failed to copy emails. Please try again.");
+    }
+  };
+
   const filteredRegs = registrations.filter(
     (r) =>
       r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -83,6 +103,7 @@ export default function RegistrationsDashboard() {
         onBack={() => router.back()}
         onExportCsv={downloadCSV}
         onEmailAll={emailAllRegistrants}
+        onCopyAllEmails={copyAllEmails}
         canEmailAll={registrations.length > 0}
       />
 

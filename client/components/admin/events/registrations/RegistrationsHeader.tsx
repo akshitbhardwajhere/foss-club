@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Download, Mail, Search, Users } from "lucide-react";
+import { ArrowLeft, Copy, Download, Mail, Search, Users } from "lucide-react";
 
 interface RegistrationsHeaderProps {
   eventTitle: string;
@@ -10,6 +10,7 @@ interface RegistrationsHeaderProps {
   onBack: () => void;
   onExportCsv: () => void;
   onEmailAll: () => void;
+  onCopyAllEmails: () => void;
   canEmailAll: boolean;
 }
 
@@ -21,6 +22,7 @@ export default function RegistrationsHeader({
   onBack,
   onExportCsv,
   onEmailAll,
+  onCopyAllEmails,
   canEmailAll,
 }: RegistrationsHeaderProps) {
   return (
@@ -64,6 +66,13 @@ export default function RegistrationsHeader({
             className="flex items-center gap-2 px-4 h-10 rounded-lg bg-[#111e16] text-white hover:bg-[#16261b] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium border border-[#1b3123] whitespace-nowrap"
           >
             <Mail className="w-4 h-4" /> Email All
+          </button>
+          <button
+            onClick={onCopyAllEmails}
+            disabled={!canEmailAll}
+            className="flex items-center gap-2 px-4 h-10 rounded-lg bg-[#111e16] text-white hover:bg-[#16261b] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium border border-[#1b3123] whitespace-nowrap"
+          >
+            <Copy className="w-4 h-4" /> Copy Emails
           </button>
           <button
             onClick={onExportCsv}
