@@ -38,6 +38,34 @@ export default function RegistrationsDashboard() {
     exportRegistrationsCsv(eventTitle, registrations);
   };
 
+  const emailAllRegistrants = () => {
+    const recipients = Array.from(
+      new Set(
+        registrations
+          .map((registrant) => registrant.email.trim())
+          .filter((email) => email.length > 0),
+      ),
+    );
+
+    if (recipients.length === 0) {
+      return;
+    }
+
+    const gmailComposeUrl = new URL("https://mail.google.com/mail/");
+    gmailComposeUrl.searchParams.set("view", "cm");
+    gmailComposeUrl.searchParams.set("fs", "1");
+    gmailComposeUrl.searchParams.set("tf", "cm");
+    gmailComposeUrl.searchParams.set("to", recipients.join(","));
+    gmailComposeUrl.searchParams.set(
+      "su",
+      eventTitle
+        ? `About ${eventTitle} registrations`
+        : "About event registrations",
+    );
+
+    window.open(gmailComposeUrl.toString(), "_blank", "noopener,noreferrer");
+  };
+
   const filteredRegs = registrations.filter(
     (r) =>
       r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -54,6 +82,8 @@ export default function RegistrationsDashboard() {
         onSearchChange={setSearchQuery}
         onBack={() => router.back()}
         onExportCsv={downloadCSV}
+        onEmailAll={emailAllRegistrants}
+        canEmailAll={registrations.length > 0}
       />
 
       <RegistrationsTable

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Download, Search, Users } from "lucide-react";
+import { ArrowLeft, Download, Mail, Search, Users } from "lucide-react";
 
 interface RegistrationsHeaderProps {
   eventTitle: string;
@@ -9,6 +9,8 @@ interface RegistrationsHeaderProps {
   onSearchChange: (value: string) => void;
   onBack: () => void;
   onExportCsv: () => void;
+  onEmailAll: () => void;
+  canEmailAll: boolean;
 }
 
 export default function RegistrationsHeader({
@@ -18,6 +20,8 @@ export default function RegistrationsHeader({
   onSearchChange,
   onBack,
   onExportCsv,
+  onEmailAll,
+  canEmailAll,
 }: RegistrationsHeaderProps) {
   return (
     <div className="mb-8">
@@ -54,6 +58,13 @@ export default function RegistrationsHeader({
               className="w-full bg-[#111e16] border border-[#1b3123] h-10 pl-9 pr-4 rounded-lg text-white text-sm focus:outline-none focus:border-[#08B74F]/50 focus:ring-1 focus:ring-[#08B74F]/50 transition-all"
             />
           </div>
+          <button
+            onClick={onEmailAll}
+            disabled={!canEmailAll}
+            className="flex items-center gap-2 px-4 h-10 rounded-lg bg-[#111e16] text-white hover:bg-[#16261b] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium border border-[#1b3123] whitespace-nowrap"
+          >
+            <Mail className="w-4 h-4" /> Email All
+          </button>
           <button
             onClick={onExportCsv}
             disabled={totalRegistrations === 0}
