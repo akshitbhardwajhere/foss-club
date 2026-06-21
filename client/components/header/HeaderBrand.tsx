@@ -6,7 +6,7 @@ import Image from "next/image";
 export default function HeaderBrand() {
   return (
     <Link href="/" className="flex items-center gap-3 group z-10 shrink-0">
-      <div className="w-10 h-10 rounded-full bg-[#08B74F]/10 border border-[#08B74F]/20 flex items-center justify-center text-[#08B74F] group-hover:scale-110 transition-transform duration-300 overflow-hidden">
+      <div className="w-10 h-10 rounded-full  flex items-center justify-center  group-hover:scale-110 transition-transform duration-300 overflow-hidden">
         <Image
           src="/icon.png"
           alt="FOSS Logo"
@@ -15,9 +15,15 @@ export default function HeaderBrand() {
           className="object-cover"
         />
       </div>
-      <span className="text-xl font-bold tracking-tight text-white group-hover:text-[#08B74F] transition-colors duration-300">
-        FOSS <span className="text-zinc-500 font-medium">NIT Srinagar</span>
-      </span>
+      <div className="flex gap-3 text-xl font-bold tracking-widest text-white group-hover:text-[#08B74F] transition-colors duration-300">
+        <div className="flex items-center justify-center w-fit">
+          <p>FOSS</p>
+        </div>
+        <div className="flex flex-col -space-y-2 border-l-2 border-zinc-300 px-2">
+          <p className="text-zinc-500">NIT</p>
+          <p className="text-zinc-500">SRINAGAR</p>
+        </div>
+      </div>
     </Link>
   );
 }
