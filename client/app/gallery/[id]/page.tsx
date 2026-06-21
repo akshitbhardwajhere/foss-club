@@ -8,7 +8,7 @@ import { Loader2, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
 import GalleryDatePill from "@/components/gallery/detail/GalleryDatePill";
-import GalleryImageRow from "@/components/gallery/detail/GalleryImageRow";
+import GalleryMasonryGrid from "@/components/gallery/detail/GalleryMasonryGrid";
 import type {
   GalleryEvent,
   GalleryImageItem,
@@ -18,7 +18,7 @@ import type {
  * EventGalleryDetails Component
  *
  * Dynamically loads and presents all high-resolution photos associated with a specific completed event.
- * Arranges images in an alternating zigzag pattern (image left, image right) with their respective descriptions.
+ * Arranges images in a responsive CSS-columns masonry layout with a lightbox on click.
  */
 export default function EventGalleryDetails() {
   const params = useParams();
@@ -85,15 +85,7 @@ export default function EventGalleryDetails() {
             </p>
           </div>
         ) : (
-          <div className="flex flex-col gap-16 md:gap-24">
-            {images.map((image, index) => (
-              <GalleryImageRow
-                key={image.id}
-                image={image}
-                isImageOnRight={index % 2 !== 0}
-              />
-            ))}
-          </div>
+          <GalleryMasonryGrid images={images} />
         )}
       </div>
     </div>
