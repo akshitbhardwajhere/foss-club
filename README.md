@@ -4,8 +4,8 @@ Official monorepo for the FOSS Club NIT Srinagar platform.
 
 This codebase contains:
 
-- A Next.js frontend for the public website and admin UI.
-- An Express + Prisma backend API for content management, authentication, registrations, and integrations.
+- A Next.js frontend for the public website.
+- An Express + Prisma backend API for content management, registrations, and integrations.
 
 ## What This App Includes
 
@@ -18,17 +18,6 @@ This codebase contains:
 - Team and alumni pages.
 - Gallery listing and event-wise gallery detail pages.
 - About and contact/community request pages.
-
-### Admin experience
-
-- Admin authentication (JWT cookie-based session).
-- Dashboard statistics.
-- Event CRUD and registration management.
-- Blog CRUD.
-- Team CRUD + drag-and-drop reordering.
-- Alumni status updates.
-- Gallery image management.
-- Query/community request moderation.
 
 ### Integrations
 
@@ -48,7 +37,6 @@ This codebase contains:
 - Framer Motion
 - Redux Toolkit + React Redux
 - React Hook Form + Zod
-- dnd-kit
 - Radix UI primitives + shadcn-style components
 - Tiptap editor
 
@@ -58,7 +46,6 @@ This codebase contains:
 - TypeScript
 - Prisma ORM
 - PostgreSQL
-- JWT + bcryptjs authentication
 - Multer for document upload handling
 - apicache response caching middleware
 
@@ -75,14 +62,14 @@ The repository uses a two-app monorepo architecture:
 2. Client calls backend via Axios (`NEXT_PUBLIC_API_URL`).
 3. Express routes dispatch to domain controllers.
 4. Controllers use Prisma and external integrations.
-5. Response is sent as JSON (public routes are cache-aware; admin routes are protected).
+5. Response is sent as JSON (public routes are cache-aware).
 
 ### Backend layers
 
 - `server/src/index.ts`: app bootstrap, CORS, compression, route mounts, health endpoint.
 - `server/src/routes`: endpoint grouping by domain.
 - `server/src/controllers`: business logic and response handling.
-- `server/src/middleware`: auth guard and cache policies.
+- `server/src/middleware`: cache policies.
 - `server/src/config`: Prisma, DB connection, Google auth setup.
 - `server/src/utils`: Cloudinary and mail helpers.
 - `server/prisma/schema.prisma`: authoritative data model.
@@ -90,7 +77,7 @@ The repository uses a two-app monorepo architecture:
 ### Frontend layers
 
 - `client/app`: App Router pages/layouts.
-- `client/components`: shared/admin/ui/cards/skeleton components.
+- `client/components`: shared/ui/cards/skeleton components.
 - `client/lib`: Axios client, Redux store/slices, validators/helpers.
 - `client/data`: app data (navigation and constants).
 
@@ -100,14 +87,12 @@ The repository uses a two-app monorepo architecture:
 foss-club/
 ├── client/
 │   ├── app/
-│   │   ├── admin/                  # Admin route tree
 │   │   ├── events/                 # Events + registration pages
 │   │   ├── blogs/                  # Blog listing + detail pages
 │   │   ├── gallery/                # Gallery listing + event gallery pages
 │   │   ├── team/ about/ contact/ alumni/
 │   │   └── layout.tsx              # Root app layout
 │   ├── components/
-│   │   ├── admin/
 │   │   ├── cards/
 │   │   ├── shared/
 │   │   ├── skeletons/
@@ -134,8 +119,6 @@ foss-club/
 
 ## Frontend Route Map
 
-### Public routes
-
 - `/`
 - `/about`
 - `/events`
@@ -149,19 +132,6 @@ foss-club/
 - `/alumni`
 - `/contact`
 
-### Admin routes
-
-- `/admin`
-- `/admin/login`
-- `/admin/dashboard`
-- `/admin/events`
-- `/admin/events/registrations/[eventId]`
-- `/admin/blogs`
-- `/admin/team`
-- `/admin/alumni`
-- `/admin/gallery`
-- `/admin/queries`
-
 ## API Surface
 
 All routes are mounted in `server/src/index.ts`.
@@ -171,87 +141,44 @@ All routes are mounted in `server/src/index.ts`.
 - `GET /health` - Server + database health check.
 - `GET /` - Basic API service status text.
 
-### Admin auth (`/api/admin`)
-
-- `POST /api/admin/login`
-- `POST /api/admin/logout` (protected)
-- `GET /api/admin/me` (protected)
-
-### Dashboard stats (`/api/admin/stats`)
-
-- `GET /api/admin/stats/` (protected)
-
 ### Events (`/api/events`)
 
 - `GET /api/events/`
-- `POST /api/events/` (protected)
 - `GET /api/events/next`
 - `GET /api/events/:id`
-- `PUT /api/events/:id` (protected)
-- `DELETE /api/events/:id` (protected)
 - `GET /api/events/:id/document`
 
 ### Blogs (`/api/blogs`)
 
 - `GET /api/blogs/`
-- `POST /api/blogs/` (protected)
 - `GET /api/blogs/:id`
-- `PUT /api/blogs/:id` (protected)
-- `DELETE /api/blogs/:id` (protected)
 
 ### Team (`/api/team`)
 
 - `GET /api/team/`
-- `POST /api/team/` (protected)
-- `PUT /api/team/reorder` (protected)
 - `GET /api/team/:id`
-- `PUT /api/team/:id` (protected)
-- `DELETE /api/team/:id` (protected)
 
 ### Alumni (`/api/alumni`)
 
 - `GET /api/alumni/`
-- `PUT /api/alumni/:id/status` (protected)
 
 ### Registration (`/api/registration`)
 
-- `POST /api/registration/config` (protected)
-- `GET /api/registration/list/:eventId` (protected)
-- `PATCH /api/registration/stop/:eventId` (protected)
 - `GET /api/registration/config/:eventId`
 - `POST /api/registration/submit`
 
 ### Contact/community (`/api/contact`)
 
 - `POST /api/contact/`
-- `POST /api/contact/approve` (protected)
-
-### Google Sheets sync (`/api/sheet`)
-
-- `GET /api/sheet/`
-- `POST /api/sheet/`
-- `POST /api/sheet/init`
-- `PUT /api/sheet/:rowIndex`
-- `DELETE /api/sheet/:rowIndex`
 
 ### Gallery (`/api/gallery`)
 
 - `GET /api/gallery/:eventId`
-- `POST /api/gallery/:eventId` (protected)
-- `PUT /api/gallery/:id` (protected)
-- `DELETE /api/gallery/:id` (protected)
-
-### Uploads (`/api/upload`)
-
-- `POST /api/upload/document` (protected, PDF upload)
-- `DELETE /api/upload/remove` (protected)
-- `DELETE /api/upload/remove-document` (protected)
 
 ## Data Model (Prisma)
 
 Core models defined in `server/prisma/schema.prisma`:
 
-- `Admin`
 - `Event`
 - `EventGalleryImage`
 - `Blog`
@@ -268,7 +195,6 @@ No committed `.env.example` files were found in this repository. Create these ma
 Required/expected variables:
 
 - `DATABASE_URL` (used by Prisma/PostgreSQL)
-- `JWT_SECRET` (required at startup)
 - `PORT` (optional, default `5000`)
 - `NODE_ENV` (`development` or `production`)
 - `CLIENT_URL` (CORS allowlist + email links)
@@ -279,7 +205,6 @@ Required/expected variables:
 - `MAILJET_API_KEY`
 - `MAILJET_API_SECRET`
 - `MAILJET_FROM_EMAIL`
-- `ADMIN_EMAIL` (fallback exists but should be set)
 - `GOOGLE_SHEET_ID`
 - `GOOGLE_CLIENT_EMAIL`
 - `GOOGLE_PRIVATE_KEY` (supports escaped newline format)
@@ -360,7 +285,6 @@ Frontend runs on `http://localhost:3000`.
 
 - API CORS allowlist includes local origins and production domains configured in server bootstrap.
 - Public GET endpoints use cache middleware where applicable.
-- Admin authentication uses HttpOnly cookie `jwt`.
 - Workflow `.github/workflows/cron.yml` pings the deployed Render backend on a schedule.
 
 ## Contributing
