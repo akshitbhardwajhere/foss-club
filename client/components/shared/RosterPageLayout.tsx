@@ -7,12 +7,12 @@ import BackgroundBlur from "@/components/shared/BackgroundBlur";
 import PageHeader from "@/components/shared/PageHeader";
 
 interface RosterPageLayoutProps {
-  badge: ReactNode;
-  title: ReactNode;
-  description: string;
-  containerVariants: Variants;
-  itemVariants: Variants;
-  children: ReactNode;
+  badge?: ReactNode;
+  title?: ReactNode;
+  description?: string;
+  containerVariants?: Variants;
+  itemVariants?: Variants;
+  children?: ReactNode;
 }
 
 export default function RosterPageLayout({
@@ -41,7 +41,7 @@ export default function RosterPageLayout({
 
         <motion.p
           variants={itemVariants}
-          className="text-zinc-400 text-lg max-w-2xl mb-16"
+          className="text-zinc-400 text-lg max-w-2xl"
         >
           {description}
         </motion.p>
