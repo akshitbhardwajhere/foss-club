@@ -20,6 +20,7 @@ import Link from "next/link";
 function Header() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,7 +36,9 @@ function Header() {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
+        mobileMenuOpen
+          ? "bg-[#050B08] border-b border-zinc-800/50 py-3"
+          : scrolled
           ? "bg-[#050B08]/80 backdrop-blur-lg border-b border-zinc-800/50 shadow-lg py-3"
           : "bg-transparent border-transparent py-5"
       }`}
@@ -55,7 +58,7 @@ function Header() {
             </Link>
           </div>
 
-          <HeaderMobileMenu />
+          <HeaderMobileMenu open={mobileMenuOpen} onOpenChange={setMobileMenuOpen} />
         </div>
       </div>
     </header>
