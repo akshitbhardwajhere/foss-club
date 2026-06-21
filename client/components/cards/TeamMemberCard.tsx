@@ -10,7 +10,8 @@ export default function TeamMemberCard({
   member,
   itemVariants,
   priority,
-}: TeamMemberCardProps) {
+  showDesktopCard = true,
+}: TeamMemberCardProps & { showDesktopCard?: boolean }) {
   const avatarSrc =
     member.imageUrl ||
     `https://api.dicebear.com/9.x/pixel-art/svg?seed=${member.name}`;
@@ -59,16 +60,18 @@ export default function TeamMemberCard({
       viewport={{ once: true }}
       className="w-full flex justify-center"
     >
-      <TeamMemberDesktopCard
-        member={member}
-        avatarSrc={avatarSrc}
-        priority={priority}
-        isAlumni={isAlumni}
-        colorTheme={colorTheme}
-        textTheme={textTheme}
-        shadowTheme={shadowTheme}
-        socialLinks={socialLinks}
-      />
+      {showDesktopCard && (
+        <TeamMemberDesktopCard
+          member={member}
+          avatarSrc={avatarSrc}
+          priority={priority}
+          isAlumni={isAlumni}
+          colorTheme={colorTheme}
+          textTheme={textTheme}
+          shadowTheme={shadowTheme}
+          socialLinks={socialLinks}
+        />
+      )}
 
       <TeamMemberMobileCard
         member={member}
@@ -79,6 +82,7 @@ export default function TeamMemberCard({
         textTheme={textTheme}
         codeLines={codeLines}
         socialLinks={socialLinks}
+        className={showDesktopCard ? undefined : "flex"}
       />
     </motion.div>
   );

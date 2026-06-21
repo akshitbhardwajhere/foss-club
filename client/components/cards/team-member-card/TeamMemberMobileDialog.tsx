@@ -32,7 +32,7 @@ export default function TeamMemberMobileDialog({
   return (
     <DialogContent
       showCloseButton={false}
-      className="sm:hidden bg-[#050B08] border border-zinc-800 text-white w-[92vw] max-w-95 rounded-[2rem] p-0 overflow-hidden shadow-2xl shadow-black/80"
+      className="bg-[#050B08] border border-zinc-800 text-white w-[88vw] max-w-72 rounded-[1.35rem] p-0 overflow-hidden shadow-2xl shadow-black/80"
     >
       <DialogTitle className="sr-only">
         Detailed Profile of {member.name}
@@ -82,8 +82,8 @@ export default function TeamMemberMobileDialog({
           </DialogClose>
         </div>
 
-        <div className="relative z-10 px-5 pt-4 pb-5">
-          <div className="relative mx-auto mb-4 flex h-36 w-36 items-center justify-center">
+        <div className="relative z-10 px-4 pt-4 pb-4 sm:px-4 sm:pt-4 sm:pb-4">
+          <div className="relative mx-auto mb-3.5 flex h-28 w-28 items-center justify-center sm:h-32 sm:w-32">
             <motion.div
               className={`absolute inset-0 rounded-full border border-dashed ${isAlumni ? "border-yellow-500/40" : "border-[#08B74F]/40"}`}
               animate={{ rotate: 360 }}
@@ -117,7 +117,7 @@ export default function TeamMemberMobileDialog({
                 delay: 0.25,
               }}
             />
-            <div className="relative h-28 w-28 overflow-hidden rounded-full border border-white/10 bg-zinc-950 shadow-[0_0_45px_rgba(0,0,0,0.45)]">
+            <div className="relative h-20 w-20 overflow-hidden rounded-full border border-white/10 bg-zinc-950 shadow-[0_0_45px_rgba(0,0,0,0.45)] sm:h-24 sm:w-24">
               <Image
                 src={avatarSrc}
                 alt={member.name}
@@ -128,7 +128,7 @@ export default function TeamMemberMobileDialog({
             </div>
           </div>
 
-          <h3 className="text-2xl font-bold text-center text-white">
+          <h3 className="text-lg font-bold text-center text-white sm:text-xl">
             {member.name}
           </h3>
           <p
@@ -142,7 +142,7 @@ export default function TeamMemberMobileDialog({
             </p>
           )}
 
-          <div className="mt-5 rounded-[1.5rem] border border-zinc-800 bg-zinc-950/85 p-4 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+          <div className="mt-3.5 rounded-[1.25rem] border border-zinc-800 bg-zinc-950/85 p-3 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] sm:mt-4 sm:p-3.5">
             <div className="mb-3 flex items-center justify-between text-[10px] uppercase tracking-[0.34em] text-zinc-500">
               <span>terminal</span>
               <span className={isAlumni ? "text-yellow-500" : "text-[#08B74F]"}>
@@ -150,7 +150,7 @@ export default function TeamMemberMobileDialog({
               </span>
             </div>
 
-            <div className="space-y-2 font-mono text-[12px] leading-5 text-zinc-300">
+            <div className="space-y-2 font-mono text-[10px] leading-5 text-zinc-300 sm:text-[11px]">
               {codeLines.map((line, index) => (
                 <motion.div
                   key={line}
@@ -199,7 +199,7 @@ export default function TeamMemberMobileDialog({
             </div>
           </div>
 
-          <div className="mt-4 grid grid-cols-3 gap-2">
+          <div className="mt-3.5 grid grid-cols-3 gap-2 sm:mt-4">
             {["compile", "sync", "ship"].map((label) => (
               <div
                 key={label}
@@ -210,11 +210,11 @@ export default function TeamMemberMobileDialog({
             ))}
           </div>
 
-          <div className="mt-5 flex items-center justify-center gap-4">
+          <div className="mt-3.5 flex items-center justify-center gap-3 sm:mt-4 sm:gap-4">
             <MemberSocialLinks
               links={socialLinks}
-              iconSize={24}
-              buttonClassName="w-12 h-12 rounded-full bg-zinc-900 flex items-center justify-center transition-colors"
+              iconSize={20}
+              buttonClassName="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center transition-colors"
             />
           </div>
         </div>

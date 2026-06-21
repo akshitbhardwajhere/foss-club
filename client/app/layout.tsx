@@ -16,11 +16,22 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "FOSS Club | NIT Srinagar",
-  description: "The premier Free and Open Source Software (FOSS) community at National Institute of Technology Srinagar. Join us in building the open-source future.",
-  keywords: ["FOSS", "NIT Srinagar", "Open Source", "Programming", "Coding", "Hackathons", "Tech Community", "Software Engineering"],
+  description:
+    "The premier Free and Open Source Software (FOSS) community at National Institute of Technology Srinagar. Join us in building the open-source future.",
+  keywords: [
+    "FOSS",
+    "NIT Srinagar",
+    "Open Source",
+    "Programming",
+    "Coding",
+    "Hackathons",
+    "Tech Community",
+    "Software Engineering",
+  ],
   openGraph: {
     title: "FOSS Club | NIT Srinagar",
-    description: "The premier Free and Open Source Software (FOSS) community at National Institute of Technology Srinagar.",
+    description:
+      "The premier Free and Open Source Software (FOSS) community at National Institute of Technology Srinagar.",
     siteName: "FOSS NIT Srinagar",
     locale: "en_US",
     type: "website",
@@ -28,13 +39,14 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "FOSS Club | NIT Srinagar",
-    description: "The premier Free and Open Source Software (FOSS) community at National Institute of Technology Srinagar.",
+    description:
+      "The premier Free and Open Source Software (FOSS) community at National Institute of Technology Srinagar.",
   },
 };
 
 /**
  * RootLayout (Server Component)
- * 
+ *
  * The absolute root of the Next.js application bridging the `<html>` and `<body>` tags.
  * Sets up global metadata (SEO/OpenGraph), integrates global CSS, loads local Geist fonts,
  * and initializes the dark mode theme. Wraps everything in the client-side `ProvidersAndLayout`.
@@ -51,9 +63,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#050B08] text-white overflow-x-hidden`}
       >
-        <ProvidersAndLayout>
-          {children}
-        </ProvidersAndLayout>
+        <ProvidersAndLayout>{children}</ProvidersAndLayout>
         <Toaster />
       </body>
     </html>
