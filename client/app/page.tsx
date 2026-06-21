@@ -2,160 +2,192 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, Code2, Terminal, Globe } from "lucide-react";
+import { ArrowRight, Globe } from "lucide-react";
 import BackgroundBlur from "@/components/shared/BackgroundBlur";
 import NextEventCountdown from "@/components/NextEventCountdown";
+import HeroTerminal from "@/components/home/HeroTerminal";
+import StatsSection from "@/components/home/StatsSection";
+import DomainsSection from "@/components/home/DomainsSection";
+import UpcomingEventsSection from "@/components/home/UpcomingEventsSection";
+import AboutSection from "@/components/home/AboutSection";
+import RoadmapsSection from "@/components/home/RoadmapsSection";
+import CommunitySection from "@/components/home/CommunitySection";
+import FAQSection from "@/components/home/FAQSection";
+import FinalCTASection from "@/components/home/FinalCTASection";
 import { getStaggeredMotionPresets } from "@/lib/motion";
 
 /**
- * Home Page Component
+ * Home Page
  *
- * The primary landing page for the FOSS club website (`/`).
- * Features a dynamic hero section, a sticky event countdown widget,
- * and a "bento box" style grid highlighting the club's core offerings.
+ * Redesigned multi-section landing page for FOSS Club NIT Srinagar.
+ * Sections: Hero → Stats → Domains → Events → About → Projects → Roadmaps
+ *         → Testimonials → Community → FAQ → Final CTA
  */
 export default function Home() {
   const { containerVariants, itemVariants } = getStaggeredMotionPresets({
-    childStagger: 0.2,
-    childDelay: 0.3,
-    itemOffsetY: 30,
+    childStagger: 0.18,
+    childDelay: 0.2,
+    itemOffsetY: 28,
     itemDuration: 0.6,
   });
 
   return (
     <div className="bg-[#050B08] text-white min-h-screen flex flex-col items-center font-sans selection:bg-[#08B74F]/30 selection:text-white relative overflow-hidden w-full max-w-[100vw]">
-      {/* Dynamic Background Blurs */}
       <BackgroundBlur />
 
-      {/* Hero Section */}
+      {/* ─── HERO ──────────────────────────────────────────────────── */}
       <motion.section
-        className="flex flex-col items-center justify-center min-h-svh pt-28 pb-16 md:pt-32 md:pb-24 lg:pt-32 lg:pb-32 px-4 max-w-7xl z-10 w-full overflow-hidden"
+        className="flex flex-col items-center justify-center min-h-svh pt-28 pb-16 md:pt-32 md:pb-20 px-4 max-w-7xl z-10 w-full relative"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
+        {/* Badge */}
         <motion.div
           variants={itemVariants}
-          className="mb-8 flex flex-col sm:flex-row items-center text-center gap-2 sm:gap-3 px-4 sm:px-5 py-2 sm:py-2.5 rounded-3xl sm:rounded-full border border-[#08B74F]/20 bg-[#08B74F]/5 text-[#08B74F] text-xs sm:text-sm font-semibold tracking-wide backdrop-blur-md shadow-[0_0_20px_rgba(8,183,79,0.1)] hover:bg-[#08B74F]/10 transition-colors cursor-default"
+          className="mb-8 flex items-center gap-2 px-4 py-2 rounded-full border border-[#08B74F]/20 bg-[#08B74F]/5 text-[#08B74F] text-xs sm:text-sm font-semibold tracking-wide backdrop-blur-md"
         >
-          <div className="flex items-center gap-2">
-            <Globe className="w-4 h-4 shrink-0" />
-            <span>The Premier FOSS Community</span>
-          </div>
-          <span className="hidden sm:inline">at NIT Srinagar</span>
-          <span className="sm:hidden text-[10px] opacity-80">
-            at NIT Srinagar
-          </span>
+          <Globe className="w-4 h-4 shrink-0" />
+          <span>The Premier FOSS Community at NIT Srinagar</span>
         </motion.div>
 
-        <NextEventCountdown />
+        {/* Event Countdown */}
+        <motion.div
+          variants={itemVariants}
+          className="w-full max-w-lg mb-12 min-[945px]:absolute min-[945px]:top-36 min-[945px]:right-8 lg:right-16 xl:right-24 min-[945px]:max-w-[240px] min-[945px]:mb-0 z-20"
+        >
+          <NextEventCountdown />
+        </motion.div>
 
+        {/* Headline */}
         <motion.h1
           variants={itemVariants}
-          className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-black text-center tracking-tighter leading-none mb-8 relative"
+          className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black text-center tracking-tighter leading-none mb-6"
         >
-          Innovate.
+          Build.
           <br />
-          Collaborate.
+          Contribute.
           <br />
-          <span className="text-transparent bg-clip-text bg-linear-to-r from-[#08B74F] via-emerald-400 to-[#08B74F] bg-size-[200%_auto] animate-gradient">
-            Open Source.
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#08B74F] via-emerald-400 to-[#08B74F] bg-[length:200%_auto] animate-gradient">
+            Collaborate.
           </span>
         </motion.h1>
 
+        {/* Subheadline */}
         <motion.p
           variants={itemVariants}
-          className="text-zinc-400 text-lg md:text-2xl text-center max-w-3xl mb-12 font-medium leading-relaxed"
+          className="text-zinc-400 text-lg md:text-xl text-center max-w-2xl mb-10 leading-relaxed"
         >
-          Join the Free and Open Source Software (FOSS) Club at NIT Srinagar. We
-          build, share, and learn together. Elevate your development journey
-          alongside passionate engineers.
+          Join the developers building open source at NIT Srinagar.
+          Workshops, hackathons, real projects — all open, all free.
         </motion.p>
 
+        {/* CTAs */}
         <motion.div
           variants={itemVariants}
-          className="flex flex-col sm:flex-row gap-5 w-full sm:w-auto"
+          className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mb-14"
         >
           <Link
-            href="/events"
-            className="group inline-flex items-center justify-center gap-3 bg-[#08B74F] hover:bg-[#08B74F]/90 text-[#050B08] px-10 py-5 rounded-full font-bold text-lg transition-all duration-300 shadow-[0_0_40px_rgba(8,183,79,0.3)] hover:shadow-[0_0_60px_rgba(8,183,79,0.5)] hover:-translate-y-1"
+            href="/contact"
+            className="group inline-flex items-center justify-center gap-2 bg-[#08B74F] hover:bg-[#08B74F]/90 text-black px-8 py-4 rounded-full font-bold text-base transition-all duration-300 shadow-[0_0_40px_rgba(8,183,79,0.3)] hover:shadow-[0_0_60px_rgba(8,183,79,0.5)] hover:-translate-y-0.5"
           >
-            Explore Events{" "}
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            Join the Community
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
           <Link
-            href="/blogs"
-            className="group inline-flex items-center justify-center gap-3 bg-zinc-900/50 backdrop-blur-md border border-zinc-800 hover:border-zinc-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all duration-300 hover:bg-zinc-800/80 hover:-translate-y-1"
+            href="/events"
+            className="group inline-flex items-center justify-center gap-2 bg-zinc-900/50 backdrop-blur-md border border-zinc-800 hover:border-zinc-700 text-white px-8 py-4 rounded-full font-bold text-base transition-all duration-300 hover:bg-zinc-800/80 hover:-translate-y-0.5"
           >
-            Read Our Blog
+            Explore Events
           </Link>
+        </motion.div>
+
+
+        {/* Hero Terminal */}
+        <motion.div variants={itemVariants} className="w-full mt-12">
+          <HeroTerminal />
         </motion.div>
       </motion.section>
 
-      {/* Feature Showcase Grid - Bento Box Style */}
-      <motion.section
-        className="w-full max-w-7xl px-4 sm:px-6 py-24 z-10 border-t border-zinc-900/50"
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.8 }}
-      >
-        <div className="mb-16 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight">
-            Why Join <span className="text-[#08B74F]">FOSS</span>?
-          </h2>
-          <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
-            Discover the benefits of contributing to the open-source ecosystem
-            while leveling up your personal skillset.
-          </p>
-        </div>
+      {/* Divider */}
+      <div className="w-full max-w-7xl px-4 sm:px-6">
+        <div className="h-px bg-gradient-to-r from-transparent via-zinc-800/60 to-transparent" />
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-[1fr]">
-          {[
-            {
-              title: "Open Source Projects",
-              desc: "Contribute to real-world, scalable projects and rapidly grow your GitHub portfolio with impactful commits.",
-              icon: <Code2 className="w-8 h-8 text-[#08B74F]" />,
-              colSpan: "lg:col-span-2 md:col-span-2",
-            },
-            {
-              title: "Hackathons",
-              desc: "Participate in coding competitions.",
-              icon: <Globe className="w-8 h-8 text-[#08B74F]" />,
-              colSpan: "col-span-1",
-            },
-            {
-              title: "Technical Workshops",
-              desc: "Attend hands-on masterclasses covering Linux, Git, Web Development, DevOps, and more. Learn directly from industry veterans and core team members.",
-              icon: <Terminal className="w-8 h-8 text-[#08B74F]" />,
-              colSpan: "col-span-1",
-            },
-            {
-              title: "Networking",
-              desc: "Connect with like-minded developers.",
-              icon: <ArrowRight className="w-8 h-8 text-[#08B74F]" />,
-              colSpan: "lg:col-span-2 md:col-span-1",
-            },
-          ].map((feature, i) => (
-            <div
-              key={i}
-              className={`z-[-1] bg-zinc-900/40 backdrop-blur-sm border border-zinc-800/50 p-10 rounded-[2rem] hover:border-[#08B74F]/40 transition-all duration-500 group flex flex-col justify-between hover:bg-zinc-900/60 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(8,183,79,0.1)] ${feature.colSpan}`}
-            >
-              <div>
-                <div className="w-16 h-16 rounded-2xl bg-[#08B74F]/10 border border-[#08B74F]/20 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:bg-[#08B74F]/20 transition-all duration-300 shadow-[inset_0_0_20px_rgba(8,183,79,0.05)]">
-                  {feature.icon}
-                </div>
-                <h3 className="text-2xl font-bold mb-4 tracking-tight group-hover:text-white text-zinc-100 transition-colors">
-                  {feature.title}
-                </h3>
-                <p className="text-zinc-400 font-medium leading-relaxed">
-                  {feature.desc}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </motion.section>
+      {/* ─── STATS ─────────────────────────────────────────────────── */}
+      <StatsSection />
+
+      {/* Divider */}
+      <div className="w-full max-w-7xl px-4 sm:px-6">
+        <div className="h-px bg-gradient-to-r from-transparent via-zinc-800/60 to-transparent" />
+      </div>
+
+      {/* ─── DOMAINS ───────────────────────────────────────────────── */}
+      <DomainsSection />
+
+      {/* Divider */}
+      <div className="w-full max-w-7xl px-4 sm:px-6">
+        <div className="h-px bg-gradient-to-r from-transparent via-zinc-800/60 to-transparent" />
+      </div>
+
+      {/* ─── UPCOMING EVENTS ───────────────────────────────────────── */}
+      <UpcomingEventsSection />
+
+      {/* Divider */}
+      <div className="w-full max-w-7xl px-4 sm:px-6">
+        <div className="h-px bg-gradient-to-r from-transparent via-zinc-800/60 to-transparent" />
+      </div>
+
+      {/* ─── ABOUT ─────────────────────────────────────────────────── */}
+      <AboutSection />
+
+      {/* Divider */}
+      <div className="w-full max-w-7xl px-4 sm:px-6">
+        <div className="h-px bg-gradient-to-r from-transparent via-zinc-800/60 to-transparent" />
+      </div>
+
+      {/* ─── FEATURED PROJECTS ─────────────────────────────────────── */}
+      {/* <FeaturedProjectsSection /> */}
+
+      {/* Divider */}
+      <div className="w-full max-w-7xl px-4 sm:px-6">
+        <div className="h-px bg-gradient-to-r from-transparent via-zinc-800/60 to-transparent" />
+      </div>
+
+      {/* ─── LEARNING ROADMAPS ─────────────────────────────────────── */}
+      <RoadmapsSection />
+
+      {/* Divider */}
+      <div className="w-full max-w-7xl px-4 sm:px-6">
+        <div className="h-px bg-gradient-to-r from-transparent via-zinc-800/60 to-transparent" />
+      </div>
+
+      {/* ─── TESTIMONIALS ──────────────────────────────────────────── */}
+      {/* <TestimonialsSection /> */}
+
+      {/* Divider */}
+      <div className="w-full max-w-7xl px-4 sm:px-6">
+        <div className="h-px bg-gradient-to-r from-transparent via-zinc-800/60 to-transparent" />
+      </div>
+
+      {/* ─── COMMUNITY ─────────────────────────────────────────────── */}
+      <CommunitySection />
+
+      {/* Divider */}
+      <div className="w-full max-w-7xl px-4 sm:px-6">
+        <div className="h-px bg-gradient-to-r from-transparent via-zinc-800/60 to-transparent" />
+      </div>
+
+      {/* ─── FAQ ───────────────────────────────────────────────────── */}
+      <FAQSection />
+
+      {/* Divider */}
+      <div className="w-full max-w-7xl px-4 sm:px-6">
+        <div className="h-px bg-gradient-to-r from-transparent via-zinc-800/60 to-transparent" />
+      </div>
+
+      {/* ─── FINAL CTA ─────────────────────────────────────────────── */}
+      <FinalCTASection />
     </div>
   );
 }
