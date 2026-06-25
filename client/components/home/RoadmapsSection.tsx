@@ -33,34 +33,34 @@ const ROADMAPS = [
       "Deploy to Vercel / VPS with CI/CD",
     ],
   },
-  {
-    title: "Cybersecurity",
-    emoji: "🔐",
-    color: "border-red-500/40 hover:border-red-500/60",
-    badge: "bg-red-500/10 text-red-400 border-red-500/20",
-    cta: "/blogs",
-    steps: [
-      "Linux terminal & networking basics",
-      "Web vulnerabilities (OWASP Top 10)",
-      "CTF challenges (PicoCTF, HackTheBox)",
-      "Burp Suite, Nmap, Metasploit",
-      "Write & publish CTF write-ups",
-    ],
-  },
-  {
-    title: "AI / Machine Learning",
-    emoji: "🧠",
-    color: "border-purple-500/40 hover:border-purple-500/60",
-    badge: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-    cta: "/blogs",
-    steps: [
-      "Python & NumPy/Pandas basics",
-      "Classical ML with scikit-learn",
-      "Neural networks with PyTorch",
-      "HuggingFace & fine-tuning LLMs",
-      "Deploy a model with FastAPI + Docker",
-    ],
-  },
+  // {
+  //   title: "Cybersecurity",
+  //   emoji: "🔐",
+  //   color: "border-red-500/40 hover:border-red-500/60",
+  //   badge: "bg-red-500/10 text-red-400 border-red-500/20",
+  //   cta: "/blogs",
+  //   steps: [
+  //     "Linux terminal & networking basics",
+  //     "Web vulnerabilities (OWASP Top 10)",
+  //     "CTF challenges (PicoCTF, HackTheBox)",
+  //     "Burp Suite, Nmap, Metasploit",
+  //     "Write & publish CTF write-ups",
+  //   ],
+  // },
+  // {
+  //   title: "AI / Machine Learning",
+  //   emoji: "🧠",
+  //   color: "border-purple-500/40 hover:border-purple-500/60",
+  //   badge: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+  //   cta: "/blogs",
+  //   steps: [
+  //     "Python & NumPy/Pandas basics",
+  //     "Classical ML with scikit-learn",
+  //     "Neural networks with PyTorch",
+  //     "HuggingFace & fine-tuning LLMs",
+  //     "Deploy a model with FastAPI + Docker",
+  //   ],
+  // },
 ];
 
 export default function RoadmapsSection() {
