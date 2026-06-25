@@ -10,7 +10,7 @@ const ROADMAPS = [
     emoji: "🌐",
     color: "border-[#08B74F]/40 hover:border-[#08B74F]/60",
     badge: "bg-[#08B74F]/10 text-[#08B74F] border-[#08B74F]/20",
-    cta: "/blogs",
+    cta: "/blogs/c93b8e98-24ee-4623-af97-4c35ee9a863c",
     steps: [
       "Understand Git & GitHub basics",
       "Fork & clone a repository",
