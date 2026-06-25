@@ -29,6 +29,14 @@ export const getEvents = async (req: Request, res: Response) => {
             validUntil: true,
           },
         },
+        speakers: {
+          select: {
+            id: true,
+            name: true,
+            role: true,
+            imageUrl: true,
+          },
+        },
       },
       orderBy: { createdAt: "desc" },
     });

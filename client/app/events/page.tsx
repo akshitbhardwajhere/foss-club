@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ArrowUpDown, Calendar, MapPin } from "lucide-react";
-import Link from "next/link";
+import { ArrowUpDown, Calendar, Search, Sparkles, Clock, MapPin, ArrowRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 import api from "@/lib/axios";
 import BackgroundBlur from "@/components/shared/BackgroundBlur";
-import { slugify } from "@/lib/utils";
 import PageHeader from "@/components/shared/PageHeader";
 import {
   DropdownMenu,
@@ -16,6 +16,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import PaginationControls from "@/components/shared/PaginationControls";
+import { getStaggeredMotionPresets } from "@/lib/motion";
+import { Skeleton } from "@/components/ui/skeleton";
+import { slugify } from "@/lib/utils";
+
+interface Speaker {
+  id: string;
+  name: string;
+  role: string;
+  imageUrl?: string | null;
+}
 
 interface Event {
   id: string;
@@ -24,33 +34,72 @@ interface Event {
   date: string;
   location: string;
   imageUrl?: string;
+  category?: string;
   registrationConfig?: any;
   isDateTentative?: boolean;
+  speakers?: Speaker[];
 }
 
-import { Skeleton } from "@/components/ui/skeleton";
+const ITEMS_PER_PAGE = 6;
 
-/**
- * EventsPage Component
- *
- * The primary public-facing events directory for the FOSS club.
- * Fetches event data asynchronously from the backend (`/api/events`) and renders them in a styled table format.
- * Includes client-side capabilities for comprehensive filtering (All, Live, Upcoming, Completed), sorting by date,
- * text-based searching (title/location), and pagination.
- */
+function SpeakerAvatarStack({ speakers = [] }: { speakers: Speaker[] }) {
+  if (!speakers || speakers.length === 0) return null;
+
+  return (
+    <div className="flex items-center -space-x-1.5 shrink-0">
+      {speakers.slice(0, 3).map((speaker) => {
+        const initials = speaker.name
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .slice(0, 2)
+          .toUpperCase();
+
+        return (
+          <div
+            key={speaker.id}
+            title={`${speaker.name} - ${speaker.role}`}
+            className="relative w-6 h-6 rounded-full border border-zinc-950 bg-zinc-900 flex items-center justify-center text-[8px] font-bold text-zinc-350 shrink-0"
+          >
+            {speaker.imageUrl ? (
+              <Image
+                src={speaker.imageUrl}
+                alt={speaker.name}
+                fill
+                sizes="24px"
+                className="rounded-full object-cover"
+              />
+            ) : (
+              <span>{initials}</span>
+            )}
+          </div>
+        );
+      })}
+      {speakers.length > 3 && (
+        <div className="w-6 h-6 rounded-full border border-zinc-950 bg-zinc-900 flex items-center justify-center text-[7px] font-bold text-zinc-500 shrink-0">
+          +{speakers.length - 3}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<
-    "all" | "live" | "upcoming" | "completed"
-  >("all");
+  const [filter, setFilter] = useState<"all" | "live" | "upcoming" | "completed">("all");
   const [monthSort, setMonthSort] = useState<"asc" | "desc">("asc");
+  const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+
+  const { containerVariants, itemVariants } = getStaggeredMotionPresets({
+    childStagger: 0.04,
+    itemOffsetY: 12,
+  });
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [filter, monthSort]);
+  }, [filter, monthSort, searchQuery]);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -58,7 +107,7 @@ export default function EventsPage() {
         const res = await api.get("/api/events");
         setEvents(res.data);
       } catch (err) {
-        // Error silently logged in production
+        // Error silently handled
       } finally {
         setLoading(false);
       }
@@ -69,7 +118,14 @@ export default function EventsPage() {
   const sortedFilteredEvents = useMemo(() => {
     const now = new Date();
 
-    const filteredEvents = events.filter((evt) => {
+    const filtered = events.filter((evt) => {
+      const matchesSearch =
+        evt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        evt.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (evt.category && evt.category.toLowerCase().includes(searchQuery.toLowerCase()));
+
+      if (!matchesSearch) return false;
+
       const eventDate = new Date(evt.date);
       const isLive = now.toDateString() === eventDate.toDateString();
       const isActuallyPast = eventDate < now && !isLive;
@@ -80,149 +136,216 @@ export default function EventsPage() {
       return true;
     });
 
-    return filteredEvents.sort((a, b) => {
+    return filtered.sort((a, b) => {
       const dateA = new Date(a.date).getTime();
       const dateB = new Date(b.date).getTime();
-
       return monthSort === "asc" ? dateA - dateB : dateB - dateA;
     });
-  }, [events, filter, monthSort]);
+  }, [events, filter, monthSort, searchQuery]);
 
   const totalPages = useMemo(
-    () => Math.ceil(sortedFilteredEvents.length / itemsPerPage),
-    [sortedFilteredEvents.length],
+    () => Math.max(1, Math.ceil(sortedFilteredEvents.length / ITEMS_PER_PAGE)),
+    [sortedFilteredEvents.length]
   );
 
   const paginatedEvents = useMemo(
     () =>
       sortedFilteredEvents.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage,
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
       ),
-    [sortedFilteredEvents, currentPage],
+    [sortedFilteredEvents, currentPage]
   );
 
-  const emptyFilterLabel = filter === "all" ? "" : ` ${filter}`;
+  const sortLabel = monthSort === "asc" ? "Oldest First" : "Newest First";
 
   return (
     <div className="bg-[#050B08] text-white min-h-screen flex flex-col items-center overflow-x-hidden relative w-full pt-32 pb-20 px-4 font-sans selection:bg-[#08B74F]/30 selection:text-white">
-      {/* Dynamic Background Blurs */}
       <BackgroundBlur />
 
-      <div className="max-w-6xl mx-auto w-full z-10">
+      {/* Floating high-end ambient glow spheres */}
+      <motion.div
+        animate={{
+          x: [0, 60, -30, 0],
+          y: [0, 40, -20, 0],
+          scale: [1, 1.08, 0.96, 1],
+        }}
+        transition={{
+          duration: 25,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        className="absolute top-10 left-10 w-[550px] h-[550px] rounded-full bg-[#08B74F]/3 blur-[120px] pointer-events-none"
+      />
+      <motion.div
+        animate={{
+          x: [0, -50, 40, 0],
+          y: [0, 50, -30, 0],
+          scale: [1, 1.05, 0.95, 1],
+        }}
+        transition={{
+          duration: 30,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        className="absolute bottom-1/4 right-10 w-[500px] h-[500px] rounded-full bg-[#03B77F]/2.5 blur-[130px] pointer-events-none"
+      />
+
+      <motion.div
+        className="max-w-6xl mx-auto w-full z-10"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {/* Top Tag Badge */}
+        <motion.div
+          variants={itemVariants}
+          className="mb-4 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#08B74F]/30 bg-[#08B74F]/5 text-[#08B74F] text-xs font-semibold mx-auto w-fit"
+        >
+          <Calendar className="w-3.5 h-3.5" />
+          Club Schedule
+        </motion.div>
+
+        {/* Header Title */}
         <PageHeader
           title={
-            filter === "completed"
-              ? "Past Events"
-              : filter === "live"
-                ? "Live Events"
-                : filter === "upcoming"
-                  ? "Upcoming Events"
-                  : "All Events"
+            <>
+              Club{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#08B74F] to-emerald-400">
+                Events
+              </span>
+            </>
           }
         />
 
-        <div className="flex flex-col md:flex-row justify-end items-center gap-4 mb-8">
-          <div className="flex justify-center flex-wrap gap-2 w-full md:w-auto">
-            <button
-              onClick={() => setFilter("all")}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${filter === "all" ? "bg-[#08B74F] text-black" : "bg-zinc-800/50 text-zinc-400 hover:text-white hover:bg-zinc-700"}`}
-            >
-              All
-            </button>
-            <button
-              onClick={() => setFilter("live")}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${filter === "live" ? "bg-[#08B74F] text-black" : "bg-zinc-800/50 text-zinc-400 hover:text-white hover:bg-zinc-700"}`}
-            >
-              Live
-            </button>
-            <button
-              onClick={() => setFilter("upcoming")}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${filter === "upcoming" ? "bg-[#08B74F] text-black" : "bg-zinc-800/50 text-zinc-400 hover:text-white hover:bg-zinc-700"}`}
-            >
-              Upcoming
-            </button>
-            <button
-              onClick={() => setFilter("completed")}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${filter === "completed" ? "bg-[#08B74F] text-black" : "bg-zinc-800/50 text-zinc-400 hover:text-white hover:bg-zinc-700"}`}
-            >
-              Completed
-            </button>
+        {/* Subtitle Description */}
+        <motion.p
+          variants={itemVariants}
+          className="text-zinc-400 text-center text-sm md:text-base max-w-xl mx-auto mb-10 leading-relaxed"
+        >
+          Milestones, workshops, and coding challenges hosted by FOSS Club NIT Srinagar.
+        </motion.p>
+
+        {/* Match Count Badge */}
+        {!loading && sortedFilteredEvents.length > 0 && (
+          <motion.div
+            variants={itemVariants}
+            className="flex flex-wrap justify-center gap-3 mb-10"
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900/50 border border-zinc-800 text-xs">
+              <Clock className="w-3.5 h-3.5 text-[#08B74F]" />
+              <span className="text-zinc-450">
+                <span className="text-white font-bold">{sortedFilteredEvents.length}</span>{" "}
+                {sortedFilteredEvents.length === 1 ? "event matches" : "events matches"}
+              </span>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Search & Sort Panel */}
+        <motion.div
+          variants={itemVariants}
+          className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 mb-8 pb-6 border-b border-zinc-900"
+        >
+          <div className="flex flex-wrap items-center gap-1.5 w-full md:w-auto">
+            {(["all", "live", "upcoming", "completed"] as const).map((t) => (
+              <button
+                key={t}
+                onClick={() => setFilter(t)}
+                className={`px-4 py-2 rounded-full text-xs font-semibold capitalize tracking-wide transition-all ${
+                  filter === t
+                    ? "bg-[#08B74F] text-black font-bold"
+                    : "bg-zinc-900/50 hover:bg-zinc-900 text-zinc-400 hover:text-zinc-200"
+                }`}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <div className="relative w-full md:w-60">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+              <input
+                type="text"
+                placeholder="Search events..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-3 py-2 rounded-full bg-zinc-900/40 border border-zinc-800 text-zinc-250 text-xs focus:outline-none focus:border-zinc-700 transition-all placeholder:text-zinc-500"
+              />
+            </div>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
                   aria-label="Sort events"
-                  className="px-4 py-2 rounded-full bg-zinc-800/50 border border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-700 transition-colors flex items-center justify-center gap-2 text-sm font-medium ml-auto md:ml-4"
+                  className="px-4 py-2.5 rounded-full bg-zinc-900/50 border border-zinc-700 text-zinc-350 hover:text-white hover:border-[#08B74F]/40 transition-colors flex items-center justify-center gap-2 text-xs font-semibold"
                 >
-                  <ArrowUpDown className="w-4 h-4" />
-                  Sort
+                  <ArrowUpDown className="w-3.5 h-3.5 text-[#08B74F]" />
+                  {sortLabel}
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
-                className="bg-zinc-900 border-zinc-800 text-zinc-200"
+                className="bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xl"
               >
                 <DropdownMenuRadioGroup
                   value={monthSort}
-                  onValueChange={(value) =>
-                    setMonthSort(value as "asc" | "desc")
-                  }
+                  onValueChange={(value) => setMonthSort(value as "asc" | "desc")}
                 >
-                  <DropdownMenuRadioItem value="asc">
+                  <DropdownMenuRadioItem value="asc" className="text-xs font-semibold py-2">
                     Date: Oldest First
                   </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="desc">
+                  <DropdownMenuRadioItem value="desc" className="text-xs font-semibold py-2">
                     Date: Newest First
                   </DropdownMenuRadioItem>
                 </DropdownMenuRadioGroup>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-        </div>
+        </motion.div>
 
+        {/* Content Listing (Table View) */}
         {loading ? (
-          <div className="flex flex-col gap-4">
+          <div className="space-y-4">
             {[1, 2, 3, 4, 5].map((i) => (
               <div
                 key={i}
-                className="flex items-center gap-4 bg-zinc-900/40 p-4 lg:p-6 rounded-2xl border border-zinc-800"
+                className="h-16 w-full rounded-2xl bg-zinc-900/20 border border-zinc-900 flex items-center justify-between px-6"
               >
-                <Skeleton className="h-12 w-12 rounded bg-zinc-800 hidden md:block" />
-                <div className="flex-1 space-y-3">
-                  <Skeleton className="h-5 w-1/3 bg-zinc-800" />
-                  <Skeleton className="h-4 w-1/2 bg-zinc-800" />
-                </div>
-                <div className="w-32 hidden lg:block">
-                  <Skeleton className="h-4 w-full bg-zinc-800" />
-                </div>
-                <div className="w-32 hidden md:block">
-                  <Skeleton className="h-4 w-full bg-zinc-800" />
-                </div>
-                <div className="w-24">
-                  <Skeleton className="h-8 w-full rounded-full bg-zinc-800" />
-                </div>
+                <Skeleton className="h-4 w-24 bg-zinc-900" />
+                <Skeleton className="h-4 w-48 bg-zinc-900" />
+                <Skeleton className="h-6 w-20 rounded-full bg-zinc-900" />
               </div>
             ))}
           </div>
-        ) : paginatedEvents.length === 0 ? (
-          <p className="text-zinc-400 text-center py-12">
-            No{emptyFilterLabel} events found.
-          </p>
+        ) : sortedFilteredEvents.length === 0 ? (
+          <motion.div
+            variants={itemVariants}
+            className="text-center py-20 px-6 rounded-3xl border border-zinc-800/60 bg-zinc-900/30 max-w-sm mx-auto"
+          >
+            <Sparkles className="w-10 h-10 text-zinc-700 mx-auto mb-4" />
+            <p className="text-zinc-300 text-sm font-medium mb-1">
+              No events found
+            </p>
+            <p className="text-zinc-500 text-xs">
+              Try adjusting your search or sort filters.
+            </p>
+          </motion.div>
         ) : (
-          <div className="bg-zinc-900/30 border border-zinc-800 rounded-2xl overflow-hidden backdrop-blur-sm shadow-xl">
-            {/* Table Header */}
-            <div className="hidden lg:grid grid-cols-12 gap-4 px-8 py-5 bg-zinc-900 border-b border-zinc-800 text-xs font-bold text-zinc-400 uppercase tracking-wider">
-              <div className="col-span-1">No.</div>
-              <div className="col-span-4 lg:col-span-5">EVENT NAME</div>
-              <div className="col-span-3 lg:col-span-2">LOCATION</div>
-              <div className="col-span-2">DATE & TIME</div>
-              <div className="col-span-2 text-right">ACTION</div>
+          <div className="rounded-3xl border border-zinc-900 bg-zinc-950/40 backdrop-blur-md overflow-hidden">
+            {/* Table Header Row (Desktop only) */}
+            <div className="hidden md:flex items-center justify-between py-4 px-6 border-b border-zinc-900/80 text-[10px] font-bold text-zinc-500 uppercase tracking-widest bg-black/10">
+              <div className="w-[15%]">Date</div>
+              <div className="w-[12%]">Status</div>
+              <div className="w-[50%]">Event</div>
+              <div className="w-[13%]">Venue</div>
+              <div className="w-[10%] text-right">Link</div>
             </div>
 
-            {/* Table Body */}
-            <div className="divide-y divide-zinc-800/50">
-              {paginatedEvents.map((evt, i) => {
+            {/* Table Rows */}
+            <div className="divide-y divide-zinc-900/80">
+              {paginatedEvents.map((evt) => {
                 const now = new Date();
                 const eventDate = new Date(evt.date);
                 const isLive = now.toDateString() === eventDate.toDateString();
@@ -233,133 +356,145 @@ export default function EventsPage() {
                   new Date(evt.registrationConfig.validUntil) > new Date() &&
                   !isActuallyPast;
 
+                const eventSlug = `${slugify(evt.title)}-${evt.id}`;
+
+                const formattedDate = evt.isDateTentative
+                  ? `${
+                      [
+                        "Jan",
+                        "Feb",
+                        "Mar",
+                        "Apr",
+                        "May",
+                        "Jun",
+                        "Jul",
+                        "Aug",
+                        "Sep",
+                        "Oct",
+                        "Nov",
+                        "Dec",
+                      ][new Date(evt.date).getMonth()]
+                    } ${new Date(evt.date).getFullYear()}`
+                  : new Date(evt.date).toLocaleDateString("en-GB", {
+                      day: "numeric",
+                      month: "short",
+                    });
+
+                const formattedYear = new Date(evt.date).getFullYear();
+
                 return (
-                  <div
+                  <motion.div
                     key={evt.id}
-                    className="grid grid-cols-1 lg:grid-cols-12 gap-4 px-6 lg:px-8 py-5 items-center hover:bg-zinc-800/30 transition-colors group"
+                    variants={itemVariants}
+                    className="group relative flex flex-col md:flex-row md:items-center justify-between py-5 px-6 hover:bg-zinc-900/10 transition-all duration-300 gap-4"
                   >
-                    <div className="hidden lg:block col-span-1 text-zinc-500 font-medium text-sm">
-                      {(currentPage - 1) * itemsPerPage + i + 1}
-                    </div>
+                    {/* Linear Left Hover Glow */}
+                    <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-[#08B74F] opacity-0 group-hover:opacity-100 transition-opacity" />
 
-                    <div className="col-span-1 lg:col-span-5 flex items-start gap-4">
-                      {evt.imageUrl && (
-                        <div className="w-14 h-14 bg-zinc-800 rounded-lg overflow-hidden shrink-0 relative hidden md:block border border-zinc-700/50">
-                          <Image
-                            src={evt.imageUrl}
-                            alt=""
-                            fill
-                            sizes="56px"
-                            className="object-cover group-hover:scale-110 transition-transform duration-500"
-                          />
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <Link
-                          href={`/events/${slugify(evt.title)}-${evt.id}`}
-                          className="flex flex-col items-start gap-1.5 mt-0.5 mb-1"
-                        >
-                          <h3 className="font-bold text-white text-lg group-hover:text-[#08B74F] transition-colors truncate max-w-full">
-                            {evt.title}
-                          </h3>
-                          {isLive ? (
-                            <span className="text-[10px] uppercase tracking-wide font-bold px-2 py-0.5 rounded-md bg-red-500/10 text-red-400 border border-red-500/20">
-                              Live
-                            </span>
-                          ) : isActuallyPast ? (
-                            <span className="text-[10px] uppercase tracking-wide font-bold px-2 py-0.5 rounded-md bg-zinc-800 text-zinc-400 border border-zinc-700">
-                              Completed
-                            </span>
-                          ) : (
-                            <span className="text-[10px] uppercase tracking-wide font-bold px-2 py-0.5 rounded-md bg-[#08B74F]/10 text-[#08B74F] border border-[#08B74F]/20">
-                              Upcoming
-                            </span>
-                          )}
-                        </Link>
+                    {/* Columns */}
 
-                        {/* Mobile only location & date */}
-                        <div className="flex flex-wrap items-center gap-3 mt-2 lg:hidden">
-                          <div className="flex items-center gap-1.5 text-xs text-zinc-400">
-                            <MapPin className="w-3.5 h-3.5 text-[#08B74F]" />
-                            <span className="truncate max-w-37.5">
-                              {evt.location}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1.5 text-xs text-zinc-400">
-                            <Calendar className="w-3.5 h-3.5 text-[#08B74F]" />
-                            <span>
-                              {evt.isDateTentative
-                                ? new Date(evt.date).toLocaleDateString(
-                                    "en-GB",
-                                    { month: "short", year: "numeric" },
-                                  )
-                                : new Date(evt.date).toLocaleDateString(
-                                    "en-GB",
-                                    {
-                                      day: "numeric",
-                                      month: "short",
-                                      year: "numeric",
-                                    },
-                                  )}
-                            </span>
-                          </div>
-                          {isLive && (
-                            <span className="text-[10px] font-bold text-red-400 uppercase tracking-wide">
-                              Live
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="hidden lg:flex col-span-2 text-sm text-zinc-400 items-center gap-2">
-                      <MapPin className="w-4 h-4 text-zinc-600 shrink-0" />
-                      <span className="truncate">{evt.location}</span>
-                    </div>
-
-                    <div className="hidden lg:flex col-span-2 text-sm flex-col justify-center">
-                      <div className="flex items-center gap-2 text-zinc-300">
-                        <Calendar className="w-4 h-4 text-zinc-600 shrink-0" />
-                        <span className="font-medium">
-                          {evt.isDateTentative
-                            ? `${["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][new Date(evt.date).getMonth()]} ${new Date(evt.date).getFullYear()}`
-                            : `${new Date(evt.date).getDate().toString().padStart(2, "0")} ${["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][new Date(evt.date).getMonth()]} ${new Date(evt.date).getFullYear()}`}
+                    {/* Date Column */}
+                    <div className="w-full md:w-[15%] flex md:flex-col items-center md:items-start justify-between md:justify-center gap-2">
+                      <div className="flex md:flex-col items-baseline md:items-start gap-1">
+                        <span className="text-sm font-bold text-white tracking-wide">
+                          {formattedDate}
+                        </span>
+                        <span className="text-[10px] text-zinc-500 font-semibold">
+                          {formattedYear}
                         </span>
                       </div>
-                      {isLive && (
-                        <div className="mt-1.5 flex items-center gap-1.5 text-[10px] font-bold text-red-400 pl-6">
-                          <span className="relative flex h-1.5 w-1.5">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-500"></span>
+                      
+                      {/* Mobile Status Tag */}
+                      <div className="md:hidden">
+                        {isLive ? (
+                          <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-red-950/80 text-red-400 border border-red-900/30">
+                            Live
                           </span>
-                          LIVE NOW
-                        </div>
+                        ) : isActuallyPast ? (
+                          <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-zinc-900/70 text-zinc-400 border border-zinc-800">
+                            Past
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#08B74F]/10 text-[#08B74F] border border-[#08B74F]/20">
+                            Upcoming
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Status Column (Desktop) */}
+                    <div className="hidden md:block md:w-[12%]">
+                      {isLive ? (
+                        <span className="inline-flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-red-950/80 text-red-400 border border-red-900/30">
+                          <span className="h-1 w-1 rounded-full bg-red-500 animate-pulse" />
+                          Live
+                        </span>
+                      ) : isActuallyPast ? (
+                        <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-zinc-900/70 text-zinc-400 border border-zinc-800">
+                          Past
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-[#08B74F]/10 text-[#08B74F] border border-[#08B74F]/20">
+                          Upcoming
+                        </span>
                       )}
                     </div>
 
-                    <div className="col-span-1 lg:col-span-2 flex justify-start lg:justify-end mt-4 lg:mt-0">
+                    {/* Event Info Column */}
+                    <div className="w-full md:w-[50%] flex flex-col min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <Link href={`/events/${eventSlug}`} className="hover:underline">
+                          <h3 className="text-sm font-bold text-white group-hover:text-[#08B74F] transition-colors truncate max-w-xs md:max-w-md">
+                            {evt.title}
+                          </h3>
+                        </Link>
+                        {evt.category && (
+                          <span className="text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-400 shrink-0">
+                            {evt.category}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-zinc-400 truncate pr-2">
+                        {evt.description}
+                      </p>
+                    </div>
+
+                    {/* Location Column */}
+                    <div className="w-full md:w-[13%] flex items-center justify-between md:justify-start gap-1 text-xs text-zinc-400 min-w-0">
+                      <span className="text-[11px] text-zinc-550 md:hidden font-medium">Venue</span>
+                      <div className="flex items-center gap-1.5 truncate">
+                        <MapPin className="w-3.5 h-3.5 text-zinc-600 shrink-0" />
+                        <span className="truncate">{evt.location}</span>
+                      </div>
+                    </div>
+
+                    {/* Action Column */}
+                    <div className="w-full md:w-[10%] flex md:justify-end justify-center pt-2 md:pt-0">
                       <Link
-                        href={`/events/${slugify(evt.title)}-${evt.id}`}
-                        className={`px-6 py-2.5 rounded-full font-bold text-xs tracking-wider transition-all duration-300 w-full lg:w-auto text-center border ${
+                        href={`/events/${eventSlug}`}
+                        className={`w-full md:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 md:py-1.5 rounded-xl text-xs font-bold transition-all ${
                           isRegistrationValid
-                            ? "bg-white text-black border-white hover:bg-zinc-200 hover:shadow-[0_0_15px_rgba(255,255,255,0.3)]"
+                            ? "bg-white text-black hover:bg-zinc-200"
                             : isLive
-                              ? "bg-red-500/10 text-red-500 border-red-500/30 hover:bg-red-500/20"
-                              : "bg-zinc-800 text-zinc-300 border-zinc-700 hover:text-white hover:bg-zinc-700"
+                            ? "bg-red-500/10 text-red-400 hover:bg-red-500/20"
+                            : "bg-zinc-900 text-zinc-300 hover:bg-zinc-800"
                         }`}
                       >
-                        {isRegistrationValid
-                          ? "REGISTER"
-                          : isLive
-                            ? "JOIN NOW"
-                            : "VIEW DETAILS"}
+                        {isRegistrationValid ? "Register" : isLive ? "Join" : "Details"}
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                       </Link>
                     </div>
-                  </div>
+
+                  </motion.div>
                 );
               })}
             </div>
+          </div>
+        )}
 
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-8 flex justify-center">
             <PaginationControls
               totalPages={totalPages}
               currentPage={currentPage}
@@ -367,7 +502,7 @@ export default function EventsPage() {
             />
           </div>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }
