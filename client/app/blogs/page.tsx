@@ -1,6 +1,6 @@
 "use client";
 
-import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowUpDown, BookOpen, PenLine } from "lucide-react";
 import { motion } from "framer-motion";
 import api from "@/lib/axios";
@@ -13,7 +13,6 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import SearchInput from "@/components/shared/SearchInput";
 import PaginationControls from "@/components/shared/PaginationControls";
 import BlogCard from "@/components/cards/BlogCard";
 import FeaturedBlogHero from "@/components/blogs/FeaturedBlogHero";
@@ -32,8 +31,6 @@ const GRID_ITEMS_PER_PAGE = 6;
 export default function BlogsPage() {
   const [blogs, setBlogs] = useState<BlogListItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const deferredSearchQuery = useDeferredValue(searchQuery);
   const [dateSort, setDateSort] = useState<"default" | "desc" | "asc">(
     "desc",
   );
@@ -46,7 +43,7 @@ export default function BlogsPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, dateSort]);
+  }, [dateSort]);
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -62,31 +59,18 @@ export default function BlogsPage() {
     fetchBlogs();
   }, []);
 
-  const normalizedSearch = deferredSearchQuery.trim().toLowerCase();
-
   const sortedFilteredBlogs = useMemo(() => {
-    const filteredBlogs = blogs.filter((blog) => {
-      if (!normalizedSearch) return true;
-
-      return (
-        blog.title.toLowerCase().includes(normalizedSearch) ||
-        blog.author.toLowerCase().includes(normalizedSearch) ||
-        blog.tags.some((tag) => tag.toLowerCase().includes(normalizedSearch))
-      );
-    });
-
-    return [...filteredBlogs].sort((a, b) => {
+    return [...blogs].sort((a, b) => {
       if (dateSort === "default") return 0;
 
       const dateA = new Date(a.createdAt).getTime();
       const dateB = new Date(b.createdAt).getTime();
       return dateSort === "desc" ? dateB - dateA : dateA - dateB;
     });
-  }, [blogs, dateSort, normalizedSearch]);
+  }, [blogs, dateSort]);
 
   const showFeatured =
     currentPage === 1 &&
-    !normalizedSearch &&
     dateSort !== "asc" &&
     sortedFilteredBlogs.length > 0;
 
@@ -172,14 +156,8 @@ export default function BlogsPage() {
 
         <motion.div
           variants={itemVariants}
-          className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 mb-10"
+          className="flex flex-col md:flex-row justify-end items-stretch md:items-center gap-4 mb-10"
         >
-          <SearchInput
-            className="w-full md:max-w-md"
-            placeholder="Search by title, author, or tag…"
-            value={searchQuery}
-            onChange={setSearchQuery}
-          />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

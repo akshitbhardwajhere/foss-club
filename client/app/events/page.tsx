@@ -1,6 +1,6 @@
 "use client";
 
-import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowUpDown, Calendar, MapPin } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -15,7 +15,6 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import SearchInput from "@/components/shared/SearchInput";
 import PaginationControls from "@/components/shared/PaginationControls";
 
 interface Event {
@@ -46,14 +45,12 @@ export default function EventsPage() {
     "all" | "live" | "upcoming" | "completed"
   >("all");
   const [monthSort, setMonthSort] = useState<"asc" | "desc">("asc");
-  const [searchQuery, setSearchQuery] = useState("");
-  const deferredSearchQuery = useDeferredValue(searchQuery);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, filter, monthSort]);
+  }, [filter, monthSort]);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -69,8 +66,6 @@ export default function EventsPage() {
     fetchEvents();
   }, []);
 
-  const normalizedSearch = deferredSearchQuery.trim().toLowerCase();
-
   const sortedFilteredEvents = useMemo(() => {
     const now = new Date();
 
@@ -78,14 +73,6 @@ export default function EventsPage() {
       const eventDate = new Date(evt.date);
       const isLive = now.toDateString() === eventDate.toDateString();
       const isActuallyPast = eventDate < now && !isLive;
-
-      const matchesSearch =
-        normalizedSearch.length === 0 ||
-        evt.title.toLowerCase().includes(normalizedSearch) ||
-        evt.location.toLowerCase().includes(normalizedSearch) ||
-        evt.description.toLowerCase().includes(normalizedSearch);
-
-      if (!matchesSearch) return false;
 
       if (filter === "live") return isLive;
       if (filter === "upcoming") return !isActuallyPast && !isLive;
@@ -99,7 +86,7 @@ export default function EventsPage() {
 
       return monthSort === "asc" ? dateA - dateB : dateB - dateA;
     });
-  }, [events, filter, monthSort, normalizedSearch]);
+  }, [events, filter, monthSort]);
 
   const totalPages = useMemo(
     () => Math.ceil(sortedFilteredEvents.length / itemsPerPage),
@@ -135,14 +122,7 @@ export default function EventsPage() {
           }
         />
 
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
-          <SearchInput
-            className="w-full md:w-96"
-            placeholder="Search by event name/location"
-            value={searchQuery}
-            onChange={setSearchQuery}
-          />
-
+        <div className="flex flex-col md:flex-row justify-end items-center gap-4 mb-8">
           <div className="flex justify-center flex-wrap gap-2 w-full md:w-auto">
             <button
               onClick={() => setFilter("all")}

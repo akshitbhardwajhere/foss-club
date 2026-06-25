@@ -8,15 +8,11 @@ import type { Registrant } from "./types";
 interface RegistrationsTableProps {
   loading: boolean;
   registrations: Registrant[];
-  searchQuery: string;
-  onClearSearch: () => void;
 }
 
 export default function RegistrationsTable({
   loading,
   registrations,
-  searchQuery,
-  onClearSearch,
 }: RegistrationsTableProps) {
   return (
     <motion.div
@@ -35,14 +31,6 @@ export default function RegistrationsTable({
             <p className="text-lg font-medium text-zinc-400">
               No registrations found.
             </p>
-            {searchQuery && (
-              <button
-                onClick={onClearSearch}
-                className="mt-2 text-[#08B74F] text-sm hover:underline"
-              >
-                Clear search parameters
-              </button>
-            )}
           </div>
         ) : (
           <table className="w-full text-left whitespace-nowrap text-sm">

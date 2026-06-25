@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, BadgeCheck, Search, Shuffle, Users } from "lucide-react";
+import { ArrowRight, BadgeCheck, Shuffle, Users } from "lucide-react";
 import api from "@/lib/axios";
 import { getStaggeredMotionPresets } from "@/lib/motion";
 import RosterPageLayout from "@/components/shared/RosterPageLayout";
@@ -24,7 +24,6 @@ export default function TeamPage() {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"core" | "volunteers">("core");
-  const [searchQuery, setSearchQuery] = useState("");
   const { containerVariants, itemVariants } = getStaggeredMotionPresets();
 
   const isVolunteerRole = (role: string) => /\bvolunteer\b/i.test(role);
@@ -56,23 +55,8 @@ export default function TeamPage() {
 
   const activeMembers = activeTab === "core" ? coreMembers : volunteerMembers;
 
-  const filteredMembers = useMemo(() => {
-    const normalizedQuery = searchQuery.trim().toLowerCase();
-
-    if (!normalizedQuery) return activeMembers;
-
-    return activeMembers.filter((member) => {
-      const haystack = [member.name, member.role, member.company]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
-
-      return haystack.includes(normalizedQuery);
-    });
-  }, [activeMembers, searchQuery]);
-
   const randomMember = () => {
-    const pool = filteredMembers.length > 0 ? filteredMembers : activeMembers;
+    const pool = activeMembers;
     if (pool.length === 0) return;
 
     const selected = pool[Math.floor(Math.random() * pool.length)];
@@ -228,13 +212,13 @@ export default function TeamPage() {
               <div className="w-full">
                 <TeamPageSkeleton />
               </div>
-            ) : filteredMembers.length === 0 ? (
+            ) : activeMembers.length === 0 ? (
               <div className="flex w-full items-center justify-center rounded-3xl border border-zinc-800 bg-zinc-900/30 p-20 text-zinc-500 font-medium">
                 No {activeTab === "core" ? "core members" : "volunteers"} found. Check back later!
               </div>
             ) : (
               <div className="grid w-full grid-cols-5 gap-3 sm:grid-cols-6 lg:grid-cols-6 xl:grid-cols-6">
-                {filteredMembers.map((member, i) => (
+                {activeMembers.map((member, i) => (
                   <TeamMemberMobileCard
                     key={member.id || i}
                     id={`team-member-${member.id}`}

@@ -1,12 +1,10 @@
 "use client";
 
-import { ArrowLeft, Copy, Download, Mail, Search, Users } from "lucide-react";
+import { ArrowLeft, Copy, Download, Mail, Users } from "lucide-react";
 
 interface RegistrationsHeaderProps {
   eventTitle: string;
   totalRegistrations: number;
-  searchQuery: string;
-  onSearchChange: (value: string) => void;
   onBack: () => void;
   onExportCsv: () => void;
   onEmailAll: () => void;
@@ -17,8 +15,6 @@ interface RegistrationsHeaderProps {
 export default function RegistrationsHeader({
   eventTitle,
   totalRegistrations,
-  searchQuery,
-  onSearchChange,
   onBack,
   onExportCsv,
   onEmailAll,
@@ -50,16 +46,6 @@ export default function RegistrationsHeader({
         </div>
 
         <div className="flex w-full md:w-auto items-center gap-3 mt-4 md:mt-0">
-          <div className="relative w-full md:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-            <input
-              type="text"
-              placeholder="Search registrants..."
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full bg-[#111e16] border border-[#1b3123] h-10 pl-9 pr-4 rounded-lg text-white text-sm focus:outline-none focus:border-[#08B74F]/50 focus:ring-1 focus:ring-[#08B74F]/50 transition-all"
-            />
-          </div>
           <button
             onClick={onEmailAll}
             disabled={!canEmailAll}

@@ -17,7 +17,6 @@ export default function RegistrationsDashboard() {
   const [loading, setLoading] = useState(true);
   const [eventTitle, setEventTitle] = useState("");
   const [registrations, setRegistrations] = useState<Registrant[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const fetchRegistrations = async () => {
@@ -86,20 +85,13 @@ export default function RegistrationsDashboard() {
     }
   };
 
-  const filteredRegs = registrations.filter(
-    (r) =>
-      r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      r.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      r.institute.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+
 
   return (
     <div className="min-h-screen bg-[#050B08] p-4 md:p-8 pt-24 md:pt-32 w-full max-w-8xl mx-auto selection:bg-[#08B74F]/30 text-white">
       <RegistrationsHeader
         eventTitle={eventTitle}
         totalRegistrations={registrations.length}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
         onBack={() => router.back()}
         onExportCsv={downloadCSV}
         onEmailAll={emailAllRegistrants}
@@ -109,9 +101,7 @@ export default function RegistrationsDashboard() {
 
       <RegistrationsTable
         loading={loading}
-        registrations={filteredRegs}
-        searchQuery={searchQuery}
-        onClearSearch={() => setSearchQuery("")}
+        registrations={registrations}
       />
     </div>
   );
