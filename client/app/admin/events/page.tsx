@@ -7,9 +7,6 @@ import {
   Edit3,
   Plus,
   MapPin,
-  Link as LinkIcon,
-  Users,
-  StopCircle,
 } from "lucide-react";
 import api from "@/lib/axios";
 import { formatDate } from "@/lib/utils";
@@ -20,9 +17,6 @@ import AdminPageHeader from "@/components/admin/AdminPageHeader";
 import AdminFormWrapper from "@/components/admin/AdminFormWrapper";
 import ConfirmDeleteDialog from "@/components/admin/ConfirmDeleteDialog";
 import AdminTableSkeleton from "@/components/admin/AdminTableSkeleton";
-import ReleaseFormModal from "@/components/admin/ReleaseFormModal";
-import ViewRegistrationsModal from "@/components/admin/ViewRegistrationsModal";
-import ConfirmActionDialog from "@/components/admin/ConfirmActionDialog";
 import EventFormSection from "@/components/admin/events/EventFormSection";
 import {
   eventFormSchema,
@@ -49,9 +43,6 @@ export default function EventsAdminPage() {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
-  const [isReleaseModalOpen, setIsReleaseModalOpen] = useState(false);
-  const [isRegistrationsModalOpen, setIsRegistrationsModalOpen] =
-    useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -101,15 +92,6 @@ export default function EventsAdminPage() {
     }
   };
 
-  const handleStopRegistration = async (eventId: string, title: string) => {
-    try {
-      await api.patch(`/api/registration/stop/${eventId}`);
-      await fetchEvents();
-      toast.success(`Registrations for "${title}" have been stopped.`);
-    } catch (error) {
-      toast.error("Failed to stop registrations. Please try again.");
-    }
-  };
 
   const handleEdit = async (event: EventItem) => {
     try {
@@ -207,18 +189,6 @@ export default function EventsAdminPage() {
         />
         {!isCreating && (
           <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
-            <button
-              onClick={() => setIsRegistrationsModalOpen(true)}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-600/20 text-purple-400 border border-purple-500/20 font-bold hover:bg-purple-600/30 transition-colors w-full md:w-auto justify-center"
-            >
-              <Users className="w-5 h-5" /> Registrations
-            </button>
-            <button
-              onClick={() => setIsReleaseModalOpen(true)}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600/20 text-blue-400 border border-blue-500/20 font-bold hover:bg-blue-600/30 transition-colors w-full md:w-auto justify-center"
-            >
-              <LinkIcon className="w-5 h-5" /> Release Form
-            </button>
             <button
               onClick={() => {
                 setIsCreating(true);
@@ -351,30 +321,7 @@ export default function EventsAdminPage() {
                         </td>
                         <td className="px-6 py-4 text-right">
                           <div className="flex items-center justify-end gap-2">
-                            {event.registrationConfig &&
-                              new Date(event.registrationConfig.validUntil) >
-                                new Date() && (
-                                <ConfirmActionDialog
-                                  trigger={
-                                    <button
-                                      title="Stop Registrations"
-                                      className="flex items-center justify-center w-8 h-8 rounded-lg bg-orange-500/10 text-orange-400 hover:bg-orange-500/20 transition-colors"
-                                    >
-                                      <StopCircle className="w-4 h-4" />
-                                    </button>
-                                  }
-                                  title="Stop Registrations?"
-                                  description={`This will immediately close the registration form for "${event.title}". No new registrations will be accepted.`}
-                                  actionLabel="Stop Registrations"
-                                  actionClassName="!bg-orange-600 hover:!bg-orange-700 !text-white"
-                                  onConfirm={() =>
-                                    handleStopRegistration(
-                                      event.id,
-                                      event.title,
-                                    )
-                                  }
-                                />
-                              )}
+
                             <button
                               onClick={() => handleEdit(event)}
                               className="flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700 transition-colors"
@@ -418,16 +365,7 @@ export default function EventsAdminPage() {
         </motion.div>
       )}
 
-      <ReleaseFormModal
-        isOpen={isReleaseModalOpen}
-        onClose={() => setIsReleaseModalOpen(false)}
-        events={events}
-      />
-      <ViewRegistrationsModal
-        isOpen={isRegistrationsModalOpen}
-        onClose={() => setIsRegistrationsModalOpen(false)}
-        events={events}
-      />
+
     </div>
   );
 }

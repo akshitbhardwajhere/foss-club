@@ -351,11 +351,6 @@ export default function EventsPage() {
                 const isLive = now.toDateString() === eventDate.toDateString();
                 const isActuallyPast = eventDate < now && !isLive;
 
-                const isRegistrationValid =
-                  evt.registrationConfig &&
-                  new Date(evt.registrationConfig.validUntil) > new Date() &&
-                  !isActuallyPast;
-
                 const eventSlug = `${slugify(evt.title)}-${evt.id}`;
 
                 const formattedDate = evt.isDateTentative
@@ -473,14 +468,12 @@ export default function EventsPage() {
                       <Link
                         href={`/events/${eventSlug}`}
                         className={`w-full md:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 md:py-1.5 rounded-xl text-xs font-bold transition-all ${
-                          isRegistrationValid
-                            ? "bg-white text-black hover:bg-zinc-200"
-                            : isLive
+                          isLive
                             ? "bg-red-500/10 text-red-400 hover:bg-red-500/20"
                             : "bg-zinc-900 text-zinc-300 hover:bg-zinc-800"
                         }`}
                       >
-                        {isRegistrationValid ? "Register" : isLive ? "Join" : "Details"}
+                        {isLive ? "Join" : "Details"}
                         <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                       </Link>
                     </div>

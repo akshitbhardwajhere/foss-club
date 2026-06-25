@@ -155,21 +155,12 @@ export default function UpcomingEventsSection() {
                   </div>
 
                   <div className="mt-auto">
-                    {regOpen ? (
-                      <Link
-                        href={`/events/registration/${event.registrationConfig!.eventName}`}
-                        className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-[#08B74F] text-black text-sm font-bold hover:bg-[#08B74F]/90 transition-colors"
-                      >
-                        Register Now <ArrowRight className="w-4 h-4" />
-                      </Link>
-                    ) : (
-                      <Link
-                        href={`/events/${slugify(event.title)}-${event.id}`}
-                        className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-zinc-700 text-zinc-300 text-sm font-semibold hover:border-zinc-500 hover:text-white transition-colors"
-                      >
-                        View Details
-                      </Link>
-                    )}
+                    <Link
+                      href={`/events/${slugify(event.title)}-${event.id}`}
+                      className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-zinc-700 text-zinc-300 text-sm font-semibold hover:border-zinc-500 hover:text-white transition-colors"
+                    >
+                      View Details
+                    </Link>
                   </div>
                 </div>
               </motion.div>

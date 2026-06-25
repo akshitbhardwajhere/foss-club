@@ -13,7 +13,6 @@ import alumniRoutes from "./routes/alumniRoutes";
 import statsRoutes from "./routes/statsRoutes";
 import uploadRoutes from "./routes/uploadRoutes";
 import contactRoutes from "./routes/contactRoutes";
-import registrationRoutes from "./routes/registrationRoutes";
 import sheetRoutes from "./routes/sheetRoutes";
 import galleryRoutes from "./routes/galleryRoutes";
 
@@ -102,7 +101,6 @@ app.use("/api/team", teamRoutes);
 app.use("/api/alumni", alumniRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/contact", contactRoutes);
-app.use("/api/registration", registrationRoutes);
 app.use("/api/sheet", sheetRoutes);
 app.use("/api/gallery", galleryRoutes);
 

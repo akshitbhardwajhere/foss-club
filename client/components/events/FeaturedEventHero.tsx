@@ -30,7 +30,6 @@ interface Event {
 interface FeaturedEventHeroProps {
   event: Event;
   isLive: boolean;
-  isRegistrationValid: boolean;
 }
 
 function SpeakerAvatarStack({ speakers = [] }: { speakers: Speaker[] }) {
@@ -78,7 +77,6 @@ function SpeakerAvatarStack({ speakers = [] }: { speakers: Speaker[] }) {
 export default function FeaturedEventHero({
   event,
   isLive,
-  isRegistrationValid,
 }: FeaturedEventHeroProps) {
   const eventSlug = `${slugify(event.title)}-${event.id}`;
   const cardRef = useRef<HTMLDivElement>(null);
@@ -234,7 +232,7 @@ export default function FeaturedEventHero({
                 )}
 
                 <span className="inline-flex items-center gap-2 text-sm font-bold text-[#08B74F] group-hover:gap-3 transition-all duration-300">
-                  {isRegistrationValid ? "Register for event" : "View details"}
+                  View details
                   <ArrowRight className="w-4 h-4" />
                 </span>
               </div>

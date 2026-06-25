@@ -85,11 +85,6 @@ export default function EventCard({ event, index }: EventCardProps) {
   const isLive = now.toDateString() === eventDate.toDateString();
   const isActuallyPast = eventDate < now && !isLive;
 
-  const isRegistrationValid =
-    event.registrationConfig &&
-    new Date(event.registrationConfig.validUntil) > new Date() &&
-    !isActuallyPast;
-
   const formattedDate = event.isDateTentative
     ? `${
         [
@@ -233,7 +228,7 @@ export default function EventCard({ event, index }: EventCardProps) {
               </div>
 
               <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#08B74F]">
-                {isRegistrationValid ? "Register" : isLive ? "Join" : "Details"}
+                {isLive ? "Join" : "Details"}
                 <ArrowUpRight className="w-3.5 h-3.5" />
               </span>
             </div>
