@@ -7,6 +7,7 @@ export interface EventDetail {
   imageUrl?: string;
   documentUrl?: string;
   isDateTentative?: boolean;
+  category?: string;
 }
 
 export interface EventStatusState {
