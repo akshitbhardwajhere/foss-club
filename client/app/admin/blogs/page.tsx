@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { BookOpen, Edit3, Plus } from "lucide-react";
+import { BookOpen, Plus } from "lucide-react";
 import api from "@/lib/axios";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -38,7 +38,7 @@ export default function BlogsAdminPage() {
           new Date(secondBlog.createdAt).getTime(),
       );
       setBlogs(sortedBlogs);
-    } catch (error) {
+    } catch {
       // Error handled silently
       toast.error("Failed to fetch blogs from server");
     } finally {
@@ -55,21 +55,27 @@ export default function BlogsAdminPage() {
       await api.delete(`/api/blogs/${id}`);
       setBlogs(blogs.filter((item) => item.id !== id));
       toast.success(`Blog "${title}" removed successfully.`);
-    } catch (error) {
+    } catch {
       // Error handled silently
       toast.error("Failed to delete the blog post.");
     }
   };
 
-  const handleEdit = (blog: BlogItem) => {
-    form.reset({
-      title: blog.title || "",
-      author: blog.author || "",
-      content: blog.content || "",
-      imageUrl: blog.imageUrl || "",
-    });
-    setEditingId(blog.id);
-    setIsCreating(true);
+  const handleEdit = async (blog: BlogItem) => {
+    try {
+      const res = await api.get(`/api/blogs/${blog.id}`);
+      const fullBlog = res.data;
+      form.reset({
+        title: fullBlog.title || "",
+        author: fullBlog.author || "",
+        content: fullBlog.content || "",
+        imageUrl: fullBlog.imageUrl || "",
+      });
+      setEditingId(blog.id);
+      setIsCreating(true);
+    } catch {
+      toast.error("Failed to fetch blog details");
+    }
   };
 
   async function onSubmit(values: BlogFormValues) {
@@ -87,7 +93,7 @@ export default function BlogsAdminPage() {
       setEditingId(null);
       form.reset();
     } catch (err: unknown) {
-      const error = err as any;
+      const error = err as { response?: { data?: { message?: string } }; message?: string };
       toast.error(
         error.response?.data?.message ||
           error.message ||

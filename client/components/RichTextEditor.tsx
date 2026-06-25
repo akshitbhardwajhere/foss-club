@@ -63,8 +63,7 @@ export default function RichTextEditor({
     if (editor && value !== editor.getHTML()) {
       editor.commands.setContent(value || "");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]);
+  }, [value, editor]);
 
   const setLink = useCallback(() => {
     if (!editor) return;
