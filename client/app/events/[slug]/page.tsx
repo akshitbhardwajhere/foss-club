@@ -21,7 +21,6 @@ import Image from "next/image";
 import EventStatusBadge from "@/components/events/detail/EventStatusBadge";
 import CountdownTimer from "@/components/events/detail/CountdownTimer";
 import EventShare from "@/components/events/detail/EventShare";
-import EventAgenda from "@/components/events/detail/EventAgenda";
 import SpeakerGrid from "@/components/events/detail/SpeakerGrid";
 import EventFAQ from "@/components/events/detail/EventFAQ";
 import { extractIdFromSlug, slugify } from "@/lib/utils";
@@ -294,9 +293,6 @@ export default function EventDetailPage() {
                 {event.description}
               </p>
             </motion.div>
-
-            {/* Agenda Timeline Section */}
-            <EventAgenda />
 
             {/* Speaker & Host Profile Grids */}
             <SpeakerGrid speakers={event.speakers} />
