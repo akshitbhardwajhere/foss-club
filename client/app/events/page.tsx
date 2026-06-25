@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ArrowUpDown, Calendar, Search, Sparkles, Clock, MapPin, ArrowRight } from "lucide-react";
+import { ArrowUpDown, Calendar, Sparkles, Clock, MapPin, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -88,7 +88,7 @@ export default function EventsPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "live" | "upcoming" | "completed">("all");
   const [monthSort, setMonthSort] = useState<"asc" | "desc">("asc");
-  const [searchQuery, setSearchQuery] = useState("");
+
   const [currentPage, setCurrentPage] = useState(1);
 
   const { containerVariants, itemVariants } = getStaggeredMotionPresets({
@@ -98,7 +98,7 @@ export default function EventsPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [filter, monthSort, searchQuery]);
+  }, [filter, monthSort]);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -118,12 +118,7 @@ export default function EventsPage() {
     const now = new Date();
 
     const filtered = events.filter((evt) => {
-      const matchesSearch =
-        evt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        evt.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (evt.category && evt.category.toLowerCase().includes(searchQuery.toLowerCase()));
 
-      if (!matchesSearch) return false;
 
       const eventDate = new Date(evt.date);
       const isLive = now.toDateString() === eventDate.toDateString();
@@ -140,7 +135,7 @@ export default function EventsPage() {
       const dateB = new Date(b.date).getTime();
       return monthSort === "asc" ? dateA - dateB : dateB - dateA;
     });
-  }, [events, filter, monthSort, searchQuery]);
+  }, [events, filter, monthSort]);
 
   const totalPages = useMemo(
     () => Math.max(1, Math.ceil(sortedFilteredEvents.length / ITEMS_PER_PAGE)),
@@ -262,18 +257,9 @@ export default function EventsPage() {
             ))}
           </div>
 
-          <div className="flex items-center gap-3 w-full md:w-auto">
-            <div className="relative w-full md:w-60">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-              <input
-                type="text"
-                placeholder="Search events..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 rounded-full bg-zinc-900/40 border border-zinc-800 text-zinc-250 text-xs focus:outline-none focus:border-zinc-700 transition-all placeholder:text-zinc-500"
-              />
-            </div>
 
+
+          <div className="flex items-center gap-3 w-full md:w-auto">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
@@ -328,7 +314,7 @@ export default function EventsPage() {
               No events found
             </p>
             <p className="text-zinc-500 text-xs">
-              Try adjusting your search or sort filters.
+              Try adjusting your filters.
             </p>
           </motion.div>
         ) : (
