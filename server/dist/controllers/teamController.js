@@ -26,6 +26,7 @@ const cloudinary_1 = require("../utils/cloudinary");
 const getTeamMembers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const teamMembers = yield prisma_1.default.teamMember.findMany({
+            where: { isAlumni: false },
             orderBy: [{ order: "asc" }, { createdAt: "desc" }],
         });
         res.json(teamMembers);

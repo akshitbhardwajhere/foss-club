@@ -14,6 +14,7 @@ import {
  */
 export const getEvents = async (req: Request, res: Response) => {
   try {
+    // Query database using Prisma Client. Select only public properties to reduce payload size.
     const events = await prisma.event.findMany({
       select: {
         id: true,
@@ -33,6 +34,7 @@ export const getEvents = async (req: Request, res: Response) => {
           },
         },
       },
+      // Order chronologically in descending order (newest first)
       orderBy: { createdAt: "desc" },
     });
     res.json(events);
@@ -50,6 +52,8 @@ export const getEvents = async (req: Request, res: Response) => {
  */
 export const getNextEvent = async (req: Request, res: Response) => {
   try {
+    // Set timestamp reference to the start of today to ensure live events
+    // happening later today are still captured as "upcoming".
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
 
@@ -86,6 +90,7 @@ export const getEventById = async (
 ): Promise<void> => {
   try {
     const id = req.params.id as string;
+    // Query database for unique event record matching primary key ID
     const event = await prisma.event.findUnique({
       where: { id },
       include: { speakers: true },
@@ -182,9 +187,11 @@ export const updateEvent = async (
     } = req.body;
     const id = req.params.id as string;
 
+    // Check if the event exists before attempting updates
     const eventExists = await prisma.event.findUnique({ where: { id } });
 
     if (eventExists) {
+      // If a new image is provided and there was an old one, delete the old image from Cloudinary
       if (
         imageUrl !== undefined &&
         eventExists.imageUrl &&
@@ -202,11 +209,12 @@ export const updateEvent = async (
         await deleteCloudinaryResource(eventExists.documentUrl, "raw");
       }
 
-      // Delete existing speakers first
+      // Delete existing speakers associated with this event to avoid duplicates before rewriting
       await prisma.speaker.deleteMany({
         where: { eventId: id },
       });
 
+      // Update the event with the new parameters
       const updatedEvent = await prisma.event.update({
         where: { id },
         data: {
@@ -263,12 +271,14 @@ export const deleteEvent = async (
     const eventExists = await prisma.event.findUnique({ where: { id } });
 
     if (eventExists) {
+      // Clean up Cloudinary storage media to save space and prevent dead links
       if (eventExists.imageUrl) {
         await deleteCloudinaryImage(eventExists.imageUrl);
       }
       if (eventExists.documentUrl) {
         await deleteCloudinaryResource(eventExists.documentUrl, "raw");
       }
+      // Delete event from DB (speakers delete automatically via Prisma cascade configuration)
       await prisma.event.delete({ where: { id } });
       res.json({ message: "Event removed" });
     } else {
@@ -306,7 +316,7 @@ export const downloadEventDocument = async (
       return;
     }
 
-    // Fetch the file from Cloudinary server-side (avoids all CORS issues)
+    // Fetch the file from Cloudinary server-side (avoids all client CORS issues)
     console.log("[doc-download] fetching:", event.documentUrl);
     const fileResponse = await fetch(event.documentUrl);
     console.log(
@@ -324,11 +334,11 @@ export const downloadEventDocument = async (
       return;
     }
 
-    // Build a safe filename from the event title
+    // Build a safe, URL-friendly filename from the event title
     const safeName = event.title
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
+      .replace(/[^a-z0-9]+/g, "-") // Replace non-alphanumeric chars with dashes
+      .replace(/(^-|-$)/g, "");   // Trim leading/trailing dashes
 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
@@ -336,15 +346,16 @@ export const downloadEventDocument = async (
       `attachment; filename="${safeName}-brochure.pdf"`,
     );
 
-    // Stream the Cloudinary response body directly to the client
+    // Stream the Cloudinary response body directly to the client to avoid loading large files into RAM
     const reader = (fileResponse.body as any)?.getReader?.();
     if (!reader) {
-      // Fallback: buffer the entire response
+      // Fallback: buffer the entire response if streaming is unsupported
       const buffer = await fileResponse.arrayBuffer();
       res.send(Buffer.from(buffer));
       return;
     }
 
+    // Pump response data chunks to client response stream
     const pump = async (): Promise<void> => {
       const { done, value } = await reader.read();
       if (done) {

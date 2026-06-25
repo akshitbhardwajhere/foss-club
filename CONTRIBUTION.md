@@ -39,7 +39,7 @@ npm install
 cp .env.example .env
 # Fill in your .env variables (Database URL, JWT Secret, Cloudinary, Mailjet, Google credentials)
 npx prisma generate
-npx prisma migrate dev --name init
+npx prisma migrate dev
 npm run dev
 ```
 
@@ -47,6 +47,8 @@ npm run dev
 ```bash
 cd ../client
 npm install
+cp .env.example .env.local
+# Fill in your .env.local variables (NEXT_PUBLIC_API_URL, Cloudinary settings)
 npm run dev
 ```
 

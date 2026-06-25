@@ -16,13 +16,15 @@ import contactRoutes from "./routes/contactRoutes";
 import sheetRoutes from "./routes/sheetRoutes";
 import galleryRoutes from "./routes/galleryRoutes";
 
-// Load env vars
+// Load environmental configurations from local .env files
 dotenv.config();
 
-// Validate critical environment variables
+// Identify critical env variables needed to start up successfully
 const requiredEnvVars = ["JWT_SECRET"];
+// Identify non-breaking but important variables needed for specific features
 const optionalButImportantEnvVars = ["GOOGLE_SHEET_ID"];
 
+// Check for missing keys in process.env
 const missingRequired = requiredEnvVars.filter(
   (envVar) => !process.env[envVar],
 );
@@ -30,6 +32,7 @@ const missingOptional = optionalButImportantEnvVars.filter(
   (envVar) => !process.env[envVar],
 );
 
+// Terminate execution if required environment variables are absent
 if (missingRequired.length > 0) {
   console.error(
     "❌ Missing required environment variables:",
@@ -38,6 +41,7 @@ if (missingRequired.length > 0) {
   process.exit(1);
 }
 
+// Warn developers during development if optional keys are missing
 if (missingOptional.length > 0 && process.env.NODE_ENV !== "production") {
   console.warn(
     "⚠️  Missing optional environment variables:",
@@ -46,15 +50,16 @@ if (missingOptional.length > 0 && process.env.NODE_ENV !== "production") {
   console.warn("   App will continue but some features may not work properly");
 }
 
-// Connect to database securely
+// Connect to the database using configurations
 import connectDB from "./config/db";
 import prisma from "./config/prisma";
 connectDB();
 
+// Initialize the Express framework instance
 const app: Express = express();
 
 // Middleware
-// Allow localhost for development and use CLIENT_URL from env for production
+// Define the allowed CORS origins. Filters out undefined values from variables
 const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
@@ -68,12 +73,14 @@ if (process.env.NODE_ENV !== "production") {
   console.log("Allowed CORS origins:", allowedOrigins);
 }
 
+// Enable Cross-Origin Resource Sharing (CORS) rules
 app.use(
   cors({
     origin: function (origin, callback) {
       if (process.env.NODE_ENV !== "production") {
         console.log("CORS request from origin:", origin);
       }
+      // Allow requests with no origin (like mobile apps, postman, curl)
       if (!origin) {
         callback(null, true);
       } else if (allowedOrigins.includes(origin)) {
@@ -85,29 +92,31 @@ app.use(
         callback(new Error("Not allowed by CORS"));
       }
     },
+    // Permit credentials (cookies/authorization headers) to pass through
     credentials: true,
   }),
 );
-app.use(compression());
-app.use(express.json());
-app.use(cookieParser());
+app.use(compression()); // Gzip compression middleware to shrink response payload
+app.use(express.json()); // Body-parser for JSON payloads
+app.use(cookieParser()); // Parser for reading cookies from req.cookies
 
-// Main Routes
-app.use("/api/admin", authRoutes);
-app.use("/api/admin/stats", statsRoutes);
-app.use("/api/events", eventRoutes);
-app.use("/api/blogs", blogRoutes);
-app.use("/api/team", teamRoutes);
-app.use("/api/alumni", alumniRoutes);
-app.use("/api/upload", uploadRoutes);
-app.use("/api/contact", contactRoutes);
-app.use("/api/sheet", sheetRoutes);
-app.use("/api/gallery", galleryRoutes);
+// Main Route Configurations
+app.use("/api/admin", authRoutes);            // Authentication flow (Admin side logins)
+app.use("/api/admin/stats", statsRoutes);      // Admin dashboard statistics counters
+app.use("/api/events", eventRoutes);          // Public events & registrations
+app.use("/api/blogs", blogRoutes);            // Blog posting and reading
+app.use("/api/team", teamRoutes);            // Club core members
+app.use("/api/alumni", alumniRoutes);          // Alumni network catalog
+app.use("/api/upload", uploadRoutes);          // File/Media upload controller (Cloudinary integration)
+app.use("/api/contact", contactRoutes);        // Contact form submissions
+app.use("/api/sheet", sheetRoutes);            // Google sheets synchronization
+app.use("/api/gallery", galleryRoutes);        // Public event image gallery
 
 // Health check endpoint
+// Tests database responsiveness as well as server process availability
 app.get("/health", async (req: Request, res: Response) => {
   try {
-    // Test database connection
+    // Run a fast query to test Prisma client communication with the DB
     await prisma.$queryRaw`SELECT 1`;
     res.json({ status: "ok", message: "Server and database are healthy" });
   } catch (error) {
@@ -123,7 +132,7 @@ app.get("/health", async (req: Request, res: Response) => {
   }
 });
 
-// Basic route
+// Root welcome message
 app.get("/", (req: Request, res: Response) => {
   res.send("FOSS Club API Server (Prisma/Postgres) is running");
 });

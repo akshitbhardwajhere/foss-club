@@ -24,6 +24,7 @@ const cloudinary_1 = require("../utils/cloudinary");
  */
 const getEvents = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        // Query database using Prisma Client. Select only public properties to reduce payload size.
         const events = yield prisma_1.default.event.findMany({
             select: {
                 id: true,
@@ -32,14 +33,18 @@ const getEvents = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 category: true,
                 date: true,
                 isDateTentative: true,
-                location: true,
                 imageUrl: true,
-                registrationConfig: {
+                registrationUrl: true,
+                speakers: {
                     select: {
-                        validUntil: true,
+                        id: true,
+                        name: true,
+                        role: true,
+                        imageUrl: true,
                     },
                 },
             },
+            // Order chronologically in descending order (newest first)
             orderBy: { createdAt: "desc" },
         });
         res.json(events);
@@ -58,6 +63,8 @@ exports.getEvents = getEvents;
  */
 const getNextEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        // Set timestamp reference to the start of today to ensure live events
+        // happening later today are still captured as "upcoming".
         const startOfToday = new Date();
         startOfToday.setHours(0, 0, 0, 0);
         const nextEvent = yield prisma_1.default.event.findFirst({
@@ -69,7 +76,7 @@ const getNextEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             orderBy: {
                 date: "asc", // Get the chronologically closest one first
             },
-            include: { registrationConfig: true },
+            include: { speakers: true },
         });
         // It's perfectly normal for this to be null if there are no upcoming events
         res.json(nextEvent);
@@ -90,9 +97,10 @@ exports.getNextEvent = getNextEvent;
 const getEventById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id = req.params.id;
+        // Query database for unique event record matching primary key ID
         const event = yield prisma_1.default.event.findUnique({
             where: { id },
-            include: { registrationConfig: true },
+            include: { speakers: true },
         });
         if (event) {
             res.json(event);
@@ -114,7 +122,7 @@ exports.getEventById = getEventById;
  */
 const createEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { title, description, category, date, isDateTentative, location, imageUrl, documentUrl, } = req.body;
+        const { title, description, category, date, isDateTentative, location, imageUrl, documentUrl, registrationUrl, speakers, } = req.body;
         const event = yield prisma_1.default.event.create({
             data: {
                 title,
@@ -125,6 +133,21 @@ const createEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 location,
                 imageUrl,
                 documentUrl: documentUrl || null,
+                registrationUrl: registrationUrl || null,
+                speakers: speakers && speakers.length > 0 ? {
+                    create: speakers.map((s) => ({
+                        name: s.name,
+                        role: s.role,
+                        org: s.org,
+                        imageUrl: s.imageUrl || null,
+                        github: s.github || null,
+                        linkedin: s.linkedin || null,
+                        bio: s.bio,
+                    })),
+                } : undefined,
+            },
+            include: {
+                speakers: true,
             },
         });
         res.status(201).json(event);
@@ -144,10 +167,12 @@ exports.createEvent = createEvent;
  */
 const updateEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { title, description, category, date, isDateTentative, location, imageUrl, documentUrl, } = req.body;
+        const { title, description, category, date, isDateTentative, location, imageUrl, documentUrl, registrationUrl, speakers, } = req.body;
         const id = req.params.id;
+        // Check if the event exists before attempting updates
         const eventExists = yield prisma_1.default.event.findUnique({ where: { id } });
         if (eventExists) {
+            // If a new image is provided and there was an old one, delete the old image from Cloudinary
             if (imageUrl !== undefined &&
                 eventExists.imageUrl &&
                 imageUrl !== eventExists.imageUrl) {
@@ -159,6 +184,11 @@ const updateEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 documentUrl !== eventExists.documentUrl) {
                 yield (0, cloudinary_1.deleteCloudinaryResource)(eventExists.documentUrl, "raw");
             }
+            // Delete existing speakers associated with this event to avoid duplicates before rewriting
+            yield prisma_1.default.speaker.deleteMany({
+                where: { eventId: id },
+            });
+            // Update the event with the new parameters
             const updatedEvent = yield prisma_1.default.event.update({
                 where: { id },
                 data: {
@@ -170,6 +200,21 @@ const updateEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                     location: location || undefined,
                     imageUrl: imageUrl === "" ? null : imageUrl || undefined,
                     documentUrl: documentUrl === "" ? null : documentUrl || undefined,
+                    registrationUrl: registrationUrl === "" ? null : registrationUrl || undefined,
+                    speakers: speakers ? {
+                        create: speakers.map((s) => ({
+                            name: s.name,
+                            role: s.role,
+                            org: s.org,
+                            imageUrl: s.imageUrl || null,
+                            github: s.github || null,
+                            linkedin: s.linkedin || null,
+                            bio: s.bio,
+                        })),
+                    } : undefined,
+                },
+                include: {
+                    speakers: true,
                 },
             });
             res.json(updatedEvent);
@@ -196,12 +241,14 @@ const deleteEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const id = req.params.id;
         const eventExists = yield prisma_1.default.event.findUnique({ where: { id } });
         if (eventExists) {
+            // Clean up Cloudinary storage media to save space and prevent dead links
             if (eventExists.imageUrl) {
                 yield (0, cloudinary_1.deleteCloudinaryImage)(eventExists.imageUrl);
             }
             if (eventExists.documentUrl) {
                 yield (0, cloudinary_1.deleteCloudinaryResource)(eventExists.documentUrl, "raw");
             }
+            // Delete event from DB (speakers delete automatically via Prisma cascade configuration)
             yield prisma_1.default.event.delete({ where: { id } });
             res.json({ message: "Event removed" });
         }
@@ -235,7 +282,7 @@ const downloadEventDocument = (req, res) => __awaiter(void 0, void 0, void 0, fu
             res.status(404).json({ message: "No document attached to this event" });
             return;
         }
-        // Fetch the file from Cloudinary server-side (avoids all CORS issues)
+        // Fetch the file from Cloudinary server-side (avoids all client CORS issues)
         console.log("[doc-download] fetching:", event.documentUrl);
         const fileResponse = yield fetch(event.documentUrl);
         console.log("[doc-download] status:", fileResponse.status, fileResponse.statusText);
@@ -247,21 +294,22 @@ const downloadEventDocument = (req, res) => __awaiter(void 0, void 0, void 0, fu
                 .json({ message: "Failed to fetch document from storage" });
             return;
         }
-        // Build a safe filename from the event title
+        // Build a safe, URL-friendly filename from the event title
         const safeName = event.title
             .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/(^-|-$)/g, "");
+            .replace(/[^a-z0-9]+/g, "-") // Replace non-alphanumeric chars with dashes
+            .replace(/(^-|-$)/g, ""); // Trim leading/trailing dashes
         res.setHeader("Content-Type", "application/pdf");
         res.setHeader("Content-Disposition", `attachment; filename="${safeName}-brochure.pdf"`);
-        // Stream the Cloudinary response body directly to the client
+        // Stream the Cloudinary response body directly to the client to avoid loading large files into RAM
         const reader = (_b = (_a = fileResponse.body) === null || _a === void 0 ? void 0 : _a.getReader) === null || _b === void 0 ? void 0 : _b.call(_a);
         if (!reader) {
-            // Fallback: buffer the entire response
+            // Fallback: buffer the entire response if streaming is unsupported
             const buffer = yield fileResponse.arrayBuffer();
             res.send(Buffer.from(buffer));
             return;
         }
+        // Pump response data chunks to client response stream
         const pump = () => __awaiter(void 0, void 0, void 0, function* () {
             const { done, value } = yield reader.read();
             if (done) {

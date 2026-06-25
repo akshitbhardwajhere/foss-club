@@ -27,37 +27,43 @@ const SHEET_ID = process.env.GOOGLE_SHEET_ID;
  */
 const getDashboardStats = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const totalEvents = yield prisma_1.default.event.count();
-        const upcomingEvents = yield prisma_1.default.event.count({
-            where: {
-                date: {
-                    gt: new Date(),
-                },
-            },
-        });
-        const pastEvents = yield prisma_1.default.event.count({
-            where: {
-                date: {
-                    lte: new Date(),
-                },
-            },
-        });
-        const totalTeamMembers = yield prisma_1.default.teamMember.count();
-        const totalBlogs = yield prisma_1.default.blog.count();
-        let totalQueries = 0;
-        if (SHEET_ID) {
+        const now = new Date();
+        const totalQueriesPromise = (() => __awaiter(void 0, void 0, void 0, function* () {
+            if (!SHEET_ID)
+                return 0;
             try {
                 const sheetResponse = yield google_1.sheets.spreadsheets.values.get({
                     spreadsheetId: SHEET_ID,
                     range: "Sheet1!A:G",
                 });
                 const rows = sheetResponse.data.values || [];
-                totalQueries = rows.filter((r) => r[0] && String(r[0]).toLowerCase() !== "date").length;
+                return rows.filter((r) => r[0] && String(r[0]).toLowerCase() !== "date").length;
             }
             catch (e) {
                 console.error("Could not fetch sheet queries:", e);
+                return 0;
             }
-        }
+        }))();
+        const [totalEvents, upcomingEvents, pastEvents, totalTeamMembers, totalBlogs, totalQueries,] = yield Promise.all([
+            prisma_1.default.event.count(),
+            prisma_1.default.event.count({
+                where: {
+                    date: {
+                        gt: now,
+                    },
+                },
+            }),
+            prisma_1.default.event.count({
+                where: {
+                    date: {
+                        lte: now,
+                    },
+                },
+            }),
+            prisma_1.default.teamMember.count(),
+            prisma_1.default.blog.count(),
+            totalQueriesPromise,
+        ]);
         res.json({
             events: {
                 total: totalEvents,

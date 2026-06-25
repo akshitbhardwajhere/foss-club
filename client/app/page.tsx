@@ -24,18 +24,20 @@ import { getStaggeredMotionPresets } from "@/lib/motion";
  *         → Testimonials → Community → FAQ → Final CTA
  */
 export default function Home() {
+  // Define staggered framer-motion container & item presets for clean, premium loading animations
   const { containerVariants, itemVariants } = getStaggeredMotionPresets({
-    childStagger: 0.18,
-    childDelay: 0.2,
-    itemOffsetY: 28,
-    itemDuration: 0.6,
+    childStagger: 0.18, // Time delay between consecutive children entry
+    childDelay: 0.2,    // Initial delay before start
+    itemOffsetY: 28,    // Vertical offset shift
+    itemDuration: 0.6,  // Transition duration
   });
 
   return (
     <div className="bg-[#050B08] text-white min-h-screen flex flex-col items-center font-sans selection:bg-[#08B74F]/30 selection:text-white relative overflow-hidden w-full max-w-[100vw]">
+      {/* Background ambient lighting/gradient blur elements */}
       <BackgroundBlur />
 
-      {/* ─── HERO ──────────────────────────────────────────────────── */}
+      {/* ─── HERO SECTION ───────────────────────────────────────────── */}
       <motion.section
         className="flex flex-col items-center justify-center min-h-svh pt-28 pb-16 md:pt-32 md:pb-20 px-4 max-w-7xl z-10 w-full relative"
         variants={containerVariants}
@@ -114,7 +116,8 @@ export default function Home() {
         <div className="h-px bg-gradient-to-r from-transparent via-zinc-800/60 to-transparent" />
       </div>
 
-      {/* ─── STATS ─────────────────────────────────────────────────── */}
+      {/* ─── STATS SECTION ──────────────────────────────────────────── */}
+      {/* Displays key metrics such as member count, events hosted, and projects built */}
       <StatsSection />
 
       {/* Divider */}
@@ -122,7 +125,8 @@ export default function Home() {
         <div className="h-px bg-gradient-to-r from-transparent via-zinc-800/60 to-transparent" />
       </div>
 
-      {/* ─── DOMAINS ───────────────────────────────────────────────── */}
+      {/* ─── DOMAINS SECTION ────────────────────────────────────────── */}
+      {/* Showcases different focus areas like Web Dev, App Dev, Devops, and Open Source */}
       <DomainsSection />
 
       {/* Divider */}
@@ -130,7 +134,8 @@ export default function Home() {
         <div className="h-px bg-gradient-to-r from-transparent via-zinc-800/60 to-transparent" />
       </div>
 
-      {/* ─── UPCOMING EVENTS ───────────────────────────────────────── */}
+      {/* ─── UPCOMING EVENTS SECTION ────────────────────────────────── */}
+      {/* Dynamically queries and lists upcoming hackathons, workshops, and meetups */}
       <UpcomingEventsSection />
 
       {/* Divider */}
@@ -138,7 +143,8 @@ export default function Home() {
         <div className="h-px bg-gradient-to-r from-transparent via-zinc-800/60 to-transparent" />
       </div>
 
-      {/* ─── ABOUT ─────────────────────────────────────────────────── */}
+      {/* ─── ABOUT SECTION ──────────────────────────────────────────── */}
+      {/* Provides detailed background context about the club's mission and core values */}
       <AboutSection />
 
       {/* Divider */}
@@ -154,7 +160,8 @@ export default function Home() {
         <div className="h-px bg-gradient-to-r from-transparent via-zinc-800/60 to-transparent" />
       </div>
 
-      {/* ─── LEARNING ROADMAPS ─────────────────────────────────────── */}
+      {/* ─── LEARNING ROADMAPS SECTION ──────────────────────────────── */}
+      {/* Offers curated learning guides and tracks for different technologies */}
       <RoadmapsSection />
 
       {/* Divider */}
@@ -170,7 +177,8 @@ export default function Home() {
         <div className="h-px bg-gradient-to-r from-transparent via-zinc-800/60 to-transparent" />
       </div>
 
-      {/* ─── COMMUNITY ─────────────────────────────────────────────── */}
+      {/* ─── COMMUNITY SECTION ──────────────────────────────────────── */}
+      {/* Invitation channels (Discord/WhatsApp links) to connect with other devs */}
       <CommunitySection />
 
       {/* Divider */}
@@ -178,7 +186,8 @@ export default function Home() {
         <div className="h-px bg-gradient-to-r from-transparent via-zinc-800/60 to-transparent" />
       </div>
 
-      {/* ─── FAQ ───────────────────────────────────────────────────── */}
+      {/* ─── FAQ SECTION ────────────────────────────────────────────── */}
+      {/* Accordion list addressing common onboarding and participation queries */}
       <FAQSection />
 
       {/* Divider */}
@@ -186,7 +195,8 @@ export default function Home() {
         <div className="h-px bg-gradient-to-r from-transparent via-zinc-800/60 to-transparent" />
       </div>
 
-      {/* ─── FINAL CTA ─────────────────────────────────────────────── */}
+      {/* ─── FINAL CTA SECTION ──────────────────────────────────────── */}
+      {/* Large closing banner to drive sign-ups and registrations */}
       <FinalCTASection />
     </div>
   );

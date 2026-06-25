@@ -1,12 +1,15 @@
+// Generator block specifies that the Prisma Client JavaScript library should be built
 generator client {
   provider = "prisma-client-js"
 }
 
+// Datasource block configures connection settings for the PostgreSQL database via env variable
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+/// Stores administrator account information for dashboard system logins.
 model Admin {
   id           String   @id @default(uuid())
   passwordHash String
@@ -15,6 +18,7 @@ model Admin {
   email        String   @unique
 }
 
+/// Represents a club event such as a hackathon, workshop, or meeting.
 model Event {
   id                 String                   @id @default(uuid())
   title              String
@@ -28,13 +32,16 @@ model Event {
   documentUrl        String?
   registrationUrl    String?
   isDateTentative    Boolean                  @default(false)
+  // Cascade delete relations: deleting an event deletes its gallery images and speakers
   galleryImages      EventGalleryImage[]
   speakers           Speaker[]
 
+  // Indexes to accelerate event sorting and queries
   @@index([createdAt])
   @@index([date])
 }
 
+/// Individual photos linked to a specific club event.
 model EventGalleryImage {
   id          String   @id @default(uuid())
   eventId     String
@@ -43,12 +50,15 @@ model EventGalleryImage {
   order       Int      @default(0)
   createdAt   DateTime @default(now())
 
+  // Link to the parent Event model; delete cascade cleans up records on parent removal
   event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
+  // Indexes to accelerate querying images by event and maintaining slide order
   @@index([eventId])
   @@index([order])
 }
 
+/// Profiles of speakers who are invited to events.
 model Speaker {
   id        String   @id @default(uuid())
   eventId   String
@@ -61,11 +71,13 @@ model Speaker {
   bio       String
   createdAt DateTime @default(now())
 
+  // Link to the parent Event model
   event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@index([eventId])
 }
 
+/// Blog posts authored by community members.
 model Blog {
   id        String   @id @default(uuid())
   title     String
@@ -79,6 +91,7 @@ model Blog {
   @@index([createdAt])
 }
 
+/// Catalog of FOSS club members. Can be filtered for active team or alumni.
 model TeamMember {
   id          String   @id @default(uuid())
   name        String
@@ -93,6 +106,7 @@ model TeamMember {
   isAlumni    Boolean  @default(false)
   company     String?
 
+  // Indexes to accelerate members ordering and filtering based on graduation status
   @@index([order])
   @@index([isAlumni, order])
 }
