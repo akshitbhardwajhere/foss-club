@@ -1,9 +1,8 @@
 "use client";
 
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
-import { User, Calendar, ArrowUpDown } from "lucide-react";
-import Link from "next/link";
-import Image from "next/image";
+import { ArrowUpDown, BookOpen, PenLine } from "lucide-react";
+import { motion } from "framer-motion";
 import api from "@/lib/axios";
 import BackgroundBlur from "@/components/shared/BackgroundBlur";
 import PageHeader from "@/components/shared/PageHeader";
@@ -16,36 +15,34 @@ import {
 } from "@/components/ui/dropdown-menu";
 import SearchInput from "@/components/shared/SearchInput";
 import PaginationControls from "@/components/shared/PaginationControls";
+import BlogCard from "@/components/cards/BlogCard";
+import FeaturedBlogHero from "@/components/blogs/FeaturedBlogHero";
+import BlogListingSkeleton from "@/components/blogs/BlogListingSkeleton";
+import type { BlogListItem } from "@/components/blogs/types";
+import { getStaggeredMotionPresets } from "@/lib/motion";
 
-interface Blog {
-  id: string;
-  title: string;
-  content: string;
-  author: string;
-  tags: string[];
-  imageUrl?: string;
-  createdAt: string;
-}
-
-import { Skeleton } from "@/components/ui/skeleton";
+const GRID_ITEMS_PER_PAGE = 6;
 
 /**
  * BlogsPage Component
  *
- * The main public-facing blog directory for the FOSS club.
- * Fetches all published blogs from the backend (`/api/blogs`) and displays them with a paginated, searchable interface.
- * Allows users to sort chronological posts natively in the client.
+ * Public blog directory with a magazine-style card layout, featured hero,
+ * search, date sorting, and pagination.
  */
 export default function BlogsPage() {
-  const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [blogs, setBlogs] = useState<BlogListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const deferredSearchQuery = useDeferredValue(searchQuery);
   const [dateSort, setDateSort] = useState<"default" | "desc" | "asc">(
-    "default",
+    "desc",
   );
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+
+  const { containerVariants, itemVariants } = getStaggeredMotionPresets({
+    childStagger: 0.08,
+    itemOffsetY: 24,
+  });
 
   useEffect(() => {
     setCurrentPage(1);
@@ -56,7 +53,7 @@ export default function BlogsPage() {
       try {
         const res = await api.get("/api/blogs");
         setBlogs(res.data);
-      } catch (err) {
+      } catch {
         // Error silently logged in production
       } finally {
         setLoading(false);
@@ -78,7 +75,7 @@ export default function BlogsPage() {
       );
     });
 
-    return filteredBlogs.sort((a, b) => {
+    return [...filteredBlogs].sort((a, b) => {
       if (dateSort === "default") return 0;
 
       const dateA = new Date(a.createdAt).getTime();
@@ -87,231 +84,182 @@ export default function BlogsPage() {
     });
   }, [blogs, dateSort, normalizedSearch]);
 
+  const showFeatured =
+    currentPage === 1 &&
+    !normalizedSearch &&
+    dateSort !== "asc" &&
+    sortedFilteredBlogs.length > 0;
+
+  const featuredBlog = showFeatured ? sortedFilteredBlogs[0] : null;
+  const listForPagination = showFeatured
+    ? sortedFilteredBlogs.slice(1)
+    : sortedFilteredBlogs;
+
   const totalPages = useMemo(
-    () => Math.ceil(sortedFilteredBlogs.length / itemsPerPage),
-    [sortedFilteredBlogs.length],
+    () => Math.max(1, Math.ceil(listForPagination.length / GRID_ITEMS_PER_PAGE)),
+    [listForPagination.length],
   );
 
   const paginatedBlogs = useMemo(
     () =>
-      sortedFilteredBlogs.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage,
+      listForPagination.slice(
+        (currentPage - 1) * GRID_ITEMS_PER_PAGE,
+        currentPage * GRID_ITEMS_PER_PAGE,
       ),
-    [sortedFilteredBlogs, currentPage],
+    [listForPagination, currentPage],
   );
+
+  const sortLabel =
+    dateSort === "desc"
+      ? "Newest First"
+      : dateSort === "asc"
+        ? "Oldest First"
+        : "Default";
 
   return (
     <div className="bg-[#050B08] text-white min-h-screen flex flex-col items-center overflow-x-hidden relative w-full pt-32 pb-20 px-4 font-sans selection:bg-[#08B74F]/30 selection:text-white">
-      {/* Dynamic Background Blurs */}
       <BackgroundBlur />
 
-      <div className="max-w-6xl mx-auto w-full z-10">
-        <PageHeader title="Our Blog" />
+      <motion.div
+        className="max-w-7xl mx-auto w-full z-10"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div
+          variants={itemVariants}
+          className="mb-4 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#08B74F]/30 bg-[#08B74F]/5 text-[#08B74F] text-sm font-medium mx-auto w-fit"
+        >
+          <PenLine className="w-4 h-4" />
+          Student Stories
+        </motion.div>
 
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
+        <PageHeader
+          title={
+            <>
+              Our{" "}
+              <span className="text-transparent bg-clip-text bg-linear-to-r from-[#08B74F] to-emerald-400">
+                Blog
+              </span>
+            </>
+          }
+        />
+
+        <motion.p
+          variants={itemVariants}
+          className="text-zinc-400 text-center text-base md:text-lg max-w-2xl mx-auto mb-10 leading-relaxed"
+        >
+          Technical articles, tutorials, and insights written by student
+          developers at FOSS Club NIT Srinagar.
+        </motion.p>
+
+        {!loading && sortedFilteredBlogs.length > 0 && (
+          <motion.div
+            variants={itemVariants}
+            className="flex flex-wrap justify-center gap-3 mb-10"
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900/50 border border-zinc-800 text-sm">
+              <BookOpen className="w-4 h-4 text-[#08B74F]" />
+              <span className="text-zinc-400">
+                <span className="text-white font-semibold">
+                  {sortedFilteredBlogs.length}
+                </span>{" "}
+                {sortedFilteredBlogs.length === 1 ? "article" : "articles"}
+              </span>
+            </div>
+          </motion.div>
+        )}
+
+        <motion.div
+          variants={itemVariants}
+          className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 mb-10"
+        >
           <SearchInput
-            className="w-full md:w-96"
-            placeholder="Search by blog title/author"
+            className="w-full md:max-w-md"
+            placeholder="Search by title, author, or tag…"
             value={searchQuery}
             onChange={setSearchQuery}
           />
 
-          <div className="flex items-center gap-2 w-full md:w-auto ml-auto">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  aria-label="Sort blogs"
-                  className="px-4 py-2 rounded-full bg-zinc-800/50 border border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-700 transition-colors flex items-center justify-center gap-2 text-sm font-medium w-full md:w-auto"
-                >
-                  <ArrowUpDown className="w-4 h-4" />
-                  Sort By
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                className="bg-zinc-900 border-zinc-800 text-zinc-200"
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                aria-label="Sort blogs"
+                className="px-5 py-3 rounded-full bg-zinc-900/50 border border-zinc-700 text-zinc-300 hover:text-white hover:border-[#08B74F]/40 hover:bg-zinc-800/80 transition-all flex items-center justify-center gap-2 text-sm font-medium w-full md:w-auto"
               >
-                <DropdownMenuRadioGroup
-                  value={dateSort}
-                  onValueChange={(value) =>
-                    setDateSort(value as "default" | "asc" | "desc")
-                  }
-                >
-                  <DropdownMenuRadioItem value="default">
-                    Default Sort
-                  </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="desc">
-                    Date: Newest First
-                  </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="asc">
-                    Date: Oldest First
-                  </DropdownMenuRadioItem>
-                </DropdownMenuRadioGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
+                <ArrowUpDown className="w-4 h-4 text-[#08B74F]" />
+                {sortLabel}
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              className="bg-zinc-900 border-zinc-800 text-zinc-200"
+            >
+              <DropdownMenuRadioGroup
+                value={dateSort}
+                onValueChange={(value) =>
+                  setDateSort(value as "default" | "asc" | "desc")
+                }
+              >
+                <DropdownMenuRadioItem value="desc">
+                  Date: Newest First
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="asc">
+                  Date: Oldest First
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="default">
+                  Default Order
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </motion.div>
 
         {loading ? (
-          <div className="flex flex-col gap-4">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div
-                key={i}
-                className="flex items-center gap-4 bg-zinc-900/40 p-4 lg:p-6 rounded-2xl border border-zinc-800"
-              >
-                <Skeleton className="h-12 w-12 rounded bg-zinc-800 hidden md:block" />
-                <div className="flex-1 space-y-3">
-                  <Skeleton className="h-5 w-1/3 bg-zinc-800" />
-                  <Skeleton className="h-4 w-1/4 bg-zinc-800" />
-                </div>
-                <div className="w-32 hidden lg:block">
-                  <Skeleton className="h-4 w-full bg-zinc-800" />
-                </div>
-                <div className="w-32 hidden md:block">
-                  <Skeleton className="h-4 w-full bg-zinc-800" />
-                </div>
-                <div className="w-24">
-                  <Skeleton className="h-8 w-full rounded-full bg-zinc-800" />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : paginatedBlogs.length === 0 ? (
-          <p className="text-zinc-400 text-center py-12">
-            No blogs found matching your query.
-          </p>
+          <BlogListingSkeleton />
+        ) : sortedFilteredBlogs.length === 0 ? (
+          <motion.div
+            variants={itemVariants}
+            className="text-center py-20 px-6 rounded-3xl border border-zinc-800/60 bg-zinc-900/30"
+          >
+            <BookOpen className="w-12 h-12 text-zinc-700 mx-auto mb-4" />
+            <p className="text-zinc-300 text-lg font-medium mb-2">
+              No articles found
+            </p>
+            <p className="text-zinc-500 text-sm">
+              Try adjusting your search or sort filters.
+            </p>
+          </motion.div>
         ) : (
-          <div className="bg-zinc-900/30 border border-zinc-800 rounded-2xl overflow-hidden backdrop-blur-sm shadow-xl">
-            {/* Table Header */}
-            <div className="hidden lg:grid grid-cols-12 gap-4 px-8 py-5 bg-zinc-900 border-b border-zinc-800 text-xs font-bold text-zinc-400 uppercase tracking-wider">
-              <div className="col-span-1">No.</div>
-              <div className="col-span-4 lg:col-span-5">BLOG TITLE</div>
-              <div className="col-span-3 lg:col-span-2">AUTHOR</div>
-              <div className="col-span-2">PUBLISHED DATE</div>
-              <div className="col-span-2 text-right">ACTION</div>
-            </div>
+          <>
+            {featuredBlog && <FeaturedBlogHero blog={featuredBlog} />}
 
-            {/* Table Body */}
-            <div className="divide-y divide-zinc-800/50">
-              {paginatedBlogs.map((blog, i) => (
-                <div
-                  key={blog.id}
-                  className="grid grid-cols-1 lg:grid-cols-12 gap-4 px-6 lg:px-8 py-5 items-center hover:bg-zinc-800/30 transition-colors group"
-                >
-                  <div className="hidden lg:block col-span-1 text-zinc-500 font-medium text-sm">
-                    {(currentPage - 1) * itemsPerPage + i + 1}
-                  </div>
-                  <div className="col-span-1 lg:col-span-5 flex items-start gap-5">
-                    {blog.imageUrl && (
-                      <div className="w-20 h-20 bg-zinc-800 rounded-xl overflow-hidden shrink-0 relative hidden md:block border border-zinc-700/50">
-                        <Image
-                          src={blog.imageUrl}
-                          alt=""
-                          fill
-                          sizes="80px"
-                          className="object-cover group-hover:scale-110 transition-transform duration-500"
-                        />
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <Link href={`/blogs/${blog.id}`} className="block">
-                        <h3 className="font-bold text-white text-lg group-hover:text-[#08B74F] transition-colors truncate">
-                          {blog.title}
-                        </h3>
-                      </Link>
+            {paginatedBlogs.length > 0 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {paginatedBlogs.map((blog, i) => (
+                  <BlogCard key={blog.id} blog={blog} index={i} />
+                ))}
+              </div>
+            )}
 
-                      {/* Mobile only details */}
-                      <div className="flex flex-wrap items-center gap-3 mt-2 lg:hidden">
-                        <div className="flex items-center gap-1.5 text-xs text-zinc-400">
-                          <User className="w-3.5 h-3.5 text-[#08B74F]" />
-                          <span className="truncate max-w-37.5">
-                            {blog.author}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-xs text-zinc-400">
-                          <Calendar className="w-3.5 h-3.5 text-[#08B74F]" />
-                          <span>
-                            {new Date(blog.createdAt).toLocaleDateString(
-                              "en-GB",
-                              {
-                                day: "numeric",
-                                month: "short",
-                                year: "numeric",
-                              },
-                            )}
-                          </span>
-                        </div>
-                      </div>
+            {showFeatured && paginatedBlogs.length === 0 && (
+              <p className="text-zinc-500 text-center text-sm py-4">
+                More articles coming soon.
+              </p>
+            )}
 
-                      {/* Tags */}
-                      {blog.tags && blog.tags.length > 0 && (
-                        <div className="hidden lg:mt-2 lg:flex lg:flex-wrap lg:gap-2">
-                          {blog.tags.slice(0, 2).map((tag, idx) => (
-                            <span
-                              key={idx}
-                              className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="hidden lg:flex col-span-2 text-sm text-zinc-400 items-center gap-2">
-                    <User className="w-4 h-4 text-zinc-600 shrink-0" />
-                    <span className="truncate">{blog.author}</span>
-                  </div>
-
-                  <div className="hidden lg:flex col-span-2 text-sm items-center text-zinc-300 gap-2">
-                    <Calendar className="w-4 h-4 text-zinc-600 shrink-0" />
-                    <span className="font-medium">
-                      {new Date(blog.createdAt)
-                        .getDate()
-                        .toString()
-                        .padStart(2, "0")}{" "}
-                      {
-                        [
-                          "Jan",
-                          "Feb",
-                          "Mar",
-                          "Apr",
-                          "May",
-                          "Jun",
-                          "Jul",
-                          "Aug",
-                          "Sep",
-                          "Oct",
-                          "Nov",
-                          "Dec",
-                        ][new Date(blog.createdAt).getMonth()]
-                      }{" "}
-                      {new Date(blog.createdAt).getFullYear()}
-                    </span>
-                  </div>
-
-                  <div className="col-span-1 lg:col-span-2 flex justify-start lg:justify-end mt-4 lg:mt-0">
-                    <Link
-                      href={`/blogs/${blog.id}`}
-                      className="px-6 py-2.5 rounded-full font-bold text-xs tracking-wider transition-all duration-300 w-full lg:w-auto text-center border bg-zinc-800 text-zinc-300 border-zinc-700 hover:bg-white hover:text-black hover:border-white shadow-[0_0_15px_transparent] hover:shadow-[0_0_15px_rgba(255,255,255,0.3)]"
-                    >
-                      READ MORE
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <PaginationControls
-              totalPages={totalPages}
-              currentPage={currentPage}
-              onPageChange={setCurrentPage}
-            />
-          </div>
+            {totalPages > 1 && (
+              <div className="mt-10 rounded-2xl border border-zinc-800/60 bg-zinc-900/30 overflow-hidden">
+                <PaginationControls
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  onPageChange={setCurrentPage}
+                />
+              </div>
+            )}
+          </>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }
