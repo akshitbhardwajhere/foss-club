@@ -24,11 +24,6 @@ export const getEvents = async (req: Request, res: Response) => {
         isDateTentative: true,
         imageUrl: true,
         registrationUrl: true,
-        registrationConfig: {
-          select: {
-            validUntil: true,
-          },
-        },
         speakers: {
           select: {
             id: true,
@@ -67,7 +62,7 @@ export const getNextEvent = async (req: Request, res: Response) => {
       orderBy: {
         date: "asc", // Get the chronologically closest one first
       },
-      include: { registrationConfig: true, speakers: true },
+      include: { speakers: true },
     });
 
     // It's perfectly normal for this to be null if there are no upcoming events
@@ -93,7 +88,7 @@ export const getEventById = async (
     const id = req.params.id as string;
     const event = await prisma.event.findUnique({
       where: { id },
-      include: { registrationConfig: true, speakers: true },
+      include: { speakers: true },
     });
     if (event) {
       res.json(event);

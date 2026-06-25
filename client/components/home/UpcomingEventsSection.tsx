@@ -15,7 +15,6 @@ interface Event {
   date: string;
   venue?: string;
   imageUrl?: string;
-  registrationConfig?: { validUntil: string; eventName: string };
 }
 
 function formatDate(dateStr: string) {
@@ -95,10 +94,6 @@ export default function UpcomingEventsSection() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {events.map((event, i) => {
-            const regOpen =
-              event.registrationConfig &&
-              new Date(event.registrationConfig.validUntil) > new Date();
-
             return (
               <motion.div
                 key={event.id}

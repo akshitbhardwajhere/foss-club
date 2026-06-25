@@ -12,8 +12,6 @@ This codebase contains:
 ### Public experience
 
 - Home page with dynamic next-event countdown.
-- Events listing and event detail pages.
-- Event registration flow.
 - Blogs listing and detail pages.
 - Team and alumni pages.
 - Gallery listing and event-wise gallery detail pages.
@@ -122,8 +120,6 @@ foss-club/
 - `/`
 - `/about`
 - `/events`
-- `/events/[id]`
-- `/events/registration/[eventName]`
 - `/blogs`
 - `/blogs/[id]`
 - `/gallery`
@@ -162,10 +158,7 @@ All routes are mounted in `server/src/index.ts`.
 
 - `GET /api/alumni/`
 
-### Registration (`/api/registration`)
 
-- `GET /api/registration/config/:eventId`
-- `POST /api/registration/submit`
 
 ### Contact/community (`/api/contact`)
 
@@ -183,8 +176,6 @@ Core models defined in `server/prisma/schema.prisma`:
 - `EventGalleryImage`
 - `Blog`
 - `TeamMember`
-- `EventRegistrationConfig`
-- `EventRegistration`
 
 ## Environment Variables
 

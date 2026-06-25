@@ -35,7 +35,6 @@ interface Event {
   location: string;
   imageUrl?: string;
   category?: string;
-  registrationConfig?: any;
   isDateTentative?: boolean;
   speakers?: Speaker[];
 }

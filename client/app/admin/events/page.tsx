@@ -34,7 +34,6 @@ interface EventItem {
   imageUrl?: string;
   documentUrl?: string;
   registrationUrl?: string;
-  registrationConfig?: any;
   isDateTentative?: boolean;
 }
 

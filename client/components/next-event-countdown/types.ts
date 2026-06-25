@@ -3,7 +3,6 @@ export interface NextEvent {
   title: string;
   date: string;
   imageUrl?: string | null;
-  registrationConfig?: unknown;
   isDateTentative?: boolean;
 }
 
