@@ -194,10 +194,12 @@ export default function EventsPage() {
         {/* Top Tag Badge */}
         <motion.div
           variants={itemVariants}
-          className="mb-4 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#08B74F]/30 bg-[#08B74F]/5 text-[#08B74F] text-xs font-semibold mx-auto w-fit"
+          className="flex justify-center mb-4"
         >
-          <Calendar className="w-3.5 h-3.5" />
-          Club Schedule
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#08B74F]/30 bg-[#08B74F]/5 text-[#08B74F] text-xs font-semibold">
+            <Calendar className="w-3.5 h-3.5" />
+            Club Schedule
+          </div>
         </motion.div>
 
         {/* Header Title */}

@@ -112,10 +112,12 @@ export default function BlogsPage() {
       >
         <motion.div
           variants={itemVariants}
-          className="mb-4 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#08B74F]/30 bg-[#08B74F]/5 text-[#08B74F] text-sm font-medium mx-auto w-fit"
+          className="flex justify-center mb-4"
         >
-          <PenLine className="w-4 h-4" />
-          Student Stories
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#08B74F]/30 bg-[#08B74F]/5 text-[#08B74F] text-sm font-medium">
+            <PenLine className="w-4 h-4" />
+            Student Stories
+          </div>
         </motion.div>
 
         <PageHeader
