@@ -299,7 +299,7 @@ export default function EventDetailPage() {
             <EventAgenda />
 
             {/* Speaker & Host Profile Grids */}
-            <SpeakerGrid />
+            <SpeakerGrid speakers={event.speakers} />
 
             {/* Event FAQ Accordion Section */}
             <EventFAQ />

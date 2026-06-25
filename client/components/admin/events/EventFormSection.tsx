@@ -1,6 +1,7 @@
 "use client";
 
 import type { UseFormReturn } from "react-hook-form";
+import { useFieldArray } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -15,6 +16,7 @@ import ImageUpload from "@/components/ImageUpload";
 import PdfUpload from "@/components/PdfUpload";
 import type { EventFormValues } from "./formSchema";
 import { EVENT_CATEGORIES } from "./formSchema";
+import { PlusCircle, Trash2, Users } from "lucide-react";
 
 interface EventFormSectionProps {
   form: UseFormReturn<EventFormValues>;
@@ -29,6 +31,11 @@ export default function EventFormSection({
   editingId,
   onSubmit,
 }: EventFormSectionProps) {
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "speakers",
+  });
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -282,6 +289,217 @@ export default function EventFormSection({
               )}
             />
           </div>
+        </div>
+
+        {/* Dynamic Speakers & Hosts Section */}
+        <div className="border-t border-zinc-800 pt-6 mt-8 space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                <Users className="w-4 h-4 text-[#08B74F]" /> Hosts & Speakers
+              </h4>
+              <p className="text-xs text-zinc-500 mt-0.5">
+                Add profile details for speakers, key organizers, or mentors leading this event.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() =>
+                append({
+                  name: "",
+                  role: "",
+                  org: "",
+                  imageUrl: "",
+                  github: "",
+                  linkedin: "",
+                  bio: "",
+                })
+              }
+              className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800/80 hover:border-zinc-700/80 transition-all text-xs font-bold shrink-0 self-start md:self-auto"
+            >
+              <PlusCircle className="w-4 h-4 text-[#08B74F]" /> Add Host / Speaker
+            </button>
+          </div>
+
+          {fields.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-zinc-850 p-8 text-center text-zinc-600 text-xs">
+              No hosts or speakers added yet. Click &quot;Add Host / Speaker&quot; to list speakers.
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {fields.map((field, index) => (
+                <div
+                  key={field.id}
+                  className="p-5 rounded-2xl border border-zinc-850 bg-zinc-900/10 hover:border-zinc-800 transition-colors relative space-y-4"
+                >
+                  <div className="flex items-center justify-between border-b border-zinc-900/60 pb-3">
+                    <span className="text-xs font-black text-[#08B74F]/80 uppercase tracking-widest">
+                      Host / Speaker #{index + 1}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => remove(index)}
+                      className="text-zinc-600 hover:text-red-500 transition-colors p-1 rounded-lg hover:bg-zinc-900/50"
+                      title="Remove Speaker"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-[160px_1fr] gap-6">
+                    {/* Left: Speaker Avatar Upload */}
+                    <div className="space-y-2">
+                      <FormField
+                        control={form.control}
+                        name={`speakers.${index}.imageUrl`}
+                        render={({ field: imgField }) => (
+                          <FormItem>
+                            <FormLabel className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                              Profile Image
+                            </FormLabel>
+                            <FormControl>
+                              <div className="w-full max-w-[140px]">
+                                <ImageUpload
+                                  value={imgField.value || ""}
+                                  onChange={(url) => imgField.onChange(url)}
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* Right: Speaker Attributes */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name={`speakers.${index}.name`}
+                        render={({ field: nameField }) => (
+                          <FormItem>
+                            <FormLabel className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                              Full Name *
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="e.g. Akshit Bhardwaj"
+                                className="bg-[#111e16] border-[#1b3123] h-10 px-3 focus-visible:ring-[#08B74F] text-white text-sm"
+                                {...nameField}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name={`speakers.${index}.role`}
+                        render={({ field: roleField }) => (
+                          <FormItem>
+                            <FormLabel className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                              Role / Designation *
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="e.g. Technical Lead"
+                                className="bg-[#111e16] border-[#1b3123] h-10 px-3 focus-visible:ring-[#08B74F] text-white text-sm"
+                                {...roleField}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name={`speakers.${index}.org`}
+                        render={({ field: orgField }) => (
+                          <FormItem>
+                            <FormLabel className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                              Organization *
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="e.g. FOSS Club NIT Srinagar"
+                                className="bg-[#111e16] border-[#1b3123] h-10 px-3 focus-visible:ring-[#08B74F] text-white text-sm"
+                                {...orgField}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <FormField
+                          control={form.control}
+                          name={`speakers.${index}.github`}
+                          render={({ field: ghField }) => (
+                            <FormItem>
+                              <FormLabel className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                                GitHub Link
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="https://github.com/..."
+                                  className="bg-[#111e16] border-[#1b3123] h-10 px-3 focus-visible:ring-[#08B74F] text-white text-xs"
+                                  {...ghField}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name={`speakers.${index}.linkedin`}
+                          render={({ field: liField }) => (
+                            <FormItem>
+                              <FormLabel className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                                LinkedIn Link
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="https://linkedin.com/in/..."
+                                  className="bg-[#111e16] border-[#1b3123] h-10 px-3 focus-visible:ring-[#08B74F] text-white text-xs"
+                                  {...liField}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <FormField
+                        control={form.control}
+                        name={`speakers.${index}.bio`}
+                        render={({ field: bioField }) => (
+                          <FormItem className="col-span-full">
+                            <FormLabel className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                              Brief Bio *
+                            </FormLabel>
+                            <FormControl>
+                              <textarea
+                                className="w-full h-20 bg-[#111e16] border border-[#1b3123] rounded-lg p-3 text-sm text-zinc-300 placeholder-zinc-600 focus:outline-none focus:border-[#08B74F]/50 focus:ring-1 focus:ring-[#08B74F]/50 transition-all resize-none"
+                                placeholder="Write a short summary of the speaker's topics, domain expertise, etc."
+                                {...bioField}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="flex justify-end pt-2">

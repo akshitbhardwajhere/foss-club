@@ -29,6 +29,7 @@ model Event {
   isDateTentative    Boolean                  @default(false)
   registrationConfig EventRegistrationConfig?
   galleryImages      EventGalleryImage[]
+  speakers           Speaker[]
 
   @@index([createdAt])
   @@index([date])
@@ -46,6 +47,23 @@ model EventGalleryImage {
 
   @@index([eventId])
   @@index([order])
+}
+
+model Speaker {
+  id        String   @id @default(uuid())
+  eventId   String
+  name      String
+  role      String
+  org       String
+  imageUrl  String?
+  github    String?
+  linkedin  String?
+  bio       String
+  createdAt DateTime @default(now())
+
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
 }
 
 model Blog {

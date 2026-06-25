@@ -67,6 +67,7 @@ export default function EventsAdminPage() {
       imageUrl: "",
       documentUrl: "",
       isDateTentative: false,
+      speakers: [],
     },
   });
 
@@ -110,30 +111,48 @@ export default function EventsAdminPage() {
     }
   };
 
-  const handleEdit = (event: EventItem) => {
-    let localDateString = "";
-    if (event.date) {
-      if (event.isDateTentative) {
-        localDateString = event.date.slice(0, 7);
-      } else {
-        const d = new Date(event.date);
-        localDateString = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
-          .toISOString()
-          .slice(0, 16);
+  const handleEdit = async (event: EventItem) => {
+    try {
+      const res = await api.get(`/api/events/${event.id}`);
+      const fullEvent = res.data;
+
+      let localDateString = "";
+      if (fullEvent.date) {
+        if (fullEvent.isDateTentative) {
+          localDateString = fullEvent.date.slice(0, 7);
+        } else {
+          const d = new Date(fullEvent.date);
+          localDateString = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
+            .toISOString()
+            .slice(0, 16);
+        }
       }
+      const mappedSpeakers = (fullEvent.speakers || []).map((s: any) => ({
+        name: s.name || "",
+        role: s.role || "",
+        org: s.org || "",
+        imageUrl: s.imageUrl || "",
+        github: s.github || "",
+        linkedin: s.linkedin || "",
+        bio: s.bio || "",
+      }));
+
+      form.reset({
+        title: fullEvent.title || "",
+        category: fullEvent.category || "",
+        date: localDateString,
+        location: fullEvent.location || "",
+        description: fullEvent.description || "",
+        imageUrl: fullEvent.imageUrl || "",
+        documentUrl: fullEvent.documentUrl || "",
+        isDateTentative: fullEvent.isDateTentative || false,
+        speakers: mappedSpeakers,
+      });
+      setEditingId(fullEvent.id);
+      setIsCreating(true);
+    } catch (error) {
+      toast.error("Failed to load event details.");
     }
-    form.reset({
-      title: event.title || "",
-      category: event.category || "",
-      date: localDateString,
-      location: event.location || "",
-      description: event.description || "",
-      imageUrl: event.imageUrl || "",
-      documentUrl: event.documentUrl || "",
-      isDateTentative: event.isDateTentative || false,
-    });
-    setEditingId(event.id);
-    setIsCreating(true);
   };
 
   async function onSubmit(values: EventFormValues) {
@@ -213,6 +232,7 @@ export default function EventsAdminPage() {
                   imageUrl: "",
                   documentUrl: "",
                   isDateTentative: false,
+                  speakers: [],
                 });
               }}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#08B74F] text-black font-bold hover:bg-[#08B74F]/90 transition-colors w-full md:w-auto justify-center"

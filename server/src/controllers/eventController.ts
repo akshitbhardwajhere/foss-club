@@ -59,7 +59,7 @@ export const getNextEvent = async (req: Request, res: Response) => {
       orderBy: {
         date: "asc", // Get the chronologically closest one first
       },
-      include: { registrationConfig: true },
+      include: { registrationConfig: true, speakers: true },
     });
 
     // It's perfectly normal for this to be null if there are no upcoming events
@@ -85,7 +85,7 @@ export const getEventById = async (
     const id = req.params.id as string;
     const event = await prisma.event.findUnique({
       where: { id },
-      include: { registrationConfig: true },
+      include: { registrationConfig: true, speakers: true },
     });
     if (event) {
       res.json(event);
@@ -114,6 +114,7 @@ export const createEvent = async (req: Request, res: Response) => {
       location,
       imageUrl,
       documentUrl,
+      speakers,
     } = req.body;
 
     const event = await prisma.event.create({
@@ -126,6 +127,20 @@ export const createEvent = async (req: Request, res: Response) => {
         location,
         imageUrl,
         documentUrl: documentUrl || null,
+        speakers: speakers && speakers.length > 0 ? {
+          create: speakers.map((s: any) => ({
+            name: s.name,
+            role: s.role,
+            org: s.org,
+            imageUrl: s.imageUrl || null,
+            github: s.github || null,
+            linkedin: s.linkedin || null,
+            bio: s.bio,
+          })),
+        } : undefined,
+      },
+      include: {
+        speakers: true,
       },
     });
 
@@ -157,6 +172,7 @@ export const updateEvent = async (
       location,
       imageUrl,
       documentUrl,
+      speakers,
     } = req.body;
     const id = req.params.id as string;
 
@@ -180,6 +196,11 @@ export const updateEvent = async (
         await deleteCloudinaryResource(eventExists.documentUrl, "raw");
       }
 
+      // Delete existing speakers first
+      await prisma.speaker.deleteMany({
+        where: { eventId: id },
+      });
+
       const updatedEvent = await prisma.event.update({
         where: { id },
         data: {
@@ -192,6 +213,20 @@ export const updateEvent = async (
           location: location || undefined,
           imageUrl: imageUrl === "" ? null : imageUrl || undefined,
           documentUrl: documentUrl === "" ? null : documentUrl || undefined,
+          speakers: speakers ? {
+            create: speakers.map((s: any) => ({
+              name: s.name,
+              role: s.role,
+              org: s.org,
+              imageUrl: s.imageUrl || null,
+              github: s.github || null,
+              linkedin: s.linkedin || null,
+              bio: s.bio,
+            })),
+          } : undefined,
+        },
+        include: {
+          speakers: true,
         },
       });
       res.json(updatedEvent);

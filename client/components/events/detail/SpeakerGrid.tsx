@@ -3,45 +3,16 @@
 import { motion } from "framer-motion";
 import { Github, Linkedin, MessageSquare, Terminal } from "lucide-react";
 
-interface Speaker {
-  name: string;
-  role: string;
-  org: string;
-  imageUrl: string;
-  github?: string;
-  linkedin?: string;
-  bio: string;
+import { Speaker } from "./types";
+
+interface SpeakerGridProps {
+  speakers?: Speaker[];
 }
 
-export default function SpeakerGrid() {
-  const speakers: Speaker[] = [
-    {
-      name: "Akshit Bhardwaj",
-      role: "Technical Lead",
-      org: "FOSS Club NIT Srinagar",
-      imageUrl: "https://api.dicebear.com/9.x/pixel-art/svg?seed=Akshit",
-      github: "https://github.com",
-      linkedin: "https://linkedin.com",
-      bio: "Open source advocate, full-stack engineer, and systems developer. Leads core projects.",
-    },
-    {
-      name: "Suhail Bashir",
-      role: "Club President",
-      org: "FOSS Club NIT Srinagar",
-      imageUrl: "https://api.dicebear.com/9.x/pixel-art/svg?seed=Suhail",
-      github: "https://github.com",
-      linkedin: "https://linkedin.com",
-      bio: "FOSS researcher, community builder, and coordinator for open-source incubation programs.",
-    },
-    {
-      name: "Dr. Pramod Kumar",
-      role: "Faculty Coordinator",
-      org: "NIT Srinagar",
-      imageUrl: "https://api.dicebear.com/9.x/pixel-art/svg?seed=Pramod",
-      linkedin: "https://linkedin.com",
-      bio: "Assisting students in fostering open-source development, systems research, and innovation.",
-    },
-  ];
+export default function SpeakerGrid({ speakers = [] }: SpeakerGridProps) {
+  if (!speakers || speakers.length === 0) {
+    return null;
+  }
 
   return (
     <div className="w-full bg-zinc-900/20 border border-zinc-800/40 backdrop-blur-sm rounded-3xl p-6 md:p-8 mt-10">
@@ -65,7 +36,7 @@ export default function SpeakerGrid() {
             <div className="flex items-center gap-4 mb-4">
               <div className="relative w-14 h-14 rounded-xl border border-zinc-800 bg-zinc-900 overflow-hidden shrink-0 group-hover:border-[#08B74F]/40 transition-colors">
                 <img
-                  src={speaker.imageUrl}
+                  src={speaker.imageUrl || `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(speaker.name)}`}
                   alt={speaker.name}
                   width={56}
                   height={56}
