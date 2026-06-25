@@ -2,6 +2,7 @@
 
 import type { UseFormReturn } from "react-hook-form";
 import { useFieldArray } from "react-hook-form";
+import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -17,6 +18,13 @@ import PdfUpload from "@/components/PdfUpload";
 import type { EventFormValues } from "./formSchema";
 import { EVENT_CATEGORIES } from "./formSchema";
 import { PlusCircle, Trash2, Users } from "lucide-react";
+
+const RichTextEditor = dynamic(() => import("@/components/RichTextEditor"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[200px] w-full bg-[#0d1a12] animate-pulse rounded-lg border border-[#1b3123]" />
+  ),
+});
 
 interface EventFormSectionProps {
   form: UseFormReturn<EventFormValues>;
@@ -227,13 +235,11 @@ export default function EventFormSection({
                     </span>
                   </div>
                   <FormControl>
-                    <div className="w-full border border-[#1b3123] rounded-lg overflow-hidden bg-[#111e16] focus-within:border-[#08B74F]/50 focus-within:ring-1 focus-within:ring-[#08B74F]/50 transition-all">
-                      <textarea
-                        className="w-full h-128 bg-transparent p-3 text-sm text-zinc-300 placeholder-zinc-600 focus:outline-none resize-none font-mono"
-                        placeholder="# Write your event details here...&#10;- Agenda&#10;- Requirements"
-                        {...field}
-                      ></textarea>
-                    </div>
+                    <RichTextEditor
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Start writing the event description and agenda..."
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -284,6 +290,32 @@ export default function EventFormSection({
                   <FormMessage />
                   <p className="text-[10px] text-zinc-500 mt-1">
                     PDF only, max 10MB. Users will see a download button.
+                  </p>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="registrationUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-medium text-zinc-300 mb-1 block">
+                    Registration Link{" "}
+                    <span className="text-zinc-500 font-normal">
+                      (optional)
+                    </span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="e.g. https://forms.gle/... or external link"
+                      className="bg-[#111e16] border-[#1b3123] h-10 px-3 focus-visible:ring-[#08B74F] text-white text-sm"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                  <p className="text-[10px] text-zinc-500 mt-1">
+                    If provided, registration buttons will direct users to this URL.
                   </p>
                 </FormItem>
               )}

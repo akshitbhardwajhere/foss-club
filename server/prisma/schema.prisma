@@ -26,6 +26,7 @@ model Event {
   updatedAt          DateTime                 @updatedAt
   category           String
   documentUrl        String?
+  registrationUrl    String?
   isDateTentative    Boolean                  @default(false)
   registrationConfig EventRegistrationConfig?
   galleryImages      EventGalleryImage[]

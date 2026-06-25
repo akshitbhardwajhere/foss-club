@@ -18,7 +18,7 @@ import {
 import PaginationControls from "@/components/shared/PaginationControls";
 import { getStaggeredMotionPresets } from "@/lib/motion";
 import { Skeleton } from "@/components/ui/skeleton";
-import { slugify } from "@/lib/utils";
+import { slugify, stripHtml } from "@/lib/utils";
 
 interface Speaker {
   id: string;
@@ -450,7 +450,7 @@ export default function EventsPage() {
                         )}
                       </div>
                       <p className="text-xs text-zinc-400 truncate pr-2">
-                        {evt.description}
+                        {stripHtml(evt.description)}
                       </p>
                     </div>
 

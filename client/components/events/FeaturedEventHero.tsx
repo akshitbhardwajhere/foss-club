@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Calendar, MapPin, Sparkles, Tag, Clock } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { slugify } from "@/lib/utils";
+import { slugify, stripHtml } from "@/lib/utils";
 
 interface Speaker {
   id: string;
@@ -195,7 +195,7 @@ export default function FeaturedEventHero({
               </h2>
 
               <p className="text-zinc-400 text-sm leading-relaxed mb-6 line-clamp-2">
-                {event.description}
+                {stripHtml(event.description)}
               </p>
 
               <div className="flex flex-wrap items-center gap-y-3 gap-x-5 text-xs text-zinc-500 mb-6 border-t border-zinc-900/60 pt-4">

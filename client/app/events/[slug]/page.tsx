@@ -104,29 +104,15 @@ export default function EventDetailPage() {
               router.replace(`/events/${correctSlug}`);
             }
 
-            try {
-              const configRes = await api.get(
-                `/api/registration/config/${id}`,
-              );
-              const isValid = new Date(configRes.data.validUntil) > new Date();
-              const isPast = new Date(res.data.date) < new Date();
-
-              if (configRes.data && isValid && !isPast) {
-                setIsRegistrationOpen(true);
-                const eventNameForUrl = res.data.title
-                  .toLowerCase()
-                  .replace(/[^a-z0-9]+/g, "-")
-                  .replace(/(^-|-$)/g, "");
-                setRegistrationLink(
-                  `/events/registration/${eventNameForUrl}?id=${id}`,
-                );
-              } else if (configRes.data && !isValid && !isPast) {
-                setIsRegistrationClosed(true);
-              } else {
-                setIsRegistrationOpen(false);
-              }
-            } catch (configErr) {
-              console.error("Config fetch error:", configErr);
+            const isPast = new Date(res.data.date) < new Date();
+            if (res.data.registrationUrl && !isPast) {
+              setIsRegistrationOpen(true);
+              setRegistrationLink(res.data.registrationUrl);
+            } else if (res.data.registrationUrl && isPast) {
+              setIsRegistrationClosed(true);
+            } else {
+              setIsRegistrationOpen(false);
+              setIsRegistrationClosed(false);
             }
           }
         }
@@ -289,9 +275,10 @@ export default function EventDetailPage() {
               <h3 className="text-xl md:text-2xl font-bold text-white mb-4">
                 About the Event
               </h3>
-              <p className="whitespace-pre-wrap leading-relaxed text-zinc-350 text-sm md:text-base lg:text-md">
-                {event.description}
-              </p>
+              <div 
+                className="blog-content leading-relaxed text-zinc-350 text-sm md:text-base lg:text-md"
+                dangerouslySetInnerHTML={{ __html: event.description }}
+              />
             </motion.div>
 
             {/* Speaker & Host Profile Grids */}
@@ -329,13 +316,15 @@ export default function EventDetailPage() {
               {/* Main Call to Action Button */}
               <div className="space-y-4">
                 {isRegistrationOpen ? (
-                  <button
-                    onClick={() => router.push(registrationLink)}
-                    className="w-full py-4 bg-[#08B74F] hover:bg-[#08B74F]/95 text-black font-extrabold text-md rounded-2xl shadow-[0_0_25px_rgba(8,183,79,0.35)] hover:shadow-[0_0_35px_rgba(8,183,79,0.6)] transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5 active:translate-y-0 active:scale-98 font-sans"
+                  <a
+                    href={registrationLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-4 bg-[#08B74F] hover:bg-[#08B74F]/95 text-black font-extrabold text-md rounded-2xl shadow-[0_0_25px_rgba(8,183,79,0.35)] hover:shadow-[0_0_35px_rgba(8,183,79,0.6)] transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5 active:translate-y-0 active:scale-98 font-sans cursor-pointer text-center"
                   >
                     <span>Register Now</span>
                     <ChevronRight className="w-5 h-5" />
-                  </button>
+                  </a>
                 ) : isRegistrationClosed ? (
                   <div className="w-full py-4 bg-zinc-900 border border-zinc-800 text-zinc-550 font-bold text-center rounded-2xl cursor-not-allowed text-sm">
                     Registrations Closed

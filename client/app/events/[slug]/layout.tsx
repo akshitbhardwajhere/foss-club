@@ -23,7 +23,8 @@ export async function generateMetadata({
         const res = await axios.get(`${API_BASE}/api/events/${id}`);
         const event: Event = res.data;
 
-        const description = `${event.description.slice(0, 140).trim()} — ${event.location}`;
+        const cleanDesc = event.description.replace(/<[^>]*>/g, "");
+        const description = `${cleanDesc.slice(0, 140).trim()} — ${event.location}`;
         const formattedDate = new Date(event.date).toLocaleDateString("en-IN", {
             day: "numeric",
             month: "long",

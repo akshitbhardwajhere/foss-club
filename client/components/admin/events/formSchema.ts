@@ -24,6 +24,7 @@ export const eventFormSchema = z.object({
   description: z.string().min(10, { message: "Description needed." }),
   imageUrl: z.string().optional(),
   documentUrl: z.string().optional(),
+  registrationUrl: z.string().optional(),
   isDateTentative: z.boolean().optional(),
   speakers: z.array(speakerFormSchema),
 });

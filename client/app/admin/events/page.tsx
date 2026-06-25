@@ -33,6 +33,7 @@ interface EventItem {
   location: string;
   imageUrl?: string;
   documentUrl?: string;
+  registrationUrl?: string;
   registrationConfig?: any;
   isDateTentative?: boolean;
 }
@@ -57,6 +58,7 @@ export default function EventsAdminPage() {
       description: "",
       imageUrl: "",
       documentUrl: "",
+      registrationUrl: "",
       isDateTentative: false,
       speakers: [],
     },
@@ -127,6 +129,7 @@ export default function EventsAdminPage() {
         description: fullEvent.description || "",
         imageUrl: fullEvent.imageUrl || "",
         documentUrl: fullEvent.documentUrl || "",
+        registrationUrl: fullEvent.registrationUrl || "",
         isDateTentative: fullEvent.isDateTentative || false,
         speakers: mappedSpeakers,
       });
@@ -201,6 +204,7 @@ export default function EventsAdminPage() {
                   description: "",
                   imageUrl: "",
                   documentUrl: "",
+                  registrationUrl: "",
                   isDateTentative: false,
                   speakers: [],
                 });

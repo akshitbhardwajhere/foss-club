@@ -22,8 +22,8 @@ export const getEvents = async (req: Request, res: Response) => {
         category: true,
         date: true,
         isDateTentative: true,
-        location: true,
         imageUrl: true,
+        registrationUrl: true,
         registrationConfig: {
           select: {
             validUntil: true,
@@ -122,6 +122,7 @@ export const createEvent = async (req: Request, res: Response) => {
       location,
       imageUrl,
       documentUrl,
+      registrationUrl,
       speakers,
     } = req.body;
 
@@ -135,6 +136,7 @@ export const createEvent = async (req: Request, res: Response) => {
         location,
         imageUrl,
         documentUrl: documentUrl || null,
+        registrationUrl: registrationUrl || null,
         speakers: speakers && speakers.length > 0 ? {
           create: speakers.map((s: any) => ({
             name: s.name,
@@ -180,6 +182,7 @@ export const updateEvent = async (
       location,
       imageUrl,
       documentUrl,
+      registrationUrl,
       speakers,
     } = req.body;
     const id = req.params.id as string;
@@ -221,6 +224,7 @@ export const updateEvent = async (
           location: location || undefined,
           imageUrl: imageUrl === "" ? null : imageUrl || undefined,
           documentUrl: documentUrl === "" ? null : documentUrl || undefined,
+          registrationUrl: registrationUrl === "" ? null : registrationUrl || undefined,
           speakers: speakers ? {
             create: speakers.map((s: any) => ({
               name: s.name,

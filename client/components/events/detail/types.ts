@@ -17,6 +17,7 @@ export interface EventDetail {
   location: string;
   imageUrl?: string;
   documentUrl?: string;
+  registrationUrl?: string;
   isDateTentative?: boolean;
   category?: string;
   speakers?: Speaker[];

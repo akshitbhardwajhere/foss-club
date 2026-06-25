@@ -4,7 +4,7 @@ import { useState, useRef } from "react";
 import { ArrowUpRight, Calendar, MapPin, Sparkles, Tag, Clock } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { slugify } from "@/lib/utils";
+import { slugify, stripHtml } from "@/lib/utils";
 import { motion } from "framer-motion";
 
 interface Speaker {
@@ -196,7 +196,7 @@ export default function EventCard({ event, index }: EventCardProps) {
             </h2>
 
             <p className="text-zinc-400 text-xs mb-5 line-clamp-2 leading-relaxed grow">
-              {event.description}
+              {stripHtml(event.description)}
             </p>
 
             <div className="space-y-2 pt-3 border-t border-zinc-900/80 mb-5">
