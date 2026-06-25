@@ -5,7 +5,7 @@ import { ArrowRight, BookOpen, Clock, Sparkles, Tag, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { estimateReadTime, formatBlogDate } from "@/components/blogs/detail/helpers";
-import { stripHtml } from "@/lib/utils";
+import { stripHtml, slugify } from "@/lib/utils";
 
 interface Blog {
   id: string;
@@ -32,7 +32,7 @@ export default function FeaturedBlogHero({ blog }: FeaturedBlogHeroProps) {
       transition={{ duration: 0.55 }}
       className="mb-10"
     >
-      <Link href={`/blogs/${blog.id}`} className="group block">
+      <Link href={`/blogs/${slugify(blog.title)}-${blog.id}`} className="group block">
         <article className="relative overflow-hidden rounded-3xl border border-zinc-800/60 bg-zinc-900/40 backdrop-blur-sm transition-all duration-500 hover:border-[#08B74F]/40 hover:shadow-[0_24px_60px_-20px_rgba(8,183,79,0.18)]">
           <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-[#08B74F]/60 to-transparent" />
 

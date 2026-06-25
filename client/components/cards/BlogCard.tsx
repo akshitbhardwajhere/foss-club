@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { estimateReadTime } from "@/components/blogs/detail/helpers";
 import type { BlogListItem } from "@/components/blogs/types";
-import { stripHtml } from "@/lib/utils";
+import { stripHtml, slugify } from "@/lib/utils";
 import CardShell from "@/components/cards/CardShell";
 
 interface BlogCardProps {
@@ -18,7 +18,7 @@ export default function BlogCard({ blog, index }: BlogCardProps) {
   const excerpt = stripHtml(blog.content).slice(0, 140).trim();
 
   return (
-    <Link href={`/blogs/${blog.id}`} className="block h-full">
+    <Link href={`/blogs/${slugify(blog.title)}-${blog.id}`} className="block h-full">
       <CardShell index={index} className="cursor-pointer h-full flex flex-col">
         {blog.imageUrl ? (
           <div className="relative w-full h-44 overflow-hidden">

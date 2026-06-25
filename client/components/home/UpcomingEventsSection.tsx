@@ -6,6 +6,7 @@ import { Calendar, MapPin, Clock, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import api from "@/lib/axios";
+import { slugify } from "@/lib/utils";
 
 interface Event {
   id: string;
@@ -163,7 +164,7 @@ export default function UpcomingEventsSection() {
                       </Link>
                     ) : (
                       <Link
-                        href={`/events/${event.id}`}
+                        href={`/events/${slugify(event.title)}-${event.id}`}
                         className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-zinc-700 text-zinc-300 text-sm font-semibold hover:border-zinc-500 hover:text-white transition-colors"
                       >
                         View Details

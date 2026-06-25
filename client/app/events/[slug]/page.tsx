@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import Image from "next/image";
 import EventActionRow from "@/components/events/detail/EventActionRow";
 import EventStatusBadge from "@/components/events/detail/EventStatusBadge";
+import { extractIdFromSlug, slugify } from "@/lib/utils";
 import {
   buildEventStatus,
   formatEventDate,
@@ -19,7 +20,7 @@ import type { EventDetail } from "@/components/events/detail/types";
 /**
  * EventDetailPage Component
  *
- * Renders the full details of a single event dynamically based on the URL `[id]` parameter.
+ * Renders the full details of a single event dynamically based on the URL `[slug]` parameter.
  * Also queries the backend to determine if registrations are currently open or closed,
  * and handles the native client-side downloading of PDF brochures.
  */
@@ -68,33 +69,41 @@ export default function EventDetailPage() {
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        if (params.id) {
-          const res = await api.get(`/api/events/${params.id}`);
-          setEvent(res.data);
+        if (params.slug) {
+          const id = extractIdFromSlug(params.slug as string);
+          if (id) {
+            const res = await api.get(`/api/events/${id}`);
+            setEvent(res.data);
 
-          try {
-            const configRes = await api.get(
-              `/api/registration/config/${params.id}`,
-            );
-            const isValid = new Date(configRes.data.validUntil) > new Date();
-            const isPast = new Date(res.data.date) < new Date();
-
-            if (configRes.data && isValid && !isPast) {
-              setIsRegistrationOpen(true);
-              const eventNameForUrl = res.data.title
-                .toLowerCase()
-                .replace(/[^a-z0-9]+/g, "-")
-                .replace(/(^-|-$)/g, "");
-              setRegistrationLink(
-                `/events/registration/${eventNameForUrl}?id=${params.id}`,
-              );
-            } else if (configRes.data && !isValid && !isPast) {
-              setIsRegistrationClosed(true);
-            } else {
-              setIsRegistrationOpen(false);
+            const correctSlug = `${slugify(res.data.title)}-${res.data.id}`;
+            if (params.slug !== correctSlug) {
+              router.replace(`/events/${correctSlug}`);
             }
-          } catch (configErr) {
-            console.error("Config fetch error:", configErr);
+
+            try {
+              const configRes = await api.get(
+                `/api/registration/config/${id}`,
+              );
+              const isValid = new Date(configRes.data.validUntil) > new Date();
+              const isPast = new Date(res.data.date) < new Date();
+
+              if (configRes.data && isValid && !isPast) {
+                setIsRegistrationOpen(true);
+                const eventNameForUrl = res.data.title
+                  .toLowerCase()
+                  .replace(/[^a-z0-9]+/g, "-")
+                  .replace(/(^-|-$)/g, "");
+                setRegistrationLink(
+                  `/events/registration/${eventNameForUrl}?id=${id}`,
+                );
+              } else if (configRes.data && !isValid && !isPast) {
+                setIsRegistrationClosed(true);
+              } else {
+                setIsRegistrationOpen(false);
+              }
+            } catch (configErr) {
+              console.error("Config fetch error:", configErr);
+            }
           }
         }
       } catch (err) {
@@ -104,7 +113,7 @@ export default function EventDetailPage() {
       }
     };
     fetchEvent();
-  }, [params.id]);
+  }, [params.slug, router]);
 
   if (loading) {
     return (

@@ -6,9 +6,10 @@ import BackgroundBlur from "@/components/shared/BackgroundBlur";
 import PageHeader from "@/components/shared/PageHeader";
 import { Loader2, ChevronLeft } from "lucide-react";
 import Link from "next/link";
-import { notFound, useParams } from "next/navigation";
+import { notFound, useParams, useRouter } from "next/navigation";
 import GalleryDatePill from "@/components/gallery/detail/GalleryDatePill";
 import GalleryMasonryGrid from "@/components/gallery/detail/GalleryMasonryGrid";
+import { extractIdFromSlug, slugify } from "@/lib/utils";
 import type {
   GalleryEvent,
   GalleryImageItem,
@@ -22,22 +23,31 @@ import type {
  */
 export default function EventGalleryDetails() {
   const params = useParams();
+  const router = useRouter();
   const [event, setEvent] = useState<GalleryEvent | null>(null);
   const [images, setImages] = useState<GalleryImageItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    if (!params?.id) return;
+    if (!params?.slug) return;
 
     const fetchGalleryData = async () => {
       try {
+        const id = extractIdFromSlug(params.slug as string);
+        if (!id) return;
+
         const [eventRes, galleryRes] = await Promise.all([
-          api.get(`/api/events/${params.id}`),
-          api.get(`/api/gallery/${params.id}`),
+          api.get(`/api/events/${id}`),
+          api.get(`/api/gallery/${id}`),
         ]);
         setEvent(eventRes.data);
         setImages(galleryRes.data);
+
+        const correctSlug = `${slugify(eventRes.data.title)}-${eventRes.data.id}`;
+        if (params.slug !== correctSlug) {
+          router.replace(`/gallery/${correctSlug}`);
+        }
       } catch (err) {
         console.error("Error fetching gallery:", err);
         setError(true);
@@ -46,7 +56,7 @@ export default function EventGalleryDetails() {
       }
     };
     fetchGalleryData();
-  }, [params.id]);
+  }, [params?.slug, router]);
 
   if (loading) {
     return (

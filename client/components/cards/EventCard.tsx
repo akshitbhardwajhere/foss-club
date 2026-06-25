@@ -5,6 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import CardShell from "@/components/cards/CardShell";
 
+import { slugify } from "@/lib/utils";
+
 interface Event {
   id: string;
   title: string;
@@ -40,7 +42,7 @@ export default function EventCard({ event, index, isPast }: EventCardProps) {
     !isActuallyPast;
 
   return (
-    <Link href={`/events/${event.id}`}>
+    <Link href={`/events/${slugify(event.title)}-${event.id}`}>
       <CardShell index={index} className="h-full flex flex-col relative">
         <div className="absolute top-4 right-4 z-10 flex gap-2">
           {event.category && (

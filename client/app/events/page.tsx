@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import api from "@/lib/axios";
 import BackgroundBlur from "@/components/shared/BackgroundBlur";
+import { slugify } from "@/lib/utils";
 import PageHeader from "@/components/shared/PageHeader";
 import {
   DropdownMenu,
@@ -275,7 +276,7 @@ export default function EventsPage() {
                       )}
                       <div className="flex-1 min-w-0">
                         <Link
-                          href={`/events/${evt.id}`}
+                          href={`/events/${slugify(evt.title)}-${evt.id}`}
                           className="flex flex-col items-start gap-1.5 mt-0.5 mb-1"
                         >
                           <h3 className="font-bold text-white text-lg group-hover:text-[#08B74F] transition-colors truncate max-w-full">
@@ -358,7 +359,7 @@ export default function EventsPage() {
 
                     <div className="col-span-1 lg:col-span-2 flex justify-start lg:justify-end mt-4 lg:mt-0">
                       <Link
-                        href={`/events/${evt.id}`}
+                        href={`/events/${slugify(evt.title)}-${evt.id}`}
                         className={`px-6 py-2.5 rounded-full font-bold text-xs tracking-wider transition-all duration-300 w-full lg:w-auto text-center border ${
                           isRegistrationValid
                             ? "bg-white text-black border-white hover:bg-zinc-200 hover:shadow-[0_0_15px_rgba(255,255,255,0.3)]"

@@ -10,6 +10,7 @@ import Link from "next/link";
 import ReadingProgress from "@/components/blogs/detail/ReadingProgress";
 import BlogDetailSkeleton from "@/components/blogs/detail/BlogDetailSkeleton";
 import BlogAuthorSection from "@/components/blogs/detail/BlogAuthorSection";
+import { extractIdFromSlug, slugify } from "@/lib/utils";
 import {
   estimateReadTime,
   formatBlogDate,
@@ -35,9 +36,16 @@ export default function BlogDetailPage() {
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        if (params.id) {
-          const res = await api.get(`/api/blogs/${params.id}`);
-          setBlog(res.data);
+        if (params.slug) {
+          const id = extractIdFromSlug(params.slug as string);
+          if (id) {
+            const res = await api.get(`/api/blogs/${id}`);
+            setBlog(res.data);
+            const correctSlug = `${slugify(res.data.title)}-${res.data.id}`;
+            if (params.slug !== correctSlug) {
+              router.replace(`/blogs/${correctSlug}`);
+            }
+          }
         }
       } catch {
         // Error silently logged in production
@@ -46,7 +54,7 @@ export default function BlogDetailPage() {
       }
     };
     fetchBlog();
-  }, [params.id]);
+  }, [params.slug, router]);
 
   useEffect(() => {
     const handleScroll = () => setShowScrollTop(window.scrollY > 500);

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { CalendarClock } from "lucide-react";
 import Image from "next/image";
 import api from "@/lib/axios";
+import { slugify } from "@/lib/utils";
 import type { NextEvent } from "@/components/next-event-countdown/types";
 
 /**
@@ -48,7 +49,7 @@ export default function NextEventCountdown() {
       className="w-full max-w-[240px] mx-auto group/countdown"
     >
       <Link
-        href={`/events/${event.id}`}
+        href={`/events/${slugify(event.title)}-${event.id}`}
         className="block bg-[#fafafa] border border-[#e6e6e6] rounded-[10px] overflow-hidden transition-all duration-300 shadow-[0_4px_14px_rgba(0,0,0,0.12)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.18)] hover:-translate-y-0.5 w-[240px] h-[120px]"
       >
         {/* Top 75% Cover Image */}

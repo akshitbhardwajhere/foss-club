@@ -37,3 +37,38 @@ export function stripHtml(html: string): string {
     .replace(/&quot;/g, '"') // Replace quotes
     .replace(/&#39;/g, "'"); // Replace apostrophes
 }
+
+/**
+ * Converts a string into a URL-friendly slug.
+ */
+export function slugify(text: string): string {
+  if (!text) return "";
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")       // Replace spaces with -
+    .replace(/[^\w\-]+/g, "")    // Remove all non-word chars
+    .replace(/\-\-+/g, "-")      // Replace multiple - with single -
+    .replace(/^-+/, "")          // Trim - from start of text
+    .replace(/-+$/, "");         // Trim - from end of text
+}
+
+/**
+ * Extracts the 36-character UUID from the end of a slug.
+ */
+export function extractIdFromSlug(slug: string): string {
+  if (!slug) return "";
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (uuidRegex.test(slug)) {
+    return slug;
+  }
+  if (slug.length >= 36) {
+    const possibleId = slug.slice(-36);
+    if (uuidRegex.test(possibleId)) {
+      return possibleId;
+    }
+  }
+  return slug;
+}
+

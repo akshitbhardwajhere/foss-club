@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import axios from "axios";
+import { extractIdFromSlug } from "@/lib/utils";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
 
@@ -14,10 +15,11 @@ interface Blog {
 export async function generateMetadata({
     params,
 }: {
-    params: Promise<{ id: string }>;
+    params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
     try {
-        const { id } = await params;
+        const { slug } = await params;
+        const id = extractIdFromSlug(slug);
         const res = await axios.get(`${API_BASE}/api/blogs/${id}`);
         const blog: Blog = res.data;
 

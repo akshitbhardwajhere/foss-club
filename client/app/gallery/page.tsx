@@ -7,6 +7,7 @@ import BackgroundBlur from "@/components/shared/BackgroundBlur";
 import PageHeader from "@/components/shared/PageHeader";
 import { Loader2, Image as ImageIcon, Calendar, Images } from "lucide-react";
 import Image from "next/image";
+import { slugify } from "@/lib/utils";
 
 interface Event {
   id: string;
@@ -68,7 +69,7 @@ export default function GalleryPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {events.map((evt) => (
-              <Link key={evt.id} href={`/gallery/${evt.id}`}>
+              <Link key={evt.id} href={`/gallery/${slugify(evt.title)}-${evt.id}`}>
                 <div className="bg-zinc-900/30 backdrop-blur-md border border-zinc-800/50 rounded-3xl overflow-hidden hover:border-[#08B74F]/40 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(8,183,79,0.15)] transition-all duration-500 group h-full flex flex-col p-3">
                   {/* Image Container with photo album feel */}
                   <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-zinc-800/50 mb-4 shadow-md flex items-center justify-center">
