@@ -39,7 +39,13 @@ export default function NextEventCountdown() {
     fetchNextEvent();
   }, []);
 
-  if (loading || !event) return null;
+  if (loading) {
+    return (
+      <div className="w-[240px] h-[120px] mx-auto bg-zinc-900/40 border border-zinc-800/60 rounded-[10px] animate-pulse" />
+    );
+  }
+
+  if (!event) return null;
 
   return (
     <motion.div

@@ -14,6 +14,7 @@ import { RootState } from '../lib/store';
  */
 
 export default function CustomCursor() {
+    const [mounted, setMounted] = useState(false);
     const [isHovering, setIsHovering] = useState(false);
     // Optional: Read cursor variant from Redux if you have global hover states
     const cursorVariant = useSelector((state: RootState) => state.ui.cursorVariant);
@@ -23,6 +24,12 @@ export default function CustomCursor() {
     const cursorY = useSpring(0, springConfig);
 
     useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    useEffect(() => {
+        if (!mounted) return;
+
         const mouseMove = (e: MouseEvent) => {
             cursorX.set(e.clientX - 16); // Center the 32px cursor
             cursorY.set(e.clientY - 16);
@@ -38,10 +45,12 @@ export default function CustomCursor() {
         return () => {
             window.removeEventListener('mousemove', mouseMove);
         };
-    }, [cursorX, cursorY]);
+    }, [mounted, cursorX, cursorY]);
 
     // Handle global hover effects dynamically
     useEffect(() => {
+        if (!mounted) return;
+
         const handleMouseOver = (e: MouseEvent) => {
             const target = e.target as HTMLElement;
             if (
@@ -59,7 +68,7 @@ export default function CustomCursor() {
 
         window.addEventListener('mouseover', handleMouseOver);
         return () => window.removeEventListener('mouseover', handleMouseOver);
-    }, []);
+    }, [mounted]);
 
     const variants = {
         default: {
@@ -88,10 +97,15 @@ export default function CustomCursor() {
 
     const activeVariant = cursorVariant === 'hover' ? 'reduxHover' : (isHovering ? 'hover' : 'default');
 
+    // Return null during server-side rendering and initial client hydration
+    if (!mounted) {
+        return null;
+    }
+
     // Hide cursor on touch devices entirely
-    if (typeof window !== 'undefined') {
-        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-        if (isTouchDevice) return null;
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    if (isTouchDevice) {
+        return null;
     }
 
     return (
