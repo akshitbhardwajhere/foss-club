@@ -365,7 +365,7 @@ export default function EventDetailPage() {
               <div className="mt-8 pt-6 border-t border-zinc-900 space-y-4">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-zinc-500 font-semibold">Attendance Capacity</span>
-                  <span className="text-zinc-200 font-bold">150 Attendees Max</span>
+                  <span className="text-zinc-200 font-bold">100 Attendees Max</span>
                 </div>
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-zinc-500 font-semibold">Requirement</span>
