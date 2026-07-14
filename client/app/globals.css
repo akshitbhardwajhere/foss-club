@@ -341,6 +341,9 @@ button *,
   font-size: 1.0625rem;
   color: rgba(212, 212, 216, 0.88);
 }
+.blog-content li p {
+  margin: -2px;
+}
 .blog-content li::marker {
   color: rgba(8, 183, 79, 0.6);
 }
