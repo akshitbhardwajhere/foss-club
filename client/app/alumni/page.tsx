@@ -5,7 +5,7 @@ import { GraduationCap } from "lucide-react";
 import api from "@/lib/axios";
 import { getStaggeredMotionPresets } from "@/lib/motion";
 import RosterPageLayout from "@/components/shared/RosterPageLayout";
-import TeamMemberMobileCard from "@/components/cards/team-member-card/TeamMemberMobileCard";
+import AlumniMemberCard from "@/components/cards/team-member-card/AlumniMemberCard";
 import TeamPageSkeleton from "@/components/skeletons/TeamPageSkeleton";
 import { ensureUrl } from "@/lib/utils";
 import type {
@@ -31,11 +31,10 @@ export default function AlumniPage() {
     member.role.toLowerCase().includes("alumni") ||
     member.role.toLowerCase().includes("former");
 
-  const buildMobileCardData = (member: TeamMember) => {
+  const buildCardData = (member: TeamMember) => {
     const avatarSrc =
       member.imageUrl ||
       `https://api.dicebear.com/9.x/pixel-art/svg?seed=${member.name}`;
-    const firstName = member.name.split(" ")[0];
     const isAlumni = isAlumniMember(member);
     const textTheme = isAlumni ? "text-yellow-500" : "text-[#08B74F]";
     const codeLines = [
@@ -67,7 +66,7 @@ export default function AlumniPage() {
       },
     ].filter((link): link is SocialLink => Boolean(link));
 
-    return { avatarSrc, firstName, isAlumni, textTheme, codeLines, socialLinks };
+    return { avatarSrc, isAlumni, textTheme, codeLines, socialLinks };
   };
 
   useEffect(() => {
@@ -154,15 +153,15 @@ export default function AlumniPage() {
                 No alumni records found yet. Check back later!
               </div>
             ) : (
-              <div className="grid w-full grid-cols-5 gap-3 sm:grid-cols-6 lg:grid-cols-6 xl:grid-cols-6">
+              <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
                 {alumni.map((member, i) => (
-                  <TeamMemberMobileCard
+                  <AlumniMemberCard
                     key={member.id || i}
                     id={`team-member-${member.id}`}
                     member={member}
                     priority={i < 3}
                     className="flex"
-                    {...buildMobileCardData(member)}
+                    {...buildCardData(member)}
                   />
                 ))}
               </div>
