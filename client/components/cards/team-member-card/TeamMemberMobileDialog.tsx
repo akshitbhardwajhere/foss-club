@@ -32,7 +32,7 @@ export default function TeamMemberMobileDialog({
   return (
     <DialogContent
       showCloseButton={false}
-      className="bg-[#050B08] border border-zinc-800 text-white w-[92vw] max-w-[380px] sm:max-w-[380px] rounded-[1.5rem] p-0 overflow-hidden shadow-2xl shadow-black/80"
+      className="bg-[#050B08] border border-zinc-800 text-white w-[92vw] max-w-[440px] sm:max-w-[440px] rounded-[1.5rem] p-0 overflow-hidden shadow-2xl shadow-black/80"
     >
       <DialogTitle className="sr-only">
         Detailed Profile of {member.name}
