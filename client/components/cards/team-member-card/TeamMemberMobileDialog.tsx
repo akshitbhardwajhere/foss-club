@@ -83,14 +83,14 @@ export default function TeamMemberMobileDialog({
         </div>
 
         <div className="relative z-10 px-5 pt-4 pb-5 sm:px-6 sm:pt-5 sm:pb-6">
-          <div className="relative mx-auto mb-4 flex h-36 w-36 items-center justify-center sm:h-40 sm:w-40">
+          <div className="relative mx-auto mb-4 flex h-44 w-44 items-center justify-center sm:h-48 sm:w-48">
             <motion.div
               className={`absolute inset-0 rounded-full border border-dashed ${isAlumni ? "border-yellow-500/40" : "border-[#08B74F]/40"}`}
               animate={{ rotate: 360 }}
               transition={{ duration: 16, repeat: Infinity, ease: "linear" }}
             />
             <motion.div
-              className={`absolute inset-4 rounded-full bg-linear-to-br ${isAlumni ? "from-yellow-500/20 via-zinc-950 to-zinc-900" : "from-[#08B74F]/20 via-zinc-950 to-zinc-900"}`}
+              className={`absolute inset-6 rounded-full bg-linear-to-br ${isAlumni ? "from-yellow-500/20 via-zinc-950 to-zinc-900" : "from-[#08B74F]/20 via-zinc-950 to-zinc-900"}`}
               animate={{ scale: [1, 1.04, 1] }}
               transition={{
                 duration: 3.5,
@@ -99,8 +99,8 @@ export default function TeamMemberMobileDialog({
               }}
             />
             <motion.div
-              className={`absolute left-4 top-8 h-3.5 w-3.5 rounded-full ${isAlumni ? "bg-yellow-400" : "bg-[#08B74F]"}`}
-              animate={{ y: [0, -16, 0], opacity: [0.7, 1, 0.7] }}
+              className={`absolute left-5 top-10 h-3.5 w-3.5 rounded-full ${isAlumni ? "bg-yellow-400" : "bg-[#08B74F]"}`}
+              animate={{ y: [0, -18, 0], opacity: [0.7, 1, 0.7] }}
               transition={{
                 duration: 2.4,
                 repeat: Infinity,
@@ -108,8 +108,8 @@ export default function TeamMemberMobileDialog({
               }}
             />
             <motion.div
-              className={`absolute right-5 bottom-7 h-3 w-3 rounded-full ${isAlumni ? "bg-amber-300" : "bg-emerald-300"}`}
-              animate={{ y: [0, 14, 0], opacity: [0.6, 1, 0.6] }}
+              className={`absolute right-6 bottom-9 h-3 w-3 rounded-full ${isAlumni ? "bg-amber-300" : "bg-emerald-300"}`}
+              animate={{ y: [0, 16, 0], opacity: [0.6, 1, 0.6] }}
               transition={{
                 duration: 2.1,
                 repeat: Infinity,
@@ -117,7 +117,7 @@ export default function TeamMemberMobileDialog({
                 delay: 0.25,
               }}
             />
-            <div className="relative h-26 w-26 overflow-hidden rounded-full border border-white/10 bg-zinc-950 shadow-[0_0_45px_rgba(0,0,0,0.45)] sm:h-30 sm:w-30">
+            <div className="relative h-32 w-32 overflow-hidden rounded-full border border-white/10 bg-zinc-950 shadow-[0_0_45px_rgba(0,0,0,0.45)] sm:h-36 sm:w-36">
               <Image
                 src={avatarSrc}
                 alt={member.name}
