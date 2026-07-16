@@ -32,7 +32,7 @@ export default function TeamMemberMobileDialog({
   return (
     <DialogContent
       showCloseButton={false}
-      className="bg-[#050B08] border border-zinc-800 text-white w-[88vw] max-w-72 rounded-[1.35rem] p-0 overflow-hidden shadow-2xl shadow-black/80"
+      className="bg-[#050B08] border border-zinc-800 text-white w-[92vw] max-w-[380px] sm:max-w-[380px] rounded-[1.5rem] p-0 overflow-hidden shadow-2xl shadow-black/80"
     >
       <DialogTitle className="sr-only">
         Detailed Profile of {member.name}
@@ -74,7 +74,7 @@ export default function TeamMemberMobileDialog({
           <DialogClose asChild>
             <button
               type="button"
-              className="relative z-20 inline-flex h-9 w-9 items-center justify-center rounded-full border border-zinc-800 bg-zinc-950/70 text-zinc-300 transition-colors hover:border-white/20 hover:text-white"
+              className="relative z-20 inline-flex h-9 w-9 items-center justify-center rounded-full border border-zinc-800 bg-zinc-950/70 text-zinc-300 transition-all duration-200 hover:border-white/20 hover:text-white hover:scale-105"
               aria-label="Close profile dialog"
             >
               <X className="h-4 w-4" />
@@ -82,15 +82,15 @@ export default function TeamMemberMobileDialog({
           </DialogClose>
         </div>
 
-        <div className="relative z-10 px-4 pt-4 pb-4 sm:px-4 sm:pt-4 sm:pb-4">
-          <div className="relative mx-auto mb-3.5 flex h-28 w-28 items-center justify-center sm:h-32 sm:w-32">
+        <div className="relative z-10 px-5 pt-4 pb-5 sm:px-6 sm:pt-5 sm:pb-6">
+          <div className="relative mx-auto mb-4 flex h-36 w-36 items-center justify-center sm:h-40 sm:w-40">
             <motion.div
               className={`absolute inset-0 rounded-full border border-dashed ${isAlumni ? "border-yellow-500/40" : "border-[#08B74F]/40"}`}
               animate={{ rotate: 360 }}
               transition={{ duration: 16, repeat: Infinity, ease: "linear" }}
             />
             <motion.div
-              className={`absolute inset-3 rounded-full bg-linear-to-br ${isAlumni ? "from-yellow-500/20 via-zinc-950 to-zinc-900" : "from-[#08B74F]/20 via-zinc-950 to-zinc-900"}`}
+              className={`absolute inset-4 rounded-full bg-linear-to-br ${isAlumni ? "from-yellow-500/20 via-zinc-950 to-zinc-900" : "from-[#08B74F]/20 via-zinc-950 to-zinc-900"}`}
               animate={{ scale: [1, 1.04, 1] }}
               transition={{
                 duration: 3.5,
@@ -99,8 +99,8 @@ export default function TeamMemberMobileDialog({
               }}
             />
             <motion.div
-              className={`absolute left-3 top-6 h-3 w-3 rounded-full ${isAlumni ? "bg-yellow-400" : "bg-[#08B74F]"}`}
-              animate={{ y: [0, -14, 0], opacity: [0.7, 1, 0.7] }}
+              className={`absolute left-4 top-8 h-3.5 w-3.5 rounded-full ${isAlumni ? "bg-yellow-400" : "bg-[#08B74F]"}`}
+              animate={{ y: [0, -16, 0], opacity: [0.7, 1, 0.7] }}
               transition={{
                 duration: 2.4,
                 repeat: Infinity,
@@ -108,8 +108,8 @@ export default function TeamMemberMobileDialog({
               }}
             />
             <motion.div
-              className={`absolute right-4 bottom-5 h-2.5 w-2.5 rounded-full ${isAlumni ? "bg-amber-300" : "bg-emerald-300"}`}
-              animate={{ y: [0, 12, 0], opacity: [0.6, 1, 0.6] }}
+              className={`absolute right-5 bottom-7 h-3 w-3 rounded-full ${isAlumni ? "bg-amber-300" : "bg-emerald-300"}`}
+              animate={{ y: [0, 14, 0], opacity: [0.6, 1, 0.6] }}
               transition={{
                 duration: 2.1,
                 repeat: Infinity,
@@ -117,7 +117,7 @@ export default function TeamMemberMobileDialog({
                 delay: 0.25,
               }}
             />
-            <div className="relative h-20 w-20 overflow-hidden rounded-full border border-white/10 bg-zinc-950 shadow-[0_0_45px_rgba(0,0,0,0.45)] sm:h-24 sm:w-24">
+            <div className="relative h-26 w-26 overflow-hidden rounded-full border border-white/10 bg-zinc-950 shadow-[0_0_45px_rgba(0,0,0,0.45)] sm:h-30 sm:w-30">
               <Image
                 src={avatarSrc}
                 alt={member.name}
@@ -128,29 +128,29 @@ export default function TeamMemberMobileDialog({
             </div>
           </div>
 
-          <h3 className="text-lg font-bold text-center text-white sm:text-xl">
+          <h3 className="text-xl font-bold text-center text-white sm:text-2xl tracking-tight">
             {member.name}
           </h3>
           <p
-            className={`${textTheme} mt-1 flex items-center justify-center gap-1 text-center font-medium`}
+            className={`${textTheme} mt-1.5 flex items-center justify-center gap-1.5 text-center font-semibold text-sm sm:text-base`}
           >
-            {isAlumni && <GraduationCap className="h-4 w-4" />} {member.role}
+            {isAlumni && <GraduationCap className="h-4 w-4 sm:h-5 sm:w-5" />} {member.role}
           </p>
           {member.company && (
-            <p className="mt-1 text-center text-sm text-zinc-400">
+            <p className="mt-1.5 text-center text-xs sm:text-sm text-zinc-400">
               @ {member.company}
             </p>
           )}
 
-          <div className="mt-3.5 rounded-[1.25rem] border border-zinc-800 bg-zinc-950/85 p-3 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] sm:mt-4 sm:p-3.5">
-            <div className="mb-3 flex items-center justify-between text-[10px] uppercase tracking-[0.34em] text-zinc-500">
+          <div className="mt-5 rounded-[1.25rem] border border-zinc-800 bg-zinc-950/85 p-4 sm:p-5 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+            <div className="mb-3.5 flex items-center justify-between text-[10px] sm:text-[11px] uppercase tracking-[0.36em] text-zinc-500 font-semibold">
               <span>terminal</span>
               <span className={isAlumni ? "text-yellow-500" : "text-[#08B74F]"}>
                 connected
               </span>
             </div>
 
-            <div className="space-y-2 font-mono text-[10px] leading-5 text-zinc-300 sm:text-[11px]">
+            <div className="space-y-2.5 font-mono text-[11px] leading-5 text-zinc-300 sm:text-xs sm:leading-6">
               {codeLines.map((line, index) => (
                 <motion.div
                   key={line}
@@ -199,22 +199,31 @@ export default function TeamMemberMobileDialog({
             </div>
           </div>
 
-          <div className="mt-3.5 grid grid-cols-3 gap-2 sm:mt-4">
+          <div className="mt-5 grid grid-cols-3 gap-2 sm:mt-6">
             {["compile", "sync", "ship"].map((label) => (
-              <div
+              <button
                 key={label}
-                className={`rounded-full border px-3 py-2 text-center text-[10px] uppercase tracking-[0.24em] ${isAlumni ? "border-yellow-500/20 bg-yellow-500/10 text-yellow-400" : "border-[#08B74F]/20 bg-[#08B74F]/10 text-[#08B74F]"}`}
+                type="button"
+                className={`cursor-pointer rounded-full border px-3 py-2 text-center text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.26em] transition-all duration-300 hover:scale-105 ${
+                  isAlumni
+                    ? "border-yellow-500/20 bg-yellow-500/10 text-yellow-400 hover:border-yellow-500/40 hover:bg-yellow-500/20 hover:shadow-[0_0_15px_rgba(234,179,8,0.15)]"
+                    : "border-[#08B74F]/20 bg-[#08B74F]/10 text-[#08B74F] hover:border-[#08B74F]/40 hover:bg-[#08B74F]/20 hover:shadow-[0_0_15px_rgba(8,183,79,0.15)]"
+                }`}
               >
                 {label}
-              </div>
+              </button>
             ))}
           </div>
 
-          <div className="mt-3.5 flex items-center justify-center gap-3 sm:mt-4 sm:gap-4">
+          <div className="mt-5 flex items-center justify-center gap-3 sm:mt-6 sm:gap-4">
             <MemberSocialLinks
               links={socialLinks}
               iconSize={20}
-              buttonClassName="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center transition-colors"
+              buttonClassName={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 ${
+                isAlumni
+                  ? "bg-zinc-900/80 hover:bg-zinc-800 hover:shadow-[0_0_12px_rgba(234,179,8,0.1)]"
+                  : "bg-zinc-900/80 hover:bg-zinc-800 hover:shadow-[0_0_12px_rgba(8,183,79,0.1)]"
+              }`}
             />
           </div>
         </div>
