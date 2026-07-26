@@ -90,15 +90,15 @@ export default function ProjectsPage() {
 
         {/* Search Bar */}
         <div className="mt-6 mb-12 flex items-center justify-center">
-          <div className="relative w-full max-w-xl">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" />
+          <div className="relative w-full max-w-xl group">
             <input
               type="text"
               placeholder="Search projects or contributors..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-zinc-900/60 border border-zinc-800/80 rounded-2xl pl-12 pr-4 py-3.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#08B74F]/60 focus:ring-1 focus:ring-[#08B74F]/60 transition-all shadow-xl backdrop-blur-md"
+              className="w-full bg-[#0a1410] border border-[#1b3123] rounded-2xl pl-12 pr-4 py-3.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#08B74F] focus:ring-2 focus:ring-[#08B74F]/30 transition-all shadow-xl backdrop-blur-md"
             />
+            <Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#08B74F] z-10 group-focus-within:scale-110 transition-transform" />
           </div>
         </div>
 
