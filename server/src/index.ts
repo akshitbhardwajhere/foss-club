@@ -15,6 +15,7 @@ import uploadRoutes from "./routes/uploadRoutes";
 import contactRoutes from "./routes/contactRoutes";
 import sheetRoutes from "./routes/sheetRoutes";
 import galleryRoutes from "./routes/galleryRoutes";
+import projectRoutes from "./routes/projectRoutes";
 
 // Load environmental configurations from local .env files
 dotenv.config();
@@ -107,6 +108,7 @@ app.use("/api/events", eventRoutes);          // Public events & registrations
 app.use("/api/blogs", blogRoutes);            // Blog posting and reading
 app.use("/api/team", teamRoutes);            // Club core members
 app.use("/api/alumni", alumniRoutes);          // Alumni network catalog
+app.use("/api/projects", projectRoutes);      // FOSS club projects
 app.use("/api/upload", uploadRoutes);          // File/Media upload controller (Cloudinary integration)
 app.use("/api/contact", contactRoutes);        // Contact form submissions
 app.use("/api/sheet", sheetRoutes);            // Google sheets synchronization

@@ -111,4 +111,20 @@ model TeamMember {
   @@index([isAlumni, order])
 }
 
+/// FOSS club project created by members or community.
+model Project {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  url         String
+  githubUrl   String?
+  mediaType   String   @default("image") // "image" | "video"
+  previewUrl  String
+  developedBy String
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
+  @@index([order])
+  @@index([createdAt])
+}

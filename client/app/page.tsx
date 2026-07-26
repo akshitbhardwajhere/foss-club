@@ -10,6 +10,7 @@ import StatsSection from "@/components/home/StatsSection";
 import DomainsSection from "@/components/home/DomainsSection";
 import UpcomingEventsSection from "@/components/home/UpcomingEventsSection";
 import AboutSection from "@/components/home/AboutSection";
+import FeaturedProjectsSection from "@/components/home/FeaturedProjectsSection";
 import RoadmapsSection from "@/components/home/RoadmapsSection";
 import CommunitySection from "@/components/home/CommunitySection";
 import FAQSection from "@/components/home/FAQSection";
@@ -153,7 +154,7 @@ export default function Home() {
       </div>
 
       {/* ─── FEATURED PROJECTS ─────────────────────────────────────── */}
-      {/* <FeaturedProjectsSection /> */}
+      <FeaturedProjectsSection />
 
       {/* Divider */}
       <div className="w-full max-w-7xl px-4 sm:px-6">

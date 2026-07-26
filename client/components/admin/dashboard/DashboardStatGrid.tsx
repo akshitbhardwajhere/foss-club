@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Users, Calendar, BookOpen, Terminal } from "lucide-react";
+import { Users, Calendar, BookOpen, Terminal, FolderGit2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import AdminStatCard from "@/components/admin/AdminStatCard";
 import type { AdminDashboardStats } from "./types";
@@ -110,12 +110,37 @@ export default function DashboardStatGrid({
       />
 
       <AdminStatCard
+        title="FOSS Projects"
+        description="Manage projects showcase, live demo links, and video/image previews."
+        icon={FolderGit2}
+        href="/admin/projects"
+        colorTheme="green"
+        itemVariants={itemVariants}
+        stats={
+          loadingStats
+            ? [
+                {
+                  label: "Total Projects",
+                  value: <Skeleton className="h-6 w-12 bg-zinc-800" />,
+                  valueColor: "text-[#08B74F]",
+                },
+              ]
+            : [
+                {
+                  label: "Total Projects",
+                  value: stats.projects?.total || 0,
+                  valueColor: "text-[#08B74F]",
+                },
+              ]
+        }
+      />
+
+      <AdminStatCard
         title="Technical Blogs"
         description="Review, edit, and publish student-authored tech articles and guides."
         icon={BookOpen}
         href="/admin/blogs"
         colorTheme="orange"
-        colSpan="lg:col-span-2"
         itemVariants={itemVariants}
         stats={
           loadingStats

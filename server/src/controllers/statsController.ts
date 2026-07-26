@@ -44,6 +44,7 @@ export const getDashboardStats = async (
       pastEvents,
       totalTeamMembers,
       totalBlogs,
+      totalProjects,
       totalQueries,
     ] = await Promise.all([
       prisma.event.count(),
@@ -63,6 +64,7 @@ export const getDashboardStats = async (
       }),
       prisma.teamMember.count(),
       prisma.blog.count(),
+      prisma.project.count(),
       totalQueriesPromise,
     ]);
 
@@ -77,6 +79,9 @@ export const getDashboardStats = async (
       },
       blogs: {
         total: totalBlogs,
+      },
+      projects: {
+        total: totalProjects,
       },
       queries: {
         total: totalQueries,

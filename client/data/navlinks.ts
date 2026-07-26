@@ -16,6 +16,10 @@ export const navlinks = [
     href: "/blogs",
   },
   {
+    name: "Projects",
+    href: "/projects",
+  },
+  {
     name: "Team",
     href: "/team",
   },
