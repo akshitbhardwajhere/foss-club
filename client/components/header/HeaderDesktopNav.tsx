@@ -18,14 +18,14 @@ export default function HeaderDesktopNav({
   navlinks,
 }: HeaderDesktopNavProps) {
   return (
-    <nav className="hidden lg:flex items-center gap-1 bg-zinc-900/40 backdrop-blur-md border border-zinc-800/50 rounded-full px-2 py-1.5 absolute left-1/2 -translate-x-1/2">
+    <nav className="hidden xl:flex items-center gap-0.5 xl:gap-1 bg-zinc-900/40 backdrop-blur-md border border-zinc-800/50 rounded-full px-2 py-1.5 absolute left-1/2 -translate-x-1/2">
       {navlinks.map((link) => {
         const isActive = pathname === link.href;
         return (
           <Link
             key={link.name}
             href={link.href}
-            className="relative px-4 py-2 text-sm font-semibold transition-colors duration-300 rounded-full group"
+            className="relative px-3 xl:px-3.5 py-1.5 text-xs xl:text-sm font-semibold transition-colors duration-300 rounded-full group"
           >
             {isActive ? (
               <motion.div

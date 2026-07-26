@@ -3,15 +3,11 @@
 import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
-  FolderGit2,
   ExternalLink,
   Github,
   Search,
   Code2,
   Users,
-  Video,
-  Image as ImageIcon,
-  Sparkles,
 } from "lucide-react";
 import api from "@/lib/axios";
 import BackgroundBlur from "@/components/shared/BackgroundBlur";
@@ -33,7 +29,6 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState<ProjectItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterType, setFilterType] = useState<"all" | "image" | "video">("all");
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -51,18 +46,14 @@ export default function ProjectsPage() {
 
   const filteredProjects = useMemo(() => {
     return projects.filter((project) => {
-      const matchesSearch =
+      return (
         project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         project.developedBy.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (project.description &&
-          project.description.toLowerCase().includes(searchQuery.toLowerCase()));
-
-      const matchesType =
-        filterType === "all" || project.mediaType === filterType;
-
-      return matchesSearch && matchesType;
+          project.description.toLowerCase().includes(searchQuery.toLowerCase()))
+      );
     });
-  }, [projects, searchQuery, filterType]);
+  }, [projects, searchQuery]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -82,12 +73,12 @@ export default function ProjectsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050B08] text-white pt-24 pb-20 relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-[#050B08] text-white pt-36 sm:pt-40 md:pt-44 pb-20 relative overflow-hidden font-sans">
       <BackgroundBlur />
 
       <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
         {/* Page Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-10">
           <span className="px-4 py-1.5 rounded-full border border-[#08B74F]/30 bg-[#08B74F]/10 text-[#08B74F] text-xs font-bold tracking-widest uppercase mb-4 inline-block shadow-[0_0_15px_rgba(8,183,79,0.2)]">
             OPEN SOURCE SHOWCASE
           </span>
@@ -97,52 +88,17 @@ export default function ProjectsPage() {
           </p>
         </div>
 
-        {/* Search & Filter Bar */}
-        <div className="mt-8 mb-12 flex flex-col md:flex-row gap-4 items-center justify-between bg-zinc-900/60 p-4 rounded-2xl border border-zinc-800/80 backdrop-blur-md shadow-xl">
-          {/* Search Box */}
-          <div className="relative w-full md:w-96">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+        {/* Search Bar */}
+        <div className="mt-6 mb-12 flex items-center justify-center">
+          <div className="relative w-full max-w-xl">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" />
             <input
               type="text"
               placeholder="Search projects or contributors..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#0a1410] border border-[#1b3123] rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#08B74F]/60 focus:ring-1 focus:ring-[#08B74F]/60 transition-all"
+              className="w-full bg-zinc-900/60 border border-zinc-800/80 rounded-2xl pl-12 pr-4 py-3.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#08B74F]/60 focus:ring-1 focus:ring-[#08B74F]/60 transition-all shadow-xl backdrop-blur-md"
             />
-          </div>
-
-          {/* Filter Badges */}
-          <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
-            <button
-              onClick={() => setFilterType("all")}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
-                filterType === "all"
-                  ? "bg-[#08B74F] text-black shadow-[0_0_15px_rgba(8,183,79,0.3)]"
-                  : "bg-[#0a1410] border border-[#1b3123] text-zinc-400 hover:text-white hover:border-zinc-700"
-              }`}
-            >
-              <Sparkles className="w-3.5 h-3.5" /> All Projects ({projects.length})
-            </button>
-            <button
-              onClick={() => setFilterType("image")}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
-                filterType === "image"
-                  ? "bg-[#08B74F] text-black shadow-[0_0_15px_rgba(8,183,79,0.3)]"
-                  : "bg-[#0a1410] border border-[#1b3123] text-zinc-400 hover:text-white hover:border-zinc-700"
-              }`}
-            >
-              <ImageIcon className="w-3.5 h-3.5" /> Images
-            </button>
-            <button
-              onClick={() => setFilterType("video")}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
-                filterType === "video"
-                  ? "bg-[#08B74F] text-black shadow-[0_0_15px_rgba(8,183,79,0.3)]"
-                  : "bg-[#0a1410] border border-[#1b3123] text-zinc-400 hover:text-white hover:border-zinc-700"
-              }`}
-            >
-              <Video className="w-3.5 h-3.5" /> Videos
-            </button>
           </div>
         </div>
 
@@ -184,8 +140,8 @@ export default function ProjectsPage() {
                 variants={cardVariants}
                 className="group bg-[#0a1410]/80 border border-zinc-800/80 hover:border-[#08B74F]/50 rounded-3xl overflow-hidden backdrop-blur-md transition-all duration-300 hover:shadow-[0_10px_30px_rgba(8,183,79,0.15)] flex flex-col h-full"
               >
-                {/* Media Preview Container */}
-                <div className="relative aspect-video w-full overflow-hidden bg-black/60 border-b border-zinc-800/60 group-hover:border-[#08B74F]/30 transition-colors">
+                {/* Media Preview Container (Hidden on mobile screens, visible on md+) */}
+                <div className="hidden md:block relative aspect-video w-full overflow-hidden bg-black/60 border-b border-zinc-800/60 group-hover:border-[#08B74F]/30 transition-colors">
                   {project.mediaType === "video" ? (
                     project.previewUrl.includes("youtube.com") ||
                     project.previewUrl.includes("youtu.be") ? (
@@ -213,19 +169,6 @@ export default function ProjectsPage() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   )}
-
-                  {/* Media Type Badge Overlay */}
-                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-md border border-white/10 text-[10px] font-bold tracking-wider uppercase flex items-center gap-1.5 text-zinc-300">
-                    {project.mediaType === "video" ? (
-                      <>
-                        <Video className="w-3 h-3 text-purple-400" /> Video Demo
-                      </>
-                    ) : (
-                      <>
-                        <ImageIcon className="w-3 h-3 text-[#08B74F]" /> Preview
-                      </>
-                    )}
-                  </div>
                 </div>
 
                 {/* Card Content Body */}

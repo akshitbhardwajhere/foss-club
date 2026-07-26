@@ -13,6 +13,7 @@ import {
   House,
   Image as ImageIcon,
   GraduationCap,
+  FolderGit2,
   X,
 } from "lucide-react";
 import { navlinks } from "@/data/navlinks";
@@ -22,6 +23,7 @@ const icons: Record<string, React.ElementType> = {
   "/events": Calendar,
   "/gallery": ImageIcon,
   "/blogs": BookOpen,
+  "/projects": FolderGit2,
   "/team": Users,
   "/alumni": GraduationCap,
   "/about": Info,
@@ -51,12 +53,12 @@ export default function HeaderMobileMenu({ open, onOpenChange }: HeaderMobileMen
 
   return (
     <>
-      {/* Hamburger trigger — only visible below lg */}
+      {/* Hamburger trigger — only visible below xl */}
       <button
         type="button"
         onClick={() => onOpenChange(true)}
         aria-label="Open navigation menu"
-        className="lg:hidden flex items-center justify-center w-10 h-10 text-white"
+        className="xl:hidden flex items-center justify-center w-10 h-10 text-white"
       >
         <Menu className="w-6 h-6" />
       </button>
@@ -65,17 +67,17 @@ export default function HeaderMobileMenu({ open, onOpenChange }: HeaderMobileMen
       <div
         aria-hidden="true"
         onClick={() => onOpenChange(false)}
-        className={`fixed inset-0 z-[60] bg-black/40 backdrop-blur-[2px] transition-opacity duration-300 lg:hidden ${
+        className={`fixed inset-0 z-[60] bg-black/40 backdrop-blur-[2px] transition-opacity duration-300 xl:hidden ${
           open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
       />
 
-      {/* Full-screen sidebar overlay — mirrors Sheryians design */}
+      {/* Full-screen sidebar overlay */}
       <div
         role="dialog"
         aria-modal="true"
         aria-label="Navigation menu"
-        className={`fixed inset-0 z-[70] flex flex-col bg-[#050B08] lg:hidden transition-all duration-500 ease-in-out ${
+        className={`fixed inset-0 z-[70] flex flex-col bg-[#050B08] xl:hidden transition-all duration-500 ease-in-out ${
           open
             ? "opacity-100 translate-y-0"
             : "opacity-0 -translate-y-4 pointer-events-none"

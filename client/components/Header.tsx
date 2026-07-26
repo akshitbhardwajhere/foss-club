@@ -50,7 +50,7 @@ function Header() {
 
         {/* Desktop CTA & Mobile Trigger */}
         <div className="flex items-center gap-3">
-          <div className="hidden lg:block">
+          <div className="hidden xl:block">
             <Link href="/contact">
               <Button className="bg-[#08B74F] hover:bg-[#08B74F]/90 text-black font-bold rounded-full px-6 transition-all hover:scale-105 shadow-[0_0_20px_rgba(8,183,79,0.2)]">
                 Join Us

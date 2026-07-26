@@ -6,7 +6,6 @@ generator client {
 // Datasource block configures connection settings for the PostgreSQL database via env variable
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 /// Stores administrator account information for dashboard system logins.

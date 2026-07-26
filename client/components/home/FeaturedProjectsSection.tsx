@@ -99,8 +99,8 @@ export default function FeaturedProjectsSection() {
               transition={{ duration: 0.5, delay: i * 0.1 }}
               className="group flex flex-col md:flex-row gap-4 p-5 rounded-2xl bg-zinc-900/40 border border-zinc-800/60 hover:border-[#08B74F]/50 hover:-translate-y-1 hover:shadow-[0_16px_48px_-12px_rgba(8,183,79,0.15)] transition-all duration-300 relative overflow-hidden"
             >
-              {/* Media Thumbnail */}
-              <div className="w-full md:w-48 h-40 md:h-auto rounded-xl overflow-hidden bg-black/60 shrink-0 relative border border-zinc-800/80">
+              {/* Media Thumbnail (Hidden on mobile screens, visible on md+) */}
+              <div className="hidden md:block w-48 h-auto rounded-xl overflow-hidden bg-black/60 shrink-0 relative border border-zinc-800/80">
                 {project.mediaType === "video" ? (
                   <div className="w-full h-full flex items-center justify-center bg-purple-950/30 text-purple-400">
                     <Video className="w-8 h-8" />
