@@ -270,7 +270,7 @@ Frontend runs on `http://localhost:3000`.
 
 - `npm run dev` (nodemon + tsx)
 - `npm run build` (installs deps, generates Prisma client, compiles TS)
-- `npm run start` (runs compiled output)
+- `npm run start` (runs compiled output).
 
 ## Deployment/Operations Notes
 
