@@ -41,6 +41,16 @@ interface Event {
 
 const ITEMS_PER_PAGE = 6;
 
+type EventFilter = "current" | "all" | "live" | "upcoming" | "completed";
+
+const EVENT_FILTERS: { value: EventFilter; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "current", label: "Current & Upcoming" },
+  { value: "live", label: "Live" },
+  { value: "upcoming", label: "Upcoming" },
+  { value: "completed", label: "Completed" },
+];
+
 function SpeakerAvatarStack({ speakers = [] }: { speakers: Speaker[] }) {
   if (!speakers || speakers.length === 0) return null;
 
@@ -86,7 +96,7 @@ function SpeakerAvatarStack({ speakers = [] }: { speakers: Speaker[] }) {
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<"all" | "live" | "upcoming" | "completed">("all");
+  const [filter, setFilter] = useState<EventFilter>("current");
   const [monthSort, setMonthSort] = useState<"asc" | "desc">("asc");
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -124,6 +134,7 @@ export default function EventsPage() {
       const isLive = now.toDateString() === eventDate.toDateString();
       const isActuallyPast = eventDate < now && !isLive;
 
+      if (filter === "current") return !isActuallyPast;
       if (filter === "live") return isLive;
       if (filter === "upcoming") return !isActuallyPast && !isLive;
       if (filter === "completed") return isActuallyPast;
@@ -244,17 +255,19 @@ export default function EventsPage() {
           className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 mb-8 pb-6 border-b border-zinc-900"
         >
           <div className="flex flex-wrap items-center gap-1.5 w-full md:w-auto">
-            {(["all", "live", "upcoming", "completed"] as const).map((t) => (
+            {EVENT_FILTERS.map(({ value, label }) => (
               <button
-                key={t}
-                onClick={() => setFilter(t)}
+                key={value}
+                type="button"
+                aria-pressed={filter === value}
+                onClick={() => setFilter(value)}
                 className={`px-4 py-2 rounded-full text-xs font-semibold capitalize tracking-wide transition-all ${
-                  filter === t
+                  filter === value
                     ? "bg-[#08B74F] text-black font-bold"
                     : "bg-zinc-900/50 hover:bg-zinc-900 text-zinc-400 hover:text-zinc-200"
                 }`}
               >
-                {t}
+                {label}
               </button>
             ))}
           </div>
